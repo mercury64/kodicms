@@ -6,6 +6,7 @@ var CURRENT_URL			= '<?php echo Request::current()->url(TRUE) . URL::query() ; ?
 	PUBLIC_URL			= '<?php echo PUBLIC_URL; ?>',
 	PLUGINS_URL			= '<?php echo PLUGINS_URL; ?>',
 	LOCALE				= '<?php echo I18n::lang(); ?>',
+	DIRECTORY			= '<?php echo strtolower(Request::current()->directory()); ?>',
 	CONTROLLER			= '<?php echo strtolower(Request::current()->controller()); ?>',
 	ACTION				= '<?php echo Request::current()->action(); ?>',
 	TAG_SEPARATOR		= '<?php echo Model_Tag::SEPARATOR; ?>',
