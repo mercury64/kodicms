@@ -1,0 +1,18 @@
+<div class="widget-content widget-no-border-radius">
+	<div class="control-group">
+		<label class="control-label" for="separator"><?php echo __('Slug separator'); ?></label>
+		<div class="controls">
+			<?php echo Form::input('separator', $field->separator, array(
+				'id' => 'separator',
+				'maxlength' => 1
+			) ); ?>
+		</div>
+	</div>
+
+	<div class="control-group">
+		<label class="control-label" for="from_header"><?php echo __('Slug from header'); ?></label>
+		<div class="controls">
+			<?php echo Form::checkbox('from_header', 1, $field->from_header == 1, array('id' => 'from_header' )); ?>
+		</div>
+	</div>
+</div>

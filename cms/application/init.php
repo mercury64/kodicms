@@ -59,6 +59,7 @@ Kohana::modules( array(
 	'widget'		=> MODPATH . 'widget',
 	'reflinks'		=> MODPATH . 'reflinks',
 	'behavior'		=> MODPATH . 'behavior',
+	'datasource'	=> MODPATH . 'datasource',
 	'elfinder'		=> MODPATH . 'elfinder',
 	'ace'			=> MODPATH . 'ace',		// Core
 ) );
