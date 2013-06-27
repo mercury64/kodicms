@@ -2,6 +2,9 @@
 
 abstract class Model_Widget_Decorator {
 	
+	const ORDER_ASC		= 'ASC';
+	const ORDER_DESC	= 'DESC';
+	
 	/**
 	 *
 	 * @var integer
