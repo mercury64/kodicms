@@ -6,7 +6,7 @@ cms.plugins.ace = {};
 cms.plugins.ace.switchOn_handler = function( textarea_id, params )
 {
 	var textarea = $('#' + textarea_id).hide();
-	var height = textarea.data('height') ? textarea.data('height') : 300;
+	var height = textarea.data('height') ? textarea.data('height') : (params.height) ? params.height : 200;
 	var editArea = $('<div id=' + textarea_id + 'Div />')
 		.insertAfter(textarea)
 		.css({
