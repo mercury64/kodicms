@@ -25,7 +25,6 @@ class Behavior_Route {
 		$this->_routes = $routes;
 	}
 	
-	
 	/**
 	 *
 	 * @var array 

@@ -32,8 +32,7 @@ class KodiCMS_Controller_System_Backend extends Controller_System_Template
 				'page_name' => $page,
 				'page' => $this->page
 			));
-			
-			
+
 			if( $this->request->is_iframe() )
 			{
 				$navigation = NULL;
