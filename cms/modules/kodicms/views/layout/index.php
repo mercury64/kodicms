@@ -2,12 +2,11 @@
 	<div class="widget-header">
 		<?php echo UI::button(__('Add layout'), array(
 			'icon' => UI::icon( 'plus' ), 'href' => 'layout/add',
-			'class' => 'popup fancybox.iframe btn'
 		)); ?>
 
 		<?php echo UI::button(__('Rebuild blocks'), array(
-			'icon' => UI::icon( 'stethoscope' ), 'href' => 'layout/rebuild',
-			'class' => 'btn'
+			'icon' => UI::icon( 'refresh' ), 'href' => 'layout/rebuild',
+			'class' => 'btn btn-inverse btn-mini'
 		)); ?>
 	</div>
 

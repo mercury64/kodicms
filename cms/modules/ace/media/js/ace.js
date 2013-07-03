@@ -40,7 +40,6 @@ cms.plugins.ace.switchOn_handler = function( textarea_id, params )
 		
 			editor.setTheme("ace/theme/monokai");
 		} else {
-			
 			editor.setTheme("ace/theme/textmate");
 			editArea
 				.data('fullscreen', 'off')
@@ -74,18 +73,32 @@ cms.plugins.ace.switchOn_handler = function( textarea_id, params )
 		});		
 	}
 	
-	
+	return editor;
 };
 
 // Switch off tinymce handler
-cms.plugins.ace.switchOff_handler = function( textarea_id )
+cms.plugins.ace.switchOff_handler = function( editor, textarea_id )
 {
 	$('#' + textarea_id + 'Div').remove();
 }
 
-cms.plugins.ace.exec_handler = function( textarea_id, data )
+cms.plugins.ace.exec_handler = function( editor, command, textarea_id, data )
 {
 	
+	switch(command) {
+		case 'insert':
+			editor.insert(data);
+			break;
+		case 'changeHeight':
+			$('#' + textarea_id + 'Div')
+				.css({
+					height: data
+				});
+				
+			editor.resize();
+	}
+	
+	return true;
 }
 
 /*

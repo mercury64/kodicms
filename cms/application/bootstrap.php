@@ -106,7 +106,7 @@ Kohana::init( array(
 
 define('CMS_NAME',			'KodiCMS');
 define('CMS_SITE',			'http://www.kodicms.ru');
-define('CMS_VERSION',		'5.1.0');
+define('CMS_VERSION',		'5.5.0');
 
 if(PHP_SAPI != 'cli')
 {
@@ -127,15 +127,12 @@ Kohana::$log->attach(new Log_File(CMSPATH.'logs'));
  */
 Kohana::$config->attach(new Config_File);
 
-if ( ! Route::cache())
-{
-	Route::set( 'error', 'system/error(/<code>(/<message>))', array(
-			'message' => '.*',
-			'code' => '[0-9]+'
-		) )
-		->defaults( array(
-			'directory' => 'system',
-			'controller' => 'error',
-			'action' => 'index'
-		) );
-}
+Route::set( 'error', 'system/error(/<code>(/<message>))', array(
+		'message' => '.*',
+		'code' => '[0-9]+'
+	) )
+	->defaults( array(
+		'directory' => 'system',
+		'controller' => 'error',
+		'action' => 'index'
+	) );

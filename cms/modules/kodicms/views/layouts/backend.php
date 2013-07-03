@@ -19,15 +19,16 @@
 	</head>
 	<body id="body_<?php echo $page_body_id; ?>" class="<?php echo $request->query('type'); ?>">
 		<div id="content-wrapper">
-			<div id="navigation">
-				<?php echo View::factory('layouts/blocks/navigation'); ?>
-			</div>
-			<?php echo $breadcrumbs; ?>
-			
+			<header>
+				<nav>
+					<?php echo View::factory('layouts/blocks/navigation'); ?>
+				</nav>
+				<?php echo $breadcrumbs; ?>
+			</header>
 			<div class="container-fluid">
-				<div id="content" >
+				<section id="content" >
 				<?php echo $content; ?>
-				</div>
+				</section>
 			</div>
 		</div>
 		
