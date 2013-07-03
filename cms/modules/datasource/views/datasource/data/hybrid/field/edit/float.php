@@ -1,6 +1,6 @@
 <div class="widget-content widget-no-border-radius">
 	<div class="control-group">
-		<label class="control-label" for="primitive_default"><?php echo __( 'Primitive default' ); ?></label>
+		<label class="control-label" for="primitive_default"><?php echo __( 'Default value' ); ?></label>
 		<div class="controls">
 			<?php
 			echo Form::input( 'default', Arr::get($post_data, 'default', $field->default), array(

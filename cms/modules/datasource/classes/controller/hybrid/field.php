@@ -22,7 +22,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		
 		$this->breadcrumbs
 			->add($ds->name, 'hybrid/section/edit/' . $ds->ds_id)
-			->add(__(':action field', array(':action' => ucfirst($this->request->action()))));
+			->add(__(':action field', array(':action' => __(ucfirst($this->request->action())))));
 
 		$type = $field->family == DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE ? $field->type : $field->family;
 		

@@ -21,7 +21,7 @@ class Datasource_Data_Manager {
 	public static function types()
 	{
 		return array(
-			self::DS_HYBRID => __('Hybrid ')
+			self::DS_HYBRID => __('Hybrid')
 		);
 	}
 	

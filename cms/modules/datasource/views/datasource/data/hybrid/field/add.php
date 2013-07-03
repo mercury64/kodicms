@@ -10,7 +10,7 @@
 	<?php echo Form::hidden('ds_id', $ds->ds_id); ?>
 	
 	<div class="widget-header">
-		<h3><?php echo __( 'Add hybrid field' ); ?></h3>
+		<h3><?php echo __( 'Add field' ); ?></h3>
 	</div>
 
 	<div class="widget-content" id="filed-type">

@@ -78,5 +78,7 @@ foreach($config as $ext => $mime)
 				Image::WIDTH => __('Width'),
 			), $field->master, array('class' => 'span12')); ?>
 		</div>
+		
+		<p class="help-block"><?php echo HTML::anchor('http://kohanaframework.org'); ?></p>
 	</div>
 </div>

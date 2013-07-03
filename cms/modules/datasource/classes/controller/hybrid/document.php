@@ -38,7 +38,7 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 
 		$this->breadcrumbs
 			->add($ds->name, 'datasources/data?ds_id=' . $ds->ds_id)
-			->add(__(':action document', array(':action' => ucfirst($this->request->action()))));
+			->add(__(':action document', array(':action' => __(ucfirst($this->request->action())))));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/document/edit', array(
 			'record' => $ds->get_record(),

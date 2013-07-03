@@ -7,10 +7,10 @@
 
 		<div class="input-append pull-right">
 			<?php echo Form::select('doc_actions', array(
-				'Actions', 
-				'remove' => 'Remove', 
-				'publish' => 'Publish', 
-				'unpublish' => 'Unpublish'), NULL, array(
+				__('Actions'), 
+				'remove' => __('Remove'), 
+				'publish' => __('Publish'), 
+				'unpublish' => __('Unpublish')), NULL, array(
 				'id' => 'doc-actions', 'class' => 'input-medium no-script'
 			)); ?>
 

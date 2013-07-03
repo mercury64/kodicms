@@ -6,7 +6,7 @@
 	'class' => 'form-horizontal'
 )); ?>
 	<div class="widget-header">
-		<h3><?php echo __( 'Edit hybrid field' ); ?></h3>
+		<h3><?php echo __( 'Edit field' ); ?></h3>
 	</div>
 	<div class="widget-content widget-no-border-radius" id="filed-type">
 		<div class="control-group">

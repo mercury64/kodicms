@@ -37,7 +37,7 @@ cms.init.add(['datasources_data_index'], function () {
 		if(!confirm(__('Are you surre?')))
 			return;
 
-		Api.post('datasource/hybrid/document.' + action, data, function(response) {
+		Api.post('datasource/hybrid-document.' + action, data, function(response) {
 			window.location = '';
 		})
 	})
@@ -63,7 +63,7 @@ cms.init.add('hybrid_section_edit', function() {
 		if(!confirm(__('Are you surre?')))
 			return;
 		
-		Api.post('datasource/field.remove', $checked_fields, function(response) {
+		Api.post('datasource-field.remove', $checked_fields, function(response) {
 			if(resp.status) {
 				for(i in resp.fields) {
 					$('#field-' + resp.fields[i]).remove();
@@ -71,7 +71,7 @@ cms.init.add('hybrid_section_edit', function() {
 			}
 		})
 		
-		$.post(BASE_URL + '/hybrid//' + DS_ID, $checked_fields, function(resp) {
+		$.post(BASE_URL + '/hybrid/' + DS_ID, $checked_fields, function(resp) {
 			if(resp.status) {
 				for(i in resp.fields) {
 					$('#field-' + resp.fields[i]).remove();
