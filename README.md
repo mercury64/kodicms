@@ -21,7 +21,7 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 * Обработка ошибочных URL. (Если посетитель допустил ошибку URL, скорее всего он не получит в ответ: Страница не найдена)
 * Удобный инсталлятор
 
-## DEMO
+## DEMO / Демо сайт
 http://demo.kodicms.ru/
 
 > backend
@@ -31,10 +31,13 @@ http://demo.kodicms.ru/
 > Password: demodemo
 
 
-## Скриншоты
+## Screenshots / Скриншоты
 
 http://www.kodicms.ru/screenshots.html
 
+## Forum / Форум
+
+http://www.kodicms.ru/forum.html
 
 ## Требования
 
@@ -43,7 +46,7 @@ http://www.kodicms.ru/screenshots.html
 * MySQL (и доступ к управлению данными)
 
 
-## Установка
+## Install / Установка
 
 1. Создайте клон репозитория `https://github.com/butschster/kodicms.git` или 
 [скачайте zip архив](https://github.com/butschster/kodicms/zipball/master)
@@ -178,6 +181,17 @@ RewriteRule .* index.php/$0 [PT]# Set environment
 https://github.com/butschster/kodicms/issues
 
 ## Changelog
+
+### 5.14.0
+
+* Переделана сортировка страниц
+* Переделан модуль Plugins
+* Редактор шаблонов и сниппетов рястягивается на высоту экрана
+* Ace обзавелся двумя комбинациями клавиш: CTRL+F - на весь экран, CTRL+S - сохранение
+* В плагин Yandex Metrika добавлены дополнительные настройки
+* Переделаны настройки плагина Less compiler
+* В настройках сайта добавлено поле "Описание сайта" и заменен ключ "Заголовок сайта" на `site_title`
+* Другие улучшения ядра
 
 ### 5.5.0
 

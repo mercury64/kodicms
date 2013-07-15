@@ -1,19 +1,11 @@
 <script type="text/javascript">
-	var PAGE_ID = <?php echo (int) $page->id; ?>;
-
-	<?php if($action == 'add'): ?>
-	$(function() {
-		$('.spoiler-toggle').click();
-	})
-	<?php endif; ?>
+	var USER_ID = <?php echo (int) $user->id; ?>;
 </script>
 	
-<?php echo Form::open($action=='edit' ? 'user/edit/'.$user->id : 'user/add', array(
+<?php echo Form::open(Route::url('backend', array('controller' => 'users', 'action' => $action, 'id' => $user->id)), array(
 	'class' => Bootstrap_Form::HORIZONTAL
 )); ?>
-
 	<?php echo Form::hidden('token', Security::token()); ?>
-
 	<div class="widget">
 		<div class="widget-header">
 			<h3><?php echo __('General information'); ?></h3>
@@ -73,10 +65,11 @@
 			)); ?>
 		</div>
 
-		<div class="widget-header spoiler-toggle">
+		<?php if( ACL::check('users.change_password') OR $user->id == AuthUser::getId() ): ?>
+		<div class="widget-header spoiler-toggle" data-spoiler=".password-spoiler">
 			<h3><?php echo __('Password'); ?></h3>
 		</div>
-		<div class="widget-content spoiler">
+		<div class="widget-content spoiler password-spoiler">
 		<?php
 			echo Bootstrap_Form_Element_Control_Group::factory(array(
 				'element' => Bootstrap_Form_Element_Password::factory(array(
@@ -104,14 +97,16 @@
 			</div>
 			<?php endif; ?>
 		</div>
-		<?php if (AuthUser::hasPermission('administrator') AND $user->id > 1): ?>
+		<?php endif; ?>
+
+		<?php if (Acl::check( 'users.change_roles') AND ($user->id === NULL OR $user->id > 1)): ?>
 		<div class="widget-header">
 			<h3><?php echo __('Roles'); ?></h3>
 		</div>
 		<div class="widget-content">
 			<div class="row-fluid">
 			<?php 
-				echo Form::select('user_permission[]', $permissions, $user->roles->find_all()->as_array('id'), array(
+				echo Form::hidden('user_permission', $user->id, array(
 					'class' => 'span12'
 				));
 				
@@ -120,6 +115,34 @@
 				)); 
 			?>
 			</div>
+		</div>
+		<?php endif; ?>
+		
+		<?php if ( $user->id === NULL OR $user->id > 1): ?>
+		<div class="widget-header spoiler-toggle" data-spoiler=".permissions-spoiler">
+			<h3><?php echo __('Permissions'); ?></h3>
+		</div>
+		<div class="widget-content widget-nopad spoiler permissions-spoiler">
+			<?php foreach(Acl::get_permissions() as $title => $actions): ?>
+			<table class='table'>
+				<thead>
+					<tr>
+						<th><?php echo __('Section :section', array(':section' => __(ucfirst($title)))); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th>
+						<?php foreach($actions as $action => $title): ?>
+						<?php if( in_array( $action, $user->permissions())): ?>
+						<?php echo UI::label(__($title)); ?>
+						<?php endif; ?>
+						<?php endforeach; ?>
+						</th>
+					</tr>
+				</tbody>
+			</table>
+			<?php endforeach; ?>
 		</div>
 		<?php endif; ?>
 		
