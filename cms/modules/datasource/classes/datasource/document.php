@@ -9,7 +9,7 @@ class Datasource_Document {
 	 *
 	 * @var integer
 	 */
-	public $id;
+	public $id = NULL;
 	
 	/**
 	 *
@@ -40,6 +40,11 @@ class Datasource_Document {
 		$this->fields = array();
 	}
 	
+	public function loaded()
+	{
+		return $this->id !== NULL;
+	}
+
 	/**
 	 * 
 	 * @param array $array
@@ -47,8 +52,11 @@ class Datasource_Document {
 	 */
 	public function read_values($array) 
 	{
-		$this->id = (int) Arr::get($array, 'id');
-		$this->ds_id = (int) Arr::get($array, 'ds_id');
+		if( ! $this->loaded() )
+		{
+			$this->id = (int) Arr::get($array, 'id');
+			$this->ds_id = (int) Arr::get($array, 'ds_id');
+		}
 
 		$this->published = Arr::get($array, 'published', FALSE) ? TRUE : FALSE;
 		$this->header = Arr::get($array, 'header');

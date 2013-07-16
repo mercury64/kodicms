@@ -21,7 +21,7 @@
 					formatSelection: format,
 					escapeMarkup: function(m) { return m; },
 					ajax: {
-						url: '/api/datasource/hybrid/document.find',
+						url: '/api/datasource/hybrid-document.find',
 						data: function(query, pageNumber, context) {
 							return {
 								key: query,
@@ -37,7 +37,7 @@
 					initSelection: function(element, callback) {
 						var id = $(element).val();
 						if (id !== "") {
-							$.ajax('/api/datasource/hybrid/document.find', {
+							$.ajax('/api/datasource/hybrid-document.find', {
 								data: {
 									ids: [parseInt(id)],
 									<?php if(!empty($doc->id)): ?>id: <?php echo $doc->id; ?>,<?php endif; ?>
@@ -61,7 +61,11 @@
 	</div>
 	<div class="span1">
 		<?php echo UI::button(__('Create new'), array(
-			'href' => 'hybrid/document/create?ds_id=' . $field->from_ds,
+			'href' => Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'document',
+				'action' => 'create'
+			)) . URL::query(array('ds_id' => $field->from_ds), FALSE),
 			'icon' => UI::icon('building'),
 			'class' => 'btn popup fancybox.iframe'
 		)); ?>

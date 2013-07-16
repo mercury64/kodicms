@@ -170,8 +170,6 @@ class Datasource_Data_Manager {
 			}
 		}
 		
-		echo debug::vars($cleared_ids);
-		
 		return $cleared_ids;
 	}
 	

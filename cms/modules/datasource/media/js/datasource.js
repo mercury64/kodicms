@@ -37,7 +37,8 @@ cms.init.add(['datasources_data_index'], function () {
 		if(!confirm(__('Are you surre?')))
 			return;
 
-		Api.post('datasource/hybrid-document.' + action, data, function(response) {
+		Api.post('/datasource/hybrid-document.' + action, data, function(response) {
+			console.log(response);
 			window.location = '';
 		})
 	})

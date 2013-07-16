@@ -10,7 +10,7 @@ class DataSource_Data_Hybrid_Document {
 	 *
 	 * @var integer
 	 */
-	public $id;
+	public $id = NULL;
 	
 	/**
 	 *
@@ -67,6 +67,15 @@ class DataSource_Data_Hybrid_Document {
 	
 	/**
 	 * 
+	 * @return bool
+	 */
+	public function loaded()
+	{
+		return $this->id !== NULL;
+	}
+	
+	/**
+	 * 
 	 * @param array $arr
 	 * @return \DataSource_Data_Hybrid_Document
 	 */
@@ -76,11 +85,15 @@ class DataSource_Data_Hybrid_Document {
 		{
 			return $this;
 		}
-
-		if(isset($array['id'])) $this->id = (int) $array['id'];
-		if(isset($array['ds_id'])) $this->ds_id = (int) $array['ds_id'];
-		if(isset($array['published'])) $this->published = (bool) $array['published'];
-		if(isset($array['header'])) $this->header = $array['header'];
+		
+		if( ! $this->loaded() )
+		{
+			$this->id = (int) Arr::get($array, 'id');
+			$this->ds_id = (int) Arr::get($array, 'ds_id');
+		}
+		
+		$this->published = Arr::get($array, 'published', FALSE) ? TRUE : FALSE;
+		$this->header = Arr::get($array, 'header');
 		
 		foreach($this->field_names as $key)
 		{

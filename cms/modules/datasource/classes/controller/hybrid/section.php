@@ -52,7 +52,12 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 		
 		if($result !== NULL)
 		{
-			$this->go( URL::site('hybrid/section/edit/' . $result->ds_id));
+			$this->go( Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'section',
+				'action' => 'edit',
+				'id' => $result->ds_id
+			)));
 		}
 		else
 		{
@@ -103,7 +108,10 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 		// save and quit or save and continue editing?
 		if ( $this->request->post('commit') )
 		{
-			$this->go( URL::site('datasources/data' . URL::query(array('ds_id' => $ds->ds_id), FALSE)));
+			$this->go( Route::url('datasources', array(
+				'directory' => 'datasources',
+				'controller' => 'data'
+			)) .  URL::query(array('ds_id' => $ds->ds_id), FALSE));
 		}
 		else
 		{

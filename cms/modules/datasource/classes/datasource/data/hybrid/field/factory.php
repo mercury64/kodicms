@@ -359,8 +359,7 @@ class DataSource_Data_Hybrid_Field_Factory {
 		{
 			$params[':default'] = DB::expr('DEFAULT "' .  $field->default . '"');
 		}
-		
-		echo debug::vars($params);
+
 		return (bool) DB::query(NULL, 
 				'ALTER TABLE `:table` CHANGE `:old_key` `:new_key` :type :default'
 			)

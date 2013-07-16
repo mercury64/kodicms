@@ -21,7 +21,12 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		}
 		
 		$this->breadcrumbs
-			->add($ds->name, 'hybrid/section/edit/' . $ds->ds_id)
+			->add($ds->name, Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'section',
+				'action' => 'edit',
+				'id' => $ds->ds_id
+			)))
 			->add(__(':action field', array(':action' => __(ucfirst($this->request->action())))));
 
 		$type = $field->family == DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE ? $field->type : $field->family;
@@ -53,7 +58,12 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		// save and quit or save and continue editing?
 		if ( $this->request->post('commit') !== NULL )
 		{
-			$this->go( URL::site('hybrid/section/edit/' . $field->ds_id, FALSE));
+			$this->go( Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'section',
+				'action' => 'edit',
+				'id' => $field->ds_id
+			)));
 		}
 		else
 		{
@@ -72,7 +82,12 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			return $this->_add($ds);
 		}
 		$this->breadcrumbs
-			->add($ds->name, 'hybrid/section/edit/' . $ds->ds_id)
+			->add($ds->name, Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'section',
+				'action' => 'edit',
+				'id' => $ds->ds_id
+			)))
 			->add(__(':action field', array(':action' => ucfirst($this->request->action()))));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/field/add', array(
@@ -103,13 +118,22 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		
 		if(!$field_id)
 		{
-			Messages::errors(__('Error. Field not created'));
-			$this->go('hybrid/section/edit/' . $ds->ds_id);
+			$this->go( Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'section',
+				'action' => 'edit',
+				'id' => $ds->ds_id
+			)));
 		}
 		
 		Session::instance()->delete('post_data');
 		
-		$this->go('hybrid/field/edit/' . $field_id);
+		$this->go( Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'section',
+				'action' => 'edit',
+				'id' => $field_id
+			)));
 		
 	}
 

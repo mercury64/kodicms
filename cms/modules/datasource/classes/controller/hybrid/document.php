@@ -14,7 +14,7 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 		
 		$ds = Datasource_Data_Manager::load($ds_id);
 
-		if(!$id)
+		if( ! $id )
 		{
 			$doc = $ds->get_empty_document();
 		}
@@ -27,7 +27,7 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 				throw new HTTP_Exception_404('Document ID :id not found', array(':id' => $id));
 			}
 		}
-		
+
 		if($this->request->method() === Request::POST)
 		{
 			return $this->_save($ds, $doc);
@@ -37,7 +37,10 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 		$doc->read_values($post_data)->fetch_values();
 
 		$this->breadcrumbs
-			->add($ds->name, 'datasources/data?ds_id=' . $ds->ds_id)
+			->add($ds->name, Route::url('datasources', array(
+				'directory' => 'datasources',
+				'controller' => 'data'
+			)) . URL::query(array('ds_id' => $ds->ds_id), FALSE))
 			->add(__(':action document', array(':action' => __(ucfirst($this->request->action())))));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/document/edit', array(
@@ -60,7 +63,7 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 		$doc->read_values($this->request->post());
 		$doc->read_files($_FILES);
 
-		if($doc->id)
+		if( !empty($doc->id) )
 		{
 			$ds->update_document($doc);
 		}
@@ -74,11 +77,19 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 		// save and quit or save and continue editing?
 		if ( $this->request->post('commit') !== NULL )
 		{
-			$this->go( URL::site('datasources/data' . URL::query(array('ds_id' => $ds->ds_id), FALSE)));
+			$this->go(Route::url('datasources', array(
+				'directory' => 'datasources',
+				'controller' => 'data'
+			)) . URL::query(array('ds_id' => $ds->ds_id), FALSE));
 		}
 		else
 		{
-			$this->go('hybrid/document/view' . URL::query(array('ds_id' => $ds->ds_id, 'id' => $doc->id), FALSE));
+			
+			$this->go(Route::url('datasources', array(
+				'directory' => 'hybrid',
+				'controller' => 'document',
+				'action' => 'view'
+			)) . URL::query(array('ds_id' => $ds->ds_id, 'id' => $doc->id), FALSE));
 		}
 	}
 }
