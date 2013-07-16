@@ -10,9 +10,11 @@ foreach($config as $ext => $mime)
 	<div class="control-group">
 		<label class="control-label"><?php echo __( 'Allowed file types' ); ?></label>
 		<div class="controls">
-			<?php echo Form::select( 'types[]', $mimes, $field->types, array('class' => 'span12', 'id' => 'allowed_types')); ?>
+			<?php echo Form::select( 'types[]', $mimes, (array) $field->types, array('class' => 'span12', 'id' => 'allowed_types')); ?>
 			<span class="label file-types-label" data-types="bmp,gif,jpg,png,tif"><?php echo __('Image types'); ?></span>
-			<span class="label file-types-label" data-types="doc,docx,xls"><?php echo __('Document types'); ?></span>
+			<span class="label file-types-label" data-types="doc,docx,xls,txt,pdf"><?php echo __('Document types'); ?></span>
+			<span class="label file-types-label" data-types="rar,zip,tar,gz,7z"><?php echo __('Archive types'); ?></span>
+			<span class="label file-types-label" data-types="mp3,wav"><?php echo __('Audio types'); ?></span>
 			<script>
 			$(function() {
 				$('.file-types-label').click(function() {
@@ -79,6 +81,6 @@ foreach($config as $ext => $mime)
 			), $field->master, array('class' => 'span12')); ?>
 		</div>
 		
-		<p class="help-block"><?php echo HTML::anchor('http://kohanaframework.org'); ?></p>
+		
 	</div>
 </div>

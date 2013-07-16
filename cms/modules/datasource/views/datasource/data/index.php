@@ -1,7 +1,11 @@
 <div id="headline" class="widget">
 	<div class="tablenav form-inline widget-header page-actions">
 		<?php echo UI::button(__('Create Document'), array(
-			'href' => 'hybrid/document/create' . URL::query(array('ds_id' => $ds_id)),
+			'href' => Route::url('datasources', array(
+				'controller' => 'document',
+				'directory' => 'hybrid',
+				'action' => 'create'
+			)) . URL::query(array('ds_id' => $ds_id)),
 			'icon' => UI::icon( 'plus' )
 		)); ?>
 

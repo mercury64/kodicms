@@ -18,7 +18,11 @@
 		<tr data-id="<?php echo $id; ?>" class="<?php echo !$row['published'] ? 'unpublished' : ''; ?>">
 			<td class="row-checkbox"><?php echo Form::checkbox('doc[]', $id); ?></td>
 			<td class="row-id"><?php echo $id; ?></td>
-			<th class="row-header"><?php echo HTML::anchor('hybrid/document/view' . URL::query(array(
+			<th class="row-header"><?php echo HTML::anchor(Route::url('datasources', array(
+				'controller' => 'document',
+				'directory' => 'hybrid',
+				'action' => 'view'
+			)) . URL::query(array(
 				'ds_id' => $ds_id, 'id' => $id
 			)), $row['header']); ?></th>
 			<?php if(isset($row['type'])): ?>

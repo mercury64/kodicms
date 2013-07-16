@@ -125,9 +125,10 @@
 	</div>
 	<?php endif ;?>
 	<div class="form-actions widget-footer">
-		<?php echo UI::actions('datasources/data' . URL::query(array(
-			'ds_id' => $ds->ds_id
-		), FALSE)); ?>
+		<?php echo UI::actions(Route::url('datasources', array(
+			'controller' => 'data',
+			'directory' => 'datasources'
+		)) . URL::query(array('ds_id' => $ds->ds_id), FALSE)); ?>
 	</div>
 <?php echo Form::close(); ?>
 </div></div>

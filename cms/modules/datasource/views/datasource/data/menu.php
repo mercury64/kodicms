@@ -33,9 +33,10 @@
 		if(  is_array( $data ))
 		{
 			$result .= '<li class="'.$selected.'">';
-			$result .= HTML::anchor('datasources/data' . URL::query(array(
-				'ds_id' => $id
-			), FALSE), key($data));
+			$result .= HTML::anchor(Route::url('datasources', array(
+				'controller' => 'data',
+				'directory' => 'datasources',
+			)) . URL::query(array('ds_id' => $id), FALSE), key($data));
 			
 			
 			$result .= '<ul class="unstyled" >';
@@ -50,9 +51,10 @@
 		else
 		{
 			$result .= '<li class="'.$selected.'">';
-			$result .= HTML::anchor('datasources/data' . URL::query(array(
-				'ds_id' => $id
-			), FALSE), $data);
+			$result .= HTML::anchor(Route::url('datasources', array(
+				'controller' => 'data',
+				'directory' => 'datasources',
+			)) . URL::query(array('ds_id' => $id), FALSE), $data);
 			$result .= '</li>';
 		}
 		

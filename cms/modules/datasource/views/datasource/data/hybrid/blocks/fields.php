@@ -41,7 +41,12 @@
 					<?php echo substr($f->name, 2); ?>
 				</td>
 				<td>
-					<?php echo HTML::anchor('hybrid/field/edit/' . $f->id, $f->header ); ?>
+					<?php echo HTML::anchor(Route::url('datasources', array(
+						'controller' => 'field',
+						'directory' => 'hybrid',
+						'action' => 'edit',
+						'id' => $f->id
+					)), $f->header . ' (' . $f->type . ')' ); ?>
 				</td>
 			</tr>
 			<?php endforeach; ?>
@@ -51,7 +56,12 @@
 <div class="widget-header">
 	<div class="btn-group">
 		<?php echo UI::button(__('Add field'), array(
-			'href' => 'hybrid/field/add/' . $ds->ds_id,
+			'href' => Route::url('datasources', array(
+				'controller' => 'field',
+				'directory' => 'hybrid',
+				'action' => 'add',
+				'id' => $ds->ds_id
+			)),
 			'icon' => UI::icon('plus'),
 			'class' => 'btn fancybox'
 		)); ?>
@@ -61,3 +71,5 @@
 		)); ?>
 	</div>
 </div>
+
+

@@ -53,7 +53,12 @@
 		</div>
 	</div>
 	<div class="widget-footer form-actions">
-		<?php echo UI::actions('hybrid/section/edit/' . $ds->ds_id); ?>
+		<?php echo UI::actions(Route::url('datasources', array(
+			'controller' => 'section',
+			'directory' => 'hybrid',
+			'action' => 'edit',
+			'id' => $ds->ds_id
+		))); ?>
 	</div>
 <?php echo Form::close(); ?>
 </div>

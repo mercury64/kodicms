@@ -50,7 +50,10 @@
 		'record' => $record, 'ds' => $ds
 	)); ?>
 	<div class="form-actions widget-footer">
-		<?php echo UI::actions('datasources/data'); ?>
+		<?php echo UI::actions(Route::url('datasources', array(
+			'controller' => 'data',
+			'directory' => 'datasources'
+		))); ?>
 	</div>
 
 <?php echo Form::close(); ?>
