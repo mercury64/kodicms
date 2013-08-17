@@ -46,6 +46,15 @@ class Behavior_Settings {
 		
 		return Arr::get($this->_data, $key, $default);
 	}
+	
+	/**
+	 * 
+	 * @return Behavior_Settings
+	 */
+	public function load()
+	{
+		return $this->_load();
+	}
 
 	/**
 	 * 
@@ -76,8 +85,8 @@ class Behavior_Settings {
 
 		return View::factory('behavior/' . $this->_page->behavior_id)
 			->set('settings', $this->_data)
-			->set('behavior', $this)
-			->set('page', $this->_page);
+			->set('page', $this->_page)
+			->render();
 	}
 	
 }

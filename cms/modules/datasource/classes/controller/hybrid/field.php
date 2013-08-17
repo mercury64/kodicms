@@ -130,7 +130,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		
 		$this->go( Route::url('datasources', array(
 				'directory' => 'hybrid',
-				'controller' => 'section',
+				'controller' => 'field',
 				'action' => 'edit',
 				'id' => $field_id
 			)));

@@ -2,5 +2,7 @@
 
 class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 	
-	
+	public function fetch_data()
+	{
+	}
 }

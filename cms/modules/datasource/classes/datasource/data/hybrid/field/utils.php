@@ -53,13 +53,14 @@ class DataSource_Data_Hybrid_Field_Utils {
 	public static function get_document_headers($type, $ds_id, array $ids) 
 	{
 		$result = array();
+
 		if(!empty($ids)) 
 		{
 			$results = self::_query_document_headers($type, $ds_id, $ids);
 
 			foreach ($results as $r)
 			{
-				$result[ $r['id']] = $r['header'];
+				$result[$r['id']] = $r['header'];
 			}
 		}
 		return $result;
@@ -73,11 +74,6 @@ class DataSource_Data_Hybrid_Field_Utils {
 				->on('dshybrid.id', '=', 'ds.id')
 			->where('ds.id', 'in', $ids)
 			->execute();
-		
-		if(count($ids) == 1)
-		{
-			return $query->current();
-		}
 
 		return $query;
 	}

@@ -20,7 +20,7 @@ foreach (Datasource_Data_Manager::get_tree() as $type => $sections)
 					'controller' => 'data',
 					'directory' => 'datasources',
 				)) . URL::query(array('ds_id' => $id)),
-				'icon' => UI::icon('folder-open-alt')
+				'icon' => 'folder-open-alt'
 			)), 999);
 	}
 }

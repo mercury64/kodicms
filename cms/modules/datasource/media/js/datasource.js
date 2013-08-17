@@ -55,10 +55,11 @@ cms.init.add('hybrid_section_edit', function() {
 		} else {
 			$('#remove-fields').removeAttr('disabled');
 		}
-	}).change()
+		
+		$checked_fields = $fields.filter(':checked');
+	}).change();
 	
 	$('#remove-fields').click(function() {
-		
 		if($checked_fields.length < 1) return false;
 		
 		if(!confirm(__('Are you surre?')))
