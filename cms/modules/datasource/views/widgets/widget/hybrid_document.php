@@ -33,6 +33,12 @@
 			<label class="checkbox"><?php echo Form::checkbox('throw_404', 1, $widget->throw_404); ?> <?php echo __('Do not generate error 404 when page has no content'); ?></label>
 		</div>
 	</div>
+	
+	<div class="control-group">
+		<div class="controls">
+			<label class="checkbox"><?php echo Form::checkbox('crumbs', 1, $widget->crumbs); ?> <?php echo __('Change Bread Crumbs'); ?></label>
+		</div>
+	</div>
 </div>
 
 <?php echo View::factory('widgets/widget/blocks/fields', array(

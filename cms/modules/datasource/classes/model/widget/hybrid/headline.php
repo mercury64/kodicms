@@ -67,6 +67,10 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 	 */
 	protected $arrays = array();
 	
+	/**
+	 *
+	 * @var array 
+	 */
 	public $docs = NULL;
 
 	/**
@@ -260,6 +264,7 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 		}
 		
 		$this->docs = $result;
+		return $result;
 	}
 	
 	/**

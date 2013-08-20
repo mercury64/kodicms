@@ -142,10 +142,16 @@ class DataSource_Data_Hybrid_Field_Document extends DataSource_Data_Hybrid_Field
 	{
 		$widget_id = $widget->doc_fetched_widgets[$fid];
 
-		$widget = Widget_Manager::load($widget_id);
+		$widget = Context::instance()->get_widget($widget_id);
+		if(!$widget)
+		{
+			$widget = Widget_Manager::load($widget_id);
+		}
+		
 		if($widget === NULL) return array();
 
 		$doc_ids = explode(',', $row[$fid]);
+
 		$widget->ids = $doc_ids;
 		$docs = $widget->get_documents( $recurse - 1);
 		

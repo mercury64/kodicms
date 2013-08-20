@@ -25,7 +25,19 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 	 * @var string 
 	 */
 	public $doc_id_field = 'id';
-	
+
+	/**
+	 *
+	 * @var bool 
+	 */
+	public $crumbs = FALSE;
+		
+	/**
+	 *
+	 * @var array
+	 */
+	public $document = array();
+
 	/**
 	 * 
 	 * @param array $data
@@ -40,6 +52,7 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 		$this->doc_id = Arr::get($data, 'doc_id', $this->doc_id);
 		
 		$this->throw_404 = (bool) Arr::get($data, 'throw_404');
+		$this->crumbs = (bool) Arr::get($data, 'crumbs');
 		
 		return $this;
 	}
@@ -110,7 +123,23 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 		if(!($router instanceof Behavior_Route))
 			$this->_ctx->throw_404();
 		
-		$this->get_document();
+		$doc = $this->get_document();
+		
+		$page = $this->_ctx->get_page();
+		$page->title = $page->meta_title = $doc['header'];
+	}
+	
+	public function change_crumbs( Breadcrumbs &$crumbs )
+	{
+		parent::change_crumbs( $crumbs );
+		$page = $this->_ctx->get_page();
+		$doc = $this->get_document();
+		
+		$crumb = $crumbs->get_by('url', URL::site($page->url));
+		if($crumb !== NULL)
+		{
+			$crumb->name = $doc['header'];
+		}
 	}
 
 	public function fetch_data()
@@ -167,8 +196,10 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 			$field_class_method = 'set_doc_field';
 			if( class_exists($field_class) AND method_exists( $field_class, $field_class_method ))
 			{
-				$result[$field['name']] = call_user_func_array($field_class.'::'.$field_class_method, array( $this, $field, $result, $key, 1));
+				$result[$field['name']] = call_user_func_array($field_class.'::'.$field_class_method, array( $this, $field, $result, $key, 3));
 				
+				$result['_' . $field['name']] = $result[$key];
+
 				unset($result[$key]);
 				continue;
 			}
@@ -187,11 +218,23 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 			unset($result[$key]);
 		}
 		
+		$this->document[$id] = $result;
+		
 		return $result;
 	}
 	
-	public function get_doc_id() 
+	public function get_doc_id()
 	{
 		return $this->_ctx->behavior_router()->param('slug');
+	}
+	
+	public function get_cache_id()
+	{
+		if(IS_BACKEND) return;
+
+		return 'Widget::' 
+			. $this->type . '::' 
+			. $this->id . '::' 
+			. $this->get_doc_id();
 	}
 }

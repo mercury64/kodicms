@@ -421,7 +421,7 @@ abstract class Model_Widget_Decorator {
 	
 	public function on_page_load() {}
 	
-	public function change_crumbs( &$crumbs) {}
+	public function change_crumbs( Breadcrumbs &$crumbs) {}
 
 	/**
 	 * 
