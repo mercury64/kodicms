@@ -8,9 +8,13 @@
 			<col width="20px" />
 			<col />
 		</colgroup>
-		<thead>
+		<thead class="highlight">
 			<tr>
-				<th></th>
+				<th>
+					<?php echo Bootstrap_Form_Element_Checkbox::factory(array(
+						'name' => 'check_all', 'value' => 1
+					)); ?>
+				</th>
 				<th>
 					<?php echo __('Section :section', array(
 						':section' => UI::label(__(ucfirst($title)))
