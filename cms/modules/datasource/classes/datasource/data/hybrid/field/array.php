@@ -114,6 +114,6 @@ class DataSource_Data_Hybrid_Field_Array extends DataSource_Data_Hybrid_Field_Do
 
 		return !empty($related_widget) 
 			? $related_widget 
-			: explode(',', $row[$fid]);
+			: (!empty($row[$fid]) ? explode(',', $row[$fid]) : array());
 	}
 }
