@@ -267,6 +267,17 @@ CREATE TABLE `TABLE_PREFIX_dshybrid` (
   KEY `ds_id` (`ds_id`,`published`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `dshybrid_2` (
+  `id` int(11) unsigned NOT NULL DEFAULT '0',
+  `f_created_on` date NOT NULL,
+  `f_slug` varchar(255) NOT NULL,
+  `f_anounce` text NOT NULL,
+  `f_text` text NOT NULL,
+  `f_relatednews` varchar(255) DEFAULT NULL,
+  `f_image` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 CREATE TABLE `TABLE_PREFIX_hybriddatasources` (
   `ds_id` int(11) unsigned NOT NULL DEFAULT '0',
   `parent` int(11) unsigned NOT NULL DEFAULT '0',
