@@ -42,3 +42,5 @@
 		</div> <!-- end #page -->
 	</body>
 </html>
+
+<?php Block::def('stub_1'); ?>
