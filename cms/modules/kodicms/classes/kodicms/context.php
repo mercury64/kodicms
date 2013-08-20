@@ -92,7 +92,18 @@ class KodiCMS_Context {
 		
 		if(isset($this->_params[$param]))
 		{
-			$result = & $this->_params[$param];
+			$result = $this->_params[$param];
+		}
+		elseif ( $this->request()->query($param) !== NULL) 
+		{
+			$result = $this->request()->query($param);
+		}
+		elseif(
+			$this->behavior_router() instanceof Behavior_Route 
+		AND 
+			$this->behavior_router()->param($param) !== NULL)
+		{
+			$result = $this->behavior_router()->param($param);
 		}
 		
 		return $result;

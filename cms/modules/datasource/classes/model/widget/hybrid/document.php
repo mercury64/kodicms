@@ -225,7 +225,7 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 	
 	public function get_doc_id()
 	{
-		return $this->_ctx->behavior_router()->param('slug');
+		return $this->_ctx->get('slug');
 	}
 	
 	public function get_cache_id()
