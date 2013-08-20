@@ -133,6 +133,11 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 		
 		return $options;
 	}
+	
+	public function on_page_load()
+	{
+		parent::on_page_load();
+	}
 
 	/**
 	 * 
@@ -165,7 +170,6 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 		$result = array();
 		
 		$agent = $this->get_agent();
-		
 		if( ! $agent )
 		{
 			return $result;

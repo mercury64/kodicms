@@ -1,16 +1,19 @@
 <br />
-<label><?php echo __('Widget'); ?></label>
-<?php 
+<label><?php echo __('Item page'); ?></label>
+<?php
 
-$widgets = Widget_Manager::get_widgets('hybrid_document');
-
-foreach ($widgets as $id => $widget)
+$pages = Model_Page_Sitemap::get()->find($page->id)->children();
+$select = array('-');
+foreach($pages->flatten() as $page)
 {
-	$widgets[$id] = $widget['name'];
+	$uri = !empty($page['uri']) ? $page['uri'] : '/';
+	$select[$page['id']] = $page['title'] . ' (' . $uri . ')';
 }
-echo Form::select('behavior[widget_id]', $widgets, Arr::get($settings, 'widget_id'), array(
+
+
+echo Form::select('behavior[item_page_id]', $select, Arr::get($settings, 'item_page_id'), array(
 	'class' => 'span12'
-)); 
+));
 ?>
 <script>
 	cms.ui.init('select2')

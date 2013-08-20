@@ -24,3 +24,15 @@ foreach (Datasource_Data_Manager::get_tree() as $type => $sections)
 			)), 999);
 	}
 }
+
+Model_Navigation::get_section('Datasources')
+	->add_page(new Model_Navigation_Page(array(
+		'name' => __('Create hybrid'),
+		'url' => Route::url('datasources', array(
+			'controller' => 'section',
+			'directory' => 'hybrid',
+			'action' => 'create'
+		)) ,
+		'icon' => 'plus',
+		'divider' => TRUE
+	)), 999);
