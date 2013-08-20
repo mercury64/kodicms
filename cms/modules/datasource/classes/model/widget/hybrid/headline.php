@@ -66,6 +66,8 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 	 * @var array 
 	 */
 	protected $arrays = array();
+	
+	public $docs = NULL;
 
 	/**
 	 * 
@@ -134,9 +136,9 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 		return $options;
 	}
 	
-	public function on_page_load()
+	public function count_total()
 	{
-		parent::on_page_load();
+		return $this->get_total_documents();
 	}
 
 	/**
@@ -145,19 +147,37 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 	 */
 	public function fetch_data()
 	{
-		$docs = $this->get_documents();
+		$this->get_documents();
 		
-		$result = array();
-		
-		if(empty($docs) AND $this->throw_404)
+		if(empty($this->docs) AND $this->throw_404)
 		{
-			Model_Page_Front::not_found ();
+			$this->_ctx->throw_404();
 		}
 		
 		return array(
-			'docs' => $docs,
-			'count' => count($docs)
+			'docs' => $this->docs,
+			'count' => count($this->docs)
 		);
+	}
+	
+	public function get_total_documents()
+	{
+		$agent = $this->get_agent();
+		$query = $agent->get_query_props(array(), array(), array(), $this->doc_filter);
+		
+		if(is_array($this->ids) AND count($this->ids) > 0)
+		{
+			$query->where('d.id', 'in',  $this->ids);
+		}
+		
+		if($this->only_published === TRUE)
+		{
+			$query->where('d.published', '=',  1);
+		}
+		
+		return $query->select(array(DB::expr('COUNT(*)'),'total_docs'))
+			->execute()
+			->get('total_docs');
 	}
 	
 	/**
@@ -167,9 +187,12 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 	 */
 	public function get_documents( $recurse = 3 )
 	{
+		if( $this->docs !== NULL ) return $this->docs;
+
 		$result = array();
 		
 		$agent = $this->get_agent();
+
 		if( ! $agent )
 		{
 			return $result;
@@ -236,7 +259,7 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 			$doc['href'] = URL::site($this->doc_uri . implode( '/' , $doc_params ));
 		}
 		
-		return $result;
+		$this->docs = $result;
 	}
 	
 	/**
