@@ -118,11 +118,6 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 	{
 		parent::on_page_load();
 		
-		$router = $this->_ctx->behavior_router();
-		
-		if(!($router instanceof Behavior_Route))
-			$this->_ctx->throw_404();
-		
 		$doc = $this->get_document();
 		
 		$page = $this->_ctx->get_page();
@@ -184,6 +179,14 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 			->limit(1)
 			->execute()
 			->current();
+		
+		if(empty($result) )
+		{	
+			if($this->throw_404)
+				$this->_ctx->throw_404();
+			
+			return $result;
+		}
 		
 		foreach ($result as $key => $value)
 		{

@@ -102,7 +102,7 @@ abstract class Model_Widget_Decorator {
 	 *
 	 * @var bool 
 	 */
-	public $throw_404 = FALSE;
+	public $throw_404 = TRUE;
 	
 	/**
 	 *
