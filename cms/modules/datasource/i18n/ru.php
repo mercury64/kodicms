@@ -52,7 +52,7 @@ return array(
 	'Set current user' => 'Установить текущего пользователя',
 	'Allowed types :types' => 'Разрешенные форматы :types',
 	'' => '',
-	'' => '',
+	'Create hybrid section' => 'Создать гибридный раздел',
 	'' => '',
 	'' => '',
 	'' => '',

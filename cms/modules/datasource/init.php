@@ -27,7 +27,7 @@ foreach (Datasource_Data_Manager::get_tree() as $type => $sections)
 
 Model_Navigation::get_section('Datasources')
 	->add_page(new Model_Navigation_Page(array(
-		'name' => __('Create hybrid'),
+		'name' => __('Create hybrid section'),
 		'url' => Route::url('datasources', array(
 			'controller' => 'section',
 			'directory' => 'hybrid',
