@@ -26,9 +26,11 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	public function __construct( $data )
 	{
 		$this->max_size = Num::bytes('1MiB');
-		$this->family = self::TYPE_FILE;
 		
 		parent::__construct( $data );
+		
+		$this->family = self::TYPE_FILE;
+		$this->type = self::TYPE_FILE;
 	}
 	
 	public function set( $data )
@@ -198,7 +200,7 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	}
 	
 	public function onUpdateDocument($old, $new)
-	{
+	{	
 		$new_file = $new->fields[$this->name];
 
 		if(empty($new_file['size']))
