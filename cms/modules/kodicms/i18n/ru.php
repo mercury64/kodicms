@@ -46,6 +46,7 @@ return array(
 	/*********************** Layouts *********************************/
 	'Add layout' => 'Добавить шаблон',
 	'Edit layout' => 'Редактировать шаблон',
+	'View layout' => 'Просматривать шаблон',
 	'Layout' => 'Шаблон',
 	'Layout has been saved!' => 'Шаблон сохранен!',
 	'Layout has been deleted!' => 'Шаблон удален!',
@@ -110,6 +111,7 @@ return array(
 	'Current layput: :name' => 'Текущий шаблон :name',
 	'Show field select' => 'Выбрать из списка',
 	'Hide field select' => 'Скрыть список полей',
+	'inherit ( :layout )' => 'Наследовать ( :layout )',
 
 	/*********************** Settings *******************/
 	'General settings' => 'Главные настройки',

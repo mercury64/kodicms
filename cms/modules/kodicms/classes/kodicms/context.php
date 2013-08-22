@@ -105,6 +105,10 @@ class KodiCMS_Context {
 		{
 			$result = $this->behavior_router()->param($param);
 		}
+		else if($this->request()->query( $param ))
+		{
+			$result = $this->request()->query( $param );
+		}
 		
 		return $result;
 	}
