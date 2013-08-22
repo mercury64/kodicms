@@ -2,10 +2,11 @@
 	<h4><?php echo __('Datasource Fields'); ?></h4>
 </div>
 <div class="widget-content widget-nopad">
-	<table id="section-fields" class="table table-striped">
+	<table id="section-fields" class="table table-striped table-hover">
 		<colgroup>
 			<col width="30px" />
 			<col width="100px" />
+			<col width="300px" />
 			<col />
 		</colgroup>
 		<tbody>
@@ -17,6 +18,7 @@
 				</td>
 				<td class="sys">ID</td>
 				<td>ID</td>
+				<td></td>
 			</tr>
 			<tr>
 				<td class="f">
@@ -26,19 +28,22 @@
 				</td>
 				<td class="sys">header</td>
 				<td><?php echo __('Header'); ?></td>
+				<td></td>
 			</tr>
 
 			<?php foreach($record->fields as $f): ?>
 			<tr id="field-<?php echo $f->name; ?>">
 				<td class="f">
 					<?php 
-					$attrs = array();
+					$attrs = array('id' => $f->name);
 					if($f->ds_id != $ds->ds_id) $attrs['disabled'] = 'disabled';
 					echo Form::checkbox('field[]', $f->name, FALSE, $attrs); ?>
 
 				</td>
 				<td class="sys">
-					<?php echo substr($f->name, 2); ?>
+					<label for="<?php echo $f->name; ?>">
+						<?php echo substr($f->name, 2); ?>
+					</label>
 				</td>
 				<td>
 					<?php echo HTML::anchor(Route::url('datasources', array(
@@ -46,7 +51,10 @@
 						'directory' => 'hybrid',
 						'action' => 'edit',
 						'id' => $f->id
-					)), $f->header . ' (' . $f->type . ')' ); ?>
+					)), $f->header  ); ?>
+				</td>
+				<td>
+					<?php echo UI::label($f->type); ?>
 				</td>
 			</tr>
 			<?php endforeach; ?>
