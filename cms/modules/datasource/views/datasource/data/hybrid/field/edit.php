@@ -12,14 +12,8 @@
 		<div class="control-group">
 			<label class="control-label" for="name"><?php echo __('Field key'); ?></label>
 			<div class="controls">
-				<?php if($field->family === DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE): ?>
-				<?php echo Form::input( 'name', Arr::get($post_data, 'name', $field->name), array(
-					'class' => 'input-xlarge', 'id' => 'name'
-				) ); ?>
-				<?php else: ?>
 				<?php echo Form::hidden( 'name', Arr::get($post_data, 'name', $field->name)); ?>
 				<span class="input-xlarge uneditable-input"><?php echo $field->name; ?></span>
-				<?php endif; ?>
 			</div>
 		</div>
 		<div class="control-group">
@@ -53,7 +47,7 @@
 		</div>
 	</div>
 	<div class="widget-footer form-actions">
-		<?php echo UI::actions(Route::url('datasources', array(
+		<?php echo UI::actions(NULL, Route::url('datasources', array(
 			'controller' => 'section',
 			'directory' => 'hybrid',
 			'action' => 'edit',
