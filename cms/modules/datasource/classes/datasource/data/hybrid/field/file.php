@@ -154,8 +154,9 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	}
 	
 	function remove_folder() {
+		
 		$folder = $this->folder;
-		if( ! empty($this->folder) AND is_dir()) 
+		if( ! empty($this->folder) AND is_dir(PUBLICPATH . $this->folder)) 
 		{
 			FileSystem::factory(PUBLICPATH . $this->folder)->delete();
 			return TRUE;
