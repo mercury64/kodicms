@@ -59,27 +59,18 @@ cms.init.add('hybrid_section_edit', function() {
 		$checked_fields = $fields.filter(':checked');
 	}).change();
 	
-	$('#remove-fields').click(function() {
+	$('#remove-fields').on('click', function() {
 		if($checked_fields.length < 1) return false;
 		
 		if(!confirm(__('Are you surre?')))
 			return;
 		
-		Api.post('datasource-field.remove', $checked_fields, function(response) {
-			if(resp.status) {
-				for(i in resp.fields) {
-					$('#field-' + resp.fields[i]).remove();
-				}
+		Api.delete('/datasource/hybrid-field', $checked_fields.serialize()+'&ds_id='+DS_ID, function(response) {
+			for(i in response.response) {
+				console.log(i, response.response[i]);
+				$('#field-' + response.response[i]).remove();
 			}
 		})
-		
-		$.post(BASE_URL + '/hybrid/' + DS_ID, $checked_fields, function(resp) {
-			if(resp.status) {
-				for(i in resp.fields) {
-					$('#field-' + resp.fields[i]).remove();
-				}
-			}
-		}, 'json');
 		
 		return false;
 	});

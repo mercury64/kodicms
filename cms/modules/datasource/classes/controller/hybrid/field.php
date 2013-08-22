@@ -136,21 +136,6 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			)));
 		
 	}
-
-	public function action_remove( )
-	{
-		$ds_id = (int) $this->request->param('id');
-		
-		$fields = $this->request->post('field');
-		
-		$ds = Datasource_Data_Manager::load($ds_id);
-		DataSource_Data_Hybrid_Field_Factory::remove_fields($ds->get_record(), $fields);
-		
-		$this->json = array(
-			'status' => TRUE,
-			'fields' => $fields
-		);
-	}
 	
 	protected function _get_sections()
 	{
