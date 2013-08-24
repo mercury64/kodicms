@@ -1,11 +1,23 @@
+<?php if(!Acl::check('hybrid'.$ds->ds_id.'.document.edit')): ?>
+<script>
+$(function() {
+	$('input,textarea,select').attr('disabled', 'disabled');
+})
+</script>
+<?php endif; ?>
+
 <div class="outline">
 	<div class="widget outline_inner">
-<?php echo Form::open(Request::current()->url() . URL::query(array('id' => $doc->id)), array(
-	'class' => 'form-horizontal', 'enctype' => 'multipart/form-data'
-)); ?>
+	
+	<?php if(Acl::check('hybrid'.$ds->ds_id.'.document.edit')): ?>
+	<?php echo Form::open(Request::current()->url() . URL::query(array('id' => $doc->id)), array(
+		'class' => 'form-horizontal', 'enctype' => 'multipart/form-data'
+	)); ?>
 	<?php echo Form::hidden('ds_id', $ds->ds_id); ?>
 	<?php echo Form::hidden('id', $doc->id); ?>
-
+	<?php else: ?>
+	<div class="form-horizontal">
+	<?php endif; ?>
 	<div class="widget-header">
 		<div class="control-group">
 			<label class="control-label title"><?php echo __('Header'); ?></label>
@@ -156,11 +168,16 @@
 		<?php endforeach; ?>
 	</div>
 	<?php endif ;?>
+		
+	<?php if(Acl::check('hybrid'.$ds->ds_id.'.document.edit')): ?>
 	<div class="form-actions widget-footer">
-		<?php echo UI::actions(Route::url('datasources', array(
+		<?php echo UI::actions(TRUE, Route::url('datasources', array(
 			'controller' => 'data',
 			'directory' => 'datasources'
 		)) . URL::query(array('ds_id' => $ds->ds_id), FALSE)); ?>
 	</div>
-<?php echo Form::close(); ?>
+	<?php echo Form::close(); ?>
+	<?php else: ?>
+	</div>
+	<?php endif; ?>
 </div></div>

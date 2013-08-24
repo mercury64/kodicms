@@ -2,22 +2,50 @@
 
 class Controller_Hybrid_Field extends Controller_System_Datasource
 {
+	public $field = NULL;
+	
+	public function before()
+	{
+		if($this->request->action() == 'edit')
+		{
+			$id = (int) $this->request->param('id');
+			$this->field = DataSource_Data_Hybrid_Field_Factory::get_field($id);
+			
+			if( empty($this->field) )
+			{
+				throw new HTTP_Exception_404('Field ID :id not found', 
+						array(':id' => $id));
+			}
+			
+			$ds = $this->_get_ds($this->field->ds_id);
+			
+			if(Acl::check($ds->ds_type.$this->field->ds_id.'.field.edit'))
+			{
+				$this->allowed_actions[] = 'edit';
+			}
+		}
+		
+		if($this->request->action() == 'add')
+		{
+			$ds_id = (int) $this->request->param('id');
+			$ds = $this->_get_ds($ds_id);
+			
+			if(Acl::check($ds->ds_type.$ds_id.'.field.edit'))
+			{
+				$this->allowed_actions[] = 'add';
+			}
+		}
+
+		parent::before();
+	}
 	
 	public function action_edit()
 	{
-		$id = (int) $this->request->param('id');
-		$field = DataSource_Data_Hybrid_Field_Factory::get_field($id);
-		
-		if($field === NULL)
-		{
-			throw new HTTP_Exception_404('Field ID :id not found', array(':id' => $id));
-		}
-		
-		$ds = Datasource_Data_Manager::load($field->ds_id);
-		
+		$ds = $this->_get_ds($this->field->ds_id);
+	
 		if($this->request->method() === Request::POST)
 		{
-			return $this->_edit($field);
+			return $this->_edit($this->field);
 		}
 		
 		$this->breadcrumbs
@@ -29,11 +57,13 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			)))
 			->add(__(':action field', array(':action' => __(ucfirst($this->request->action())))));
 
-		$type = $field->family == DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE ? $field->type : $field->family;
+		$type = $this->field->family == DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE 
+				? $this->field->type 
+				: $this->field->family;
 		
 		$this->template->content = View::factory('datasource/data/hybrid/field/edit', array(
 			'ds' => $ds,
-			'field' => $field,
+			'field' => $this->field,
 			'type' => $type,
 			'sections' => $this->_get_sections(),
 			'post_data' => Session::instance()->get_once('post_data', array())
@@ -74,8 +104,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 	public function action_add( )
 	{
 		$ds_id = (int) $this->request->param('id');
-
-		$ds = Datasource_Data_Manager::load($ds_id);
+		$ds = $this->_get_ds($ds_id);
 		
 		if($this->request->method() === Request::POST)
 		{

@@ -16,7 +16,7 @@
 	<div class="widget-content widget-nopad">
 		<ul class="unstyled" >
 			<?php foreach ($data as $id => $name): ?>
-				<?php echo recurse_menu($id, $name, $ds_id); ?>
+				<?php echo recurse_menu($id, $name, $ds_id, $section); ?>
 			<?php endforeach; ?>
 		</ul>
 	</div>
@@ -25,8 +25,10 @@
 <?php endif; ?>
 
 <?php
-	function recurse_menu($id, $data, $ds_id)
+	function recurse_menu($id, $data, $ds_id, $section)
 	{
+		if(!ACL::check($section.$ds_id.'.section.view')) return;
+
 		$result = '';
 		$selected = ($id == $ds_id) ? 'selected' : '';
 
@@ -42,7 +44,7 @@
 			$result .= '<ul class="unstyled" >';
 			foreach ( $data[key($data)] as $id => $name )
 			{
-				$result .= recurse_menu($id, $name, $ds_id);
+				$result .= recurse_menu($id, $name, $ds_id, $section);
 			}
 			$result .= '</ul>';
 			

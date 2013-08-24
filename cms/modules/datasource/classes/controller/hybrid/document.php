@@ -2,6 +2,38 @@
 
 class Controller_Hybrid_Document extends Controller_System_Datasource
 {
+	public $ds = NULL;
+
+	public function before()
+	{
+		$ds_id = (int) $this->request->query('ds_id');
+		
+		$this->ds = Datasource_Data_Manager::load($ds_id);
+		if(empty($this->ds))
+		{
+			throw new HTTP_Exception_404('Datasource ID :id not found', 
+					array(':id' => $ds_id));
+		}
+		
+		if(
+			Acl::check('hybrid'.$ds_id.'.document.edit')
+		OR
+			Acl::check('hybrid'.$ds_id.'.document.view')
+		)
+		{
+			$this->allowed_actions[] = 'view';
+		}
+		
+		if(
+			Acl::check('hybrid'.$ds_id.'.document.edit')
+		)
+		{
+			$this->allowed_actions[] = 'create';
+		}
+
+		parent::before();
+	}
+
 	public function action_create()
 	{
 		return $this->action_view();
@@ -10,43 +42,42 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 	public function action_view()
 	{
 		$id = (int) $this->request->query('id');
-		$ds_id = (int) $this->request->query('ds_id');
-		
-		$ds = Datasource_Data_Manager::load($ds_id);
 
-		if( ! $id )
+		if( empty($id) )
 		{
-			$doc = $ds->get_empty_document();
+			$doc = $this->ds->get_empty_document();
 		}
 		else
 		{
-			$doc = $ds->get_document($id);
+			$doc = $this->ds->get_document($id);
 			
 			if(!$doc)
 			{
-				throw new HTTP_Exception_404('Document ID :id not found', array(':id' => $id));
+				throw new HTTP_Exception_404('Document ID :id not found', 
+						array(':id' => $id));
 			}
 		}
 
 		if($this->request->method() === Request::POST)
 		{
-			return $this->_save($ds, $doc);
+			return $this->_save($this->ds, $doc);
 		}
 		
 		$post_data = Session::instance()->get_once('post_data');
 		$doc->read_values($post_data)->fetch_values();
 
 		$this->breadcrumbs
-			->add($ds->name, Route::url('datasources', array(
+			->add($this->ds->name, Route::url('datasources', array(
 				'directory' => 'datasources',
 				'controller' => 'data'
-			)) . URL::query(array('ds_id' => $ds->ds_id), FALSE))
+			)) . URL::query(array('ds_id' => $this->ds->ds_id), FALSE))
 			->add(__(':action document', array(':action' => __(ucfirst($this->request->action())))));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/document/edit', array(
-			'record' => $ds->get_record(),
-			'ds' => $ds,
-			'doc' => $doc
+			'record' => $this->ds->get_record(),
+			'ds' => $this->ds,
+			'doc' => $doc,
+			'action' => $this->request->action()
 		));
 	}
 	

@@ -2,6 +2,33 @@
 
 class Controller_Hybrid_Section extends Controller_System_Datasource
 {
+	public $ds = NULL;
+	
+	public function before()
+	{
+		if($this->request->action() != 'create')
+		{
+			$ds_id = (int) $this->request->param('id');
+			$this->ds = Datasource_Data_Manager::load($ds_id);
+			if(empty($this->ds))
+			{
+				throw new HTTP_Exception_404('Datasource ID :id not found', 
+						array(':id' => $ds_id));
+			}
+
+			if(Acl::check($this->ds->ds_type.$ds_id.'.section.edit'))
+			{
+				$this->allowed_actions[] = 'edit';
+			}
+			
+			if(Acl::check($this->ds->ds_type.$ds_id.'.section.remove'))
+			{
+				$this->allowed_actions[] = 'remove';
+			}
+		}
+
+		parent::before();
+	}
 
 	public function action_create()
 	{
@@ -69,19 +96,17 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 	{
 		$ds_id = (int) $this->request->param('id');
 
-		$ds = Datasource_Data_Manager::load($ds_id);
-		
 		if($this->request->method() === Request::POST)
 		{
-			return $this->_edit($ds);
+			return $this->_edit($this->ds);
 		}
 
 		$this->breadcrumbs
 			->add(__('Edit hybrid'));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/edit', array(
-			'record' => $ds->get_record(),
-			'ds' => $ds
+			'record' => $this->ds->get_record(),
+			'ds' => $this->ds
 		));
 	}
 	
@@ -122,7 +147,6 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 	public function action_remove()
 	{
 		$ds_id = (int) $this->request->param('id');
-		
 		$dsf = new DataSource_Data_Hybrid_Factory();
 		
 		$dsf->remove($ds_id);

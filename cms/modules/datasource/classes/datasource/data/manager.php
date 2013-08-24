@@ -90,17 +90,23 @@ class Datasource_Data_Manager {
 	 * 
 	 * @return	array
 	 */
-	public static function get_all($type) 
+	public static function get_all($type = NULL) 
 	{
-		return DB::select(array('ds.ds_id', 'id'), 'name', 'description')
-			->select('parent', 'ds_key', 'path', 'internal')
+		$sections = DB::select(array('ds.ds_id', 'id'), 'name', 'description')
+			->select('parent', 'ds_type', 'ds_key', 'path', 'internal')
 			->from(array('datasources', 'ds'))
 			->join(array('hybriddatasources', 'hds'), 'left')
 				->on('ds.ds_id', '=', 'hds.ds_id')
-			->where('ds.ds_type', is_array($type) ? 'IN' : '=', $type)
 			->where('internal', '=', 0)
 			->order_by('ds_key')
-			->order_by('name')
+			->order_by('name');
+		
+		if($type !== NULL)
+		{
+			$sections->where('ds.ds_type', is_array($type) ? 'IN' : '=', $type);
+		}
+
+		 return $sections
 			->execute()
 			->as_array('id');
 	}

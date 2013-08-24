@@ -46,6 +46,7 @@
 		</div>
 		
 	</div>
+	
 	<?php echo View::factory('datasource/data/hybrid/blocks/fields', array(
 		'record' => $record, 'ds' => $ds
 	)); ?>
@@ -55,6 +56,5 @@
 			'directory' => 'datasources'
 		))); ?>
 	</div>
-
 <?php echo Form::close(); ?>
 </div>
