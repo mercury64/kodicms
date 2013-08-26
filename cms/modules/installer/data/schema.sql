@@ -267,7 +267,7 @@ CREATE TABLE `TABLE_PREFIX_dshybrid` (
   KEY `ds_id` (`ds_id`,`published`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `dshybrid_2` (
+CREATE TABLE IF NOT EXISTS `TABLE_PREFIX_dshybrid_2` (
   `id` int(11) unsigned NOT NULL DEFAULT '0',
   `f_created_on` date NOT NULL,
   `f_slug` varchar(255) NOT NULL,
