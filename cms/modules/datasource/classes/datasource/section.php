@@ -538,8 +538,7 @@ class Datasource_Section {
 	public function get_indexable_docs($id = NULL) 
 	{
 		$result = array();
-		$cond = ($id != null ? "id IN ($id) AND " : '')."ds_id = {$this->ds_id}";
-		
+
 		$query = DB::select('id', 'header', 'content', 'intro')
 			->from($this->ds_table)
 			->where('published', '=', 1)
