@@ -63,6 +63,14 @@
 				->checked($user->profile->notice == 1)
 				->label(__('Subscribe to email notifications'))
 			)); ?>
+			
+			<?php echo Bootstrap_Form_Element_Control_Group::factory(array(
+				'element' => Bootstrap_Form_Element_Select::factory(array(
+					'name' => 'user[locale]', 'options' => I18n::available_langs()
+				))
+				->selected($user->profile->locale)
+				->label(__('Interface language'))
+			)); ?>
 		</div>
 
 		<?php if( ACL::check('users.change_password') OR $user->id == AuthUser::getId() ): ?>
@@ -78,7 +86,7 @@
 					'placeholder' => __('Password')))
 				->label(__('Password'))
 				->append(Bootstrap_Form_Element_Input::add_on(UI::icon('lock')))
-				->help_text(__('At least :num characters. Must be unique.', array(
+				->help_text(__('At least :num characters.', array(
 					':num' => Kohana::$config->load('auth')->get( 'password_length' )
 				)))
 			));
