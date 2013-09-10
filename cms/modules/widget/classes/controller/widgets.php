@@ -19,9 +19,7 @@ class Controller_Widgets extends Controller_System_Backend {
 	public function action_index()
 	{
 		$this->template->title = __('Widgets');
-		$this->template->content = View::factory( 'widgets/index');
 
-		
 		$this->template->content = View::factory( 'widgets/index', array(
 			'widgets' => ORM::factory('widget')->find_all()
 		));
@@ -217,7 +215,7 @@ class Controller_Widgets extends Controller_System_Backend {
 		// Если не создать View шаблон, не загружаем его
 		try
 		{
-			$content = View::factory( 'widgets/widget/' . $widget->backend_template(), array(
+			$content = View::factory( 'widgets/backend/' . $widget->backend_template(), array(
 					'widget' => $widget
 				))->set($widget->load_template_data());
 		}
