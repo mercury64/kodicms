@@ -80,11 +80,10 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 	public function set_values(array $data) 
 	{
 		$this->doc_fields = $this->doc_fetched_widgets = array();
+		$this->doc_filter =  array();
 		
 		parent::set_values($data);
-
 		$this->doc_order = Arr::get($data, 'doc_order', array());
-		
 		$this->list_offset = (int) Arr::get($data, 'list_offset');
 		$this->list_size = (int) Arr::get($data, 'list_size');
 		

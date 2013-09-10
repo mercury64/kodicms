@@ -17,11 +17,15 @@
 		$("select", filters_container).select2();
 			
 		for(key in data) {
+			if(key == 'invert' && data[key] == 1) {
+				$('input[name="doc_filter[' + key +'][]"]', filters_container).check()
+				continue;
+			}
 			$('input[name="doc_filter[' + key +'][]"]', filters_container).val(data[key]);
 			$('select[name="doc_filter[' + key +'][]"]', filters_container).val(data[key]).trigger("change");
 			
-			if(key == 'id') {
-				$(filters_container).find('.field-title').text(data[key]);
+			if(key == 'field') {
+				$(filters_container).find('.field-title').text(data[key]).show();
 			}
 		}
 		
@@ -35,7 +39,7 @@
 			$('.select2-container', filters_container).remove()
 			$("select", filter).select2();
 			
-			$('input[name="filters[field][]"]', filter).on('keyup', function() {
+			$('input[name="doc_filter[field][]"]', filter).on('keyup', function() {
 				var field_title = filter.find('.field-title');
 				
 				if(!field_title.text()) field_title.hide();
@@ -56,7 +60,11 @@
 <div class="widget-content">
 	<fieldset disabled id="sample_filter" class="hide">
 		<div class="well filter">
-			<h4 class="field-title hide"></h4>
+			<div class="clearfix"></div>
+			<h4 class="field-title hide pull-left"></h4>
+			
+			<?php echo UI::button(NULL, array('icon' => UI::icon('trash'), 'class' => 'btn btn-danger btn-mini remove_filter pull-right')); ?>
+			<div class="clearfix"></div>
 			<table style="width: 100%">
 				<colgroup>
 					<col width="100px" />
@@ -78,17 +86,17 @@
 						<td><?php echo __('Condition')?></td>
 						<td>
 							<?php echo Form::select('doc_filter[condition][]', array(
-								'eq' =>			__('Equal'),
-								'btw' =>		__('Between'),
-								'gt' =>			__('Greater than'),
-								'lt' =>			__('Less than'),
-								'gteq' =>		__('Greater than or equal'),
-								'lteq' =>		__('Less than or equal'),
-								'contains' =>	__('Contains'),
-								'like' =>		__('Like')
+								DataSource_Data_Hybrid_Agent::COND_EQ => __('Equal'),
+								DataSource_Data_Hybrid_Agent::COND_BTW => __('Between'),
+								DataSource_Data_Hybrid_Agent::COND_GT => __('Greater than'),
+								DataSource_Data_Hybrid_Agent::COND_LT => __('Less than'),
+								DataSource_Data_Hybrid_Agent::COND_GTEQ => __('Greater than or equal'),
+								DataSource_Data_Hybrid_Agent::COND_LTEQ => __('Less than or equal'),
+								DataSource_Data_Hybrid_Agent::COND_CONTAINS => __('Contains'),
+								DataSource_Data_Hybrid_Agent::COND_LIKE => __('Like')
 							)); ?>
 							<label class="inline checkbox">
-								<?php echo Form::checkbox('doc_filter[invert][]', FALSE); ?>
+								<?php echo Form::checkbox('doc_filter[invert][]', 1, FALSE); ?>
 								<?php echo __('Invert condition'); ?>
 							</label>
 							
@@ -101,8 +109,8 @@
 						<td><?php echo __('Conition value')?></td>
 						<td>
 							<?php echo Form::select('doc_filter[type][]', array(
-								'ctx' =>		__('Context'),
-								'plain' =>		__('Plain')
+								DataSource_Data_Hybrid_Agent::VALUE_CTX =>		__('Context'),
+								DataSource_Data_Hybrid_Agent::VALUE_PLAIN =>		__('Plain')
 							)); ?>
 							<?php echo Form::input('doc_filter[value][]', NULL, array(
 								'class' => Bootstrap_Form_Element_Input::MEDIUM
@@ -111,7 +119,6 @@
 					</tr>
 				</tbody>
 			</table>
-			<?php echo UI::button(NULL, array('icon' => UI::icon('trash'), 'class' => 'btn btn-danger btn-mini remove_filter')); ?>
 		</div>
 	</fieldset>
 	<div id="filters_container"></div>

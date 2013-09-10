@@ -212,8 +212,19 @@ class DataSource_Data_Hybrid_Agent {
 			unset($field);
 		}
 		
+		
+		$this->_fetch_orders($order, $t, $result);
+		$this->_fetch_filters($filter, $t, $result);
+
+		return $result;
+	}
+	
+	protected function _fetch_orders($orders, &$t, & $result)
+	{
 		$j = 0;
-		foreach ($order as $pos => $data)
+		$ds_fields = $this->get_fields();
+		$sys_fields = $this->get_system_fields();
+		foreach ($orders as $pos => $data)
 		{
 			$field = NULL;
 			$fid = key($data);
@@ -232,8 +243,8 @@ class DataSource_Data_Hybrid_Agent {
 
 			if(!isset($t[$field['ds_id']])) 
 			{
-				$result->join(array('dshybrid_'. $field['ds_id'], 'd' . ($i + $j)))
-					->on('d' . ($i + $j) . '.id', '=', 'ds.id');
+				$result->join(array('dshybrid_'. $field['ds_id'], 'dorder' . $j))
+					->on('dorder' . $j . '.id', '=', 'ds.id');
 
 				$t[$field['ds_id']] = TRUE;
 			}
@@ -275,14 +286,113 @@ class DataSource_Data_Hybrid_Agent {
 
 			$j++;
 		}
-		
-		$i += $j;
-		
-		// TODO  добавить фильтры
-		
-		return $result;
 	}
 	
+	protected function _fetch_filters($filters, & $t, & $result)
+	{
+		if(empty($filters)) return;
+
+		$field_names = $this->get_field_names();
+		$ds_fields = $this->get_fields();
+		$sys_fields = $this->get_system_fields();
+
+		foreach ($filters as $pos => $data)
+		{
+			$condition = $data['condition'];
+			$type = $data['type'];
+			$invert = !empty($data['invert']);
+			$field = $data['field'];
+
+			if($type == self::VALUE_PLAIN)
+			{
+				$value = $data['value'];
+			}
+			else
+			{
+				$value = Context::instance()->get($data['value']);
+			}
+			
+			if(empty($value)) continue;
+
+			$field_id = strpos($field, '$') == 1 
+				? Context::instance()->get(substr($field, 1))
+				: $field;
+
+			if(isset($sys_fields[$field_id]))
+			{
+				$field = $sys_fields[$field_id];
+			}
+			else if(isset($ds_fields[$field_id]))
+			{
+				$field = $ds_fields[$field_id];
+			}
+			else if(isset($field_names[$field_id]))
+			{
+				$field = $ds_fields[$field_names[$field_id]];
+			}
+			else
+				$field = NULL;
+
+			if(!is_array( $field )) continue;
+			
+			if( !isset( $t[$field['ds_id']] ) ) 
+			{
+				$result->join('dshybrid_' . $field['ds_id'], 'dfilter' . $pos)
+					->on('dfilter' . $pos . '.id', '=', 'ds.id');
+				
+				$t[$field['ds_id']] = TRUE;
+			}
+	
+			$field = isset($sys_fields[$field_id]) 
+					? $field['name']
+					: DataSource_Data_Hybrid_Field::PREFFIX . $field['name'];
+	
+			$in = FALSE;
+			switch($condition) 
+			{
+				case self::COND_EQ:
+					$value = explode(',', $value);
+					
+					if($value[0] == '*') 
+						break;
+					elseif( count( $value ) > 1)
+						$in = TRUE;
+					else
+						$value = $value[0];
+					break;
+				case self::COND_BTW:
+					$value = explode('|', $value);
+					if(count($value) != 2) break;
+					break;
+				default:
+					$value = $value;
+			}
+			$in = $in === TRUE
+				? 'IN' 
+				: '=';
+			
+			if(is_array($value))
+			{
+				foreach($value as $i => $v)
+				{
+					if( preg_match('/now()|curdate()|curtime()|interval/i', $v ))
+					{
+						$value[$i] = DB::expr($v);
+					}
+				}
+			}
+			else
+				if( preg_match('/now()|curdate()|curtime()|interval/i', $value ))
+				{
+					$value = DB::expr($value);
+				}
+	
+			$conditions = array($in, 'BETWEEN', '>', '<', '>=', '<=', '>', 'LIKE');
+			
+			$result->where($field, $conditions[$condition], $value);
+		}
+	}
+
 	protected static $_instance = array();
 
 	/**
