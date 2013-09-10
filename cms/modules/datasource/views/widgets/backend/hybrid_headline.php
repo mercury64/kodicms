@@ -1,5 +1,3 @@
-<?php echo debug::vars($widget); ?>
-
 <?php echo View::factory('widgets/backend/blocks/section', array(
 	'widget' => $widget
 )); ?>
