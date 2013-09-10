@@ -102,8 +102,7 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 	
 	public function set_ds_id($ds_id)
 	{
-		$this->ds_id = (int) $ds_id;
-		return $this;
+		return (int) $ds_id;
 	}
 	
 	public function set_field($fields = array())
@@ -119,10 +118,22 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 					$this->doc_fetched_widgets[(int) $f['id']] = (int) $f['fetcher'];
 			}
 		}
-		
-		return $this;
 	}
 	
+	public function set_doc_filter(array $filters)
+	{
+		$data = array();
+		foreach($filters as $key => $rows)
+		{
+			foreach ($rows as $i => $row)
+			{
+				$data[$i][$key] = $row;
+			}
+		}
+		
+		return $data;
+	}
+
 	/**
 	 * 
 	 * @return array
@@ -136,7 +147,7 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 		{
 			$options[$value['id']] = $value['name'];
 		}
-		
+
 		return $options;
 	}
 	
