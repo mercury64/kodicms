@@ -240,4 +240,9 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 			. $this->id . '::' 
 			. $this->get_doc_id();
 	}
+	
+	public function count_total()
+	{
+		return 1;
+	}
 }

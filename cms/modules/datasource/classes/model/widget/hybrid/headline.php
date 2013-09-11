@@ -36,18 +36,6 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 	 * @var string 
 	 */
 	public $doc_id = 'id';
-
-	/**
-	 *
-	 * @var integer 
-	 */
-	public $list_offset = 0;
-	
-	/**
-	 *
-	 * @var integer 
-	 */
-	public $list_size = 10;
 	
 	/**
 	 *
@@ -84,8 +72,6 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Hybrid {
 		
 		parent::set_values($data);
 		$this->doc_order = Arr::get($data, 'doc_order', array());
-		$this->list_offset = (int) Arr::get($data, 'list_offset');
-		$this->list_size = (int) Arr::get($data, 'list_size');
 		
 		$this->only_sub = (bool) Arr::get($data, 'only_sub');
 		$this->only_published = (bool) Arr::get($data, 'only_published');

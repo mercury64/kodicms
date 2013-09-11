@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-abstract class Model_Widget_Hybrid extends Model_Widget_Decorator {
+abstract class Model_Widget_Hybrid extends Model_Widget_Decorator_Pagination {
 	
 	/**
 	 * @param array array
