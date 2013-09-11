@@ -35,9 +35,6 @@
 		var filters_container = $('#filters_container');
 		$('#add_filter').on('click', function() {
 			var filter = add_filter();
-
-			$('.select2-container', filters_container).remove()
-			$("select", filter).select2();
 			
 			$('input[name="doc_filter[field][]"]', filter).on('keyup', function() {
 				var field_title = filter.find('.field-title');

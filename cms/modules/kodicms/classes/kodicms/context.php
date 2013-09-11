@@ -98,6 +98,10 @@ class KodiCMS_Context {
 		{
 			$result = $this->request()->query($param);
 		}
+		else if($this->request()->post( $param ) !== NULL)
+		{
+			$result = $this->request()->post( $param );
+		}
 		elseif(
 			$this->behavior_router() instanceof Behavior_Route 
 		AND 
@@ -105,9 +109,9 @@ class KodiCMS_Context {
 		{
 			$result = $this->behavior_router()->param($param);
 		}
-		else if($this->request()->query( $param ))
+		else if($this->request()->param( $param ) !== NULL)
 		{
-			$result = $this->request()->query( $param );
+			$result = $this->request()->param( $param );
 		}
 		
 		return $result;
