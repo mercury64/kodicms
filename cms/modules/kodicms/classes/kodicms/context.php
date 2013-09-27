@@ -278,6 +278,15 @@ class KodiCMS_Context {
 	
 	/**
 	 * 
+	 * @return array
+	 */
+	public function get_blocks()
+	{
+		return array_keys($this->_blocks);
+	}
+
+	/**
+	 * 
 	 * @param array $widgets
 	 * @return \Context
 	 */

@@ -142,6 +142,7 @@ class Behavior_Route {
 
 				// Set the value for all matched keys
 				$this->_params[$key] = $value;
+				Context::instance()->set('.' . $key, $value);
 			}
 			
 			$this->_matched_route = $_uri;
