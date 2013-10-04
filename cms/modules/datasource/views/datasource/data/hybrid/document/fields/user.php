@@ -13,7 +13,8 @@
 		<?php endif; ?>
 		
 		<?php if($field->is_exists($value)): ?>
-		<?php echo HTML::anchor(Route::url('backend', array('controller' => 'users', 'action' => 'edit', 'id' => $value)), $field->get_user($value)->username, array('class' => 'popup fancybox.iframe')) ; ?>
+		&nbsp;
+		<?php echo HTML::anchor(Route::url('backend', array('controller' => 'users', 'action' => 'edit', 'id' => $value)), $field->get_user($value)->username, array('class' => 'popup fancybox.iframe btn')) ; ?>
 		<?php endif; ?>
 	</div>
 </div>

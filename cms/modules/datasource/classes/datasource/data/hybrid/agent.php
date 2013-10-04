@@ -89,7 +89,7 @@ class DataSource_Data_Hybrid_Agent {
 		
 		foreach ($query as $row)
 		{
-			$name = str_replace(  DataSource_Data_Hybrid_Field::PREFFIX, '', $row['name']);
+			$name = str_replace( DataSource_Data_Hybrid_Field::PREFFIX, '', $row['name']);
 			$id = $row['id'];
 
 			$this->ds_fields[$id] = array(
@@ -207,6 +207,14 @@ class DataSource_Data_Hybrid_Agent {
 					->select(array('dss'.$fid.'.header', $fid . 'header'));
 				
 				$dds[$fid] = TRUE;
+			}
+			
+			elseif($field['type'] == DataSource_Data_Hybrid_Field::TYPE_USER) 
+			{
+				$result->join('users', 'left')
+					->on(DataSource_Data_Hybrid_Field::PREFFIX . $field['name'], '=', 'users' . '.id')
+					->select(array('users.username', $fid))
+					->select(array('users.id', 'user_id'));
 			}
 
 			unset($field);

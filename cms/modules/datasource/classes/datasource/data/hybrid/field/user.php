@@ -71,8 +71,17 @@ class DataSource_Data_Hybrid_Field_User extends DataSource_Data_Hybrid_Field {
 		return $users;
 	}
 
-//	public static function set_doc_field( $widget, $field, $row, $fid )
-//	{
-//		
-//	}
+	public static function set_doc_field( $widget, $field, $row, $fid )
+	{
+		
+		return !empty($row[$fid]) 
+			? array(
+				'username' => $row[$fid],
+				'id' => $row['user_id']
+			)
+			: array(
+				'username' => '',
+				'id' => ''
+			);
+	}
 }
