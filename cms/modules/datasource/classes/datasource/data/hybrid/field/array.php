@@ -85,7 +85,7 @@ class DataSource_Data_Hybrid_Field_Array extends DataSource_Data_Hybrid_Field_Do
 	
 	public function is_valid($value) 
 	{
-		return strlen($value) != strspn($value, '0123456789,');
+		return strlen($value) == strspn($value, '0123456789,');
 	}
 	
 	public function document_validation_rules( Validation $validation, DataSource_Data_Hybrid_Document $doc )
