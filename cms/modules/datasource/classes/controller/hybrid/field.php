@@ -50,6 +50,10 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		
 		$this->breadcrumbs
 			->add($ds->name, Route::url('datasources', array(
+				'controller' => 'data',
+				'directory' => 'datasources',
+			)) . URL::query(array('ds_id' => $ds->ds_id), FALSE))
+			->add(__('Edit hybrid'), Route::url('datasources', array(
 				'directory' => 'hybrid',
 				'controller' => 'section',
 				'action' => 'edit',
@@ -112,12 +116,16 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		}
 		$this->breadcrumbs
 			->add($ds->name, Route::url('datasources', array(
+				'controller' => 'data',
+				'directory' => 'datasources',
+			)) . URL::query(array('ds_id' => $ds->ds_id), FALSE))
+			->add(__('Edit hybrid'), Route::url('datasources', array(
 				'directory' => 'hybrid',
 				'controller' => 'section',
 				'action' => 'edit',
 				'id' => $ds->ds_id
 			)))
-			->add(__(':action field', array(':action' => ucfirst($this->request->action()))));
+			->add(__(':action field', array(':action' => __(ucfirst($this->request->action())))));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/field/add', array(
 			'ds' => $ds,

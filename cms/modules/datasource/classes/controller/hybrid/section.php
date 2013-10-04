@@ -102,6 +102,10 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 		}
 
 		$this->breadcrumbs
+			->add($this->ds->name, Route::url('datasources', array(
+				'controller' => 'data',
+				'directory' => 'datasources',
+			)) . URL::query(array('ds_id' => $ds_id), FALSE))
 			->add(__('Edit hybrid'));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/edit', array(
@@ -127,6 +131,7 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 		$ds->name = $this->request->post('ds_name');
 		$ds->description = $this->request->post('ds_description');	
 		
+		$ds->fields();
 		
 		$ds->save();
 
