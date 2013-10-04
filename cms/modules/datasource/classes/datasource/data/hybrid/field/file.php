@@ -23,7 +23,7 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	public $folder = NULL;
 
 
-	public function __construct( $data )
+	public function __construct( array $data )
 	{
 		$this->max_size = Num::bytes('1MiB');
 		
@@ -33,7 +33,7 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 		$this->type = self::TYPE_FILE;
 	}
 	
-	public function set( $data )
+	public function set( array $data )
 	{
 		if(!isset($data['crop']))
 		{
@@ -194,6 +194,21 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 
 		return FALSE;
 	}
+	
+	public function set_value(array $data, $doc)
+	{
+		$file = Arr::get($data, $this->name, array());
+		if(is_array($file) AND Upload::valid($file) AND Upload::not_empty($file))
+		{
+			
+		}
+		else if(Valid::url( Arr::get($data, $this->name . '_url') )  )
+		{
+			$data[$this->name] = $data[$this->name . '_url'];
+		}
+		
+		return parent::set_value($data, $doc);
+	}
 
 	public function onCreateDocument($doc) 
 	{
@@ -201,27 +216,47 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	}
 	
 	public function onUpdateDocument($old, $new)
-	{	
+	{
 		$new_file = $new->fields[$this->name];
+		
+		if(empty($new_file))
 
-		if(empty($new_file['size']))
+		$filepath = FALSE;
+
+		if(is_array($new_file))
 		{
-			$new->fields[$this->name] = is_string($old->fields[$this->name]) ? $old->fields[$this->name] : '';
-			return;
+			if(empty($new_file['size']))
+			{
+				$this->set_old_value($old, $new);
+				return;
+			}
+
+			if( is_array($this->validate_file($new_file)))
+			{
+				$this->set_old_value($old, $new);
+				return FALSE;
+			}
+
+			$ext = strtolower( pathinfo( $new_file['name'], PATHINFO_EXTENSION ) );
+			$filename = uniqid() . '.' . $ext;
+
+			$filepath = Upload::save($new->fields[$this->name], $filename, $this->folder());
 		}
-	
-		if( is_array($this->validate_file($new_file)))
+		else if( !empty($new_file) )
 		{
-			$new->fields[$this->name] = is_string($old->fields[$this->name]) ? $old->fields[$this->name] : '';
+			list($status, $filename) = Upload::from_url( $new_file, $this->types, $this->folder() );
+
+			if($status)
+			{
+				$filepath = $this->folder() . DIRECTORY_SEPARATOR . $filename;
+			}
+		}
+
+		if( $filepath === FALSE) 
+		{
+			$this->set_old_value($old, $new);
 			return FALSE;
 		}
-
-		$ext = strtolower( pathinfo( $new_file['name'], PATHINFO_EXTENSION ) );
-		$filename = uniqid() . '.' . $ext;
-
-		$filepath = Upload::save($new->fields[$this->name], $filename, $this->folder());
-
-		if($filepath === FALSE) return FALSE;
 		
 		if($this->is_image( $filepath ))
 		{

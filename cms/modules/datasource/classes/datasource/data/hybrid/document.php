@@ -52,7 +52,7 @@ class DataSource_Data_Hybrid_Document {
 	 * 
 	 * @param DataSource_Data_Hybrid_Record $record
 	 */
-	public function __construct( DataSource_Data_Hybrid_Record $record)
+	public function __construct( DataSource_Data_Hybrid_Record $record )
 	{
 		$this->record = $record;
 		$this->ds_id = $record->ds_id;
@@ -94,13 +94,10 @@ class DataSource_Data_Hybrid_Document {
 		
 		$this->published = Arr::get($array, 'published', FALSE) ? TRUE : FALSE;
 		$this->header = Arr::get($array, 'header');
-		
-		foreach($this->field_names as $key)
+
+		foreach($this->record->fields as $key => $field)
 		{
-			if(isset($array[$key]))
-			{
-				$this->fields[$key] = $array[$key];
-			}
+			$field->set_value($array, $this);
 		}
 		
 		return $this;
@@ -113,11 +110,11 @@ class DataSource_Data_Hybrid_Document {
 	 */
 	public function read_files($array) 
 	{
-		foreach($this->field_names as $key)
+		foreach($this->record->fields as $key => $field)
 		{
-			if(isset($array[$key]) AND $this->record->fields[$key]->family == DataSource_Data_Hybrid_Field::TYPE_FILE)
+			if(isset($array[$key]) AND $field->family == DataSource_Data_Hybrid_Field::TYPE_FILE AND Upload::valid( $array[$key] ) AND Upload::not_empty($array[$key]))
 			{
-				$this->fields[$key] = $array[$key];
+				$field->set_value($array, $this);
 			}
 		}
 		

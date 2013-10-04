@@ -111,7 +111,23 @@ class DataSource_Data_Hybrid_Field {
 		
 		return new $class_name($data);
 	}
+
+	/**
+	 * 
+	 * @param array $data
+	 */
+	public function __construct( array $data) 
+	{
+		$this->set($data);
+		
+		$this->type = strtolower($this->type);
+		$this->from_ds = (int) $this->from_ds;
+	}
 	
+	/**
+	 * 
+	 * @return array
+	 */
 	public function rules()
 	{
 		return array(
@@ -151,16 +167,13 @@ class DataSource_Data_Hybrid_Field {
 		
 		return TRUE;
 	}
-
-	public function __construct($data) 
-	{
-		$this->set($data);
-		
-		$this->type = strtolower($this->type);
-		$this->from_ds = (int) $this->from_ds;
-	}
 	
-	public function set($data)
+	/**
+	 * 
+	 * @param array $data
+	 * @return \DataSource_Data_Hybrid_Field
+	 */
+	public function set( array $data)
 	{
 		$valid = $this->validate($data);
 
@@ -201,6 +214,27 @@ class DataSource_Data_Hybrid_Field {
 	public function __unset( $key )
 	{
 		unset($this->_props[$key]);
+	}
+	
+	/**
+	 * 
+	 * @param array $data
+	 * @return \DataSource_Data_Hybrid_Field
+	 */
+	public function set_value(array $data, $doc)
+	{
+		$doc->fields[$this->name] = Arr::get($data, $this->name);
+		return $this;
+	}
+	
+	/**
+	 * 
+	 * @param DataSource_Data_Hybrid_Document $old
+	 * @param DataSource_Data_Hybrid_Document $new
+	 */
+	public function set_old_value($old, $new)
+	{
+		$new->fields[$this->name] = is_string($old->fields[$this->name]) ? $old->fields[$this->name] : '';
 	}
 
 	/**
@@ -262,6 +296,10 @@ class DataSource_Data_Hybrid_Field {
 		return $this->id;
 	}
 	
+	/**
+	 * 
+	 * @return array
+	 */
 	public function update() 
 	{
 		$this->validate();
@@ -291,17 +329,20 @@ class DataSource_Data_Hybrid_Field {
 		return TRUE;
 	}
 	
+	/**
+	 * 
+	 * @return array
+	 */
 	public function as_array()
 	{
 		$data = get_object_vars($this);
-		
 		$data = Arr::merge($data, $this->_props);
+
 		return $data;
 	}
 
 	/**
 	 * 
-	 * @param Datasource_Document $doc
 	 * @return null|array
 	 */
 	public function get_sql($doc)
@@ -334,6 +375,10 @@ class DataSource_Data_Hybrid_Field {
 		FALSE ? $doc : NULL ;
 	}
 	
+	/**
+	 * 
+	 * @param DataSource_Data_Hybrid_Document $doc
+	 */
 	public function onCreateDocument($doc) 
 	{
 		if(!isset($doc->fields[$this->name]))
@@ -342,11 +387,20 @@ class DataSource_Data_Hybrid_Field {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param DataSource_Data_Hybrid_Document $old
+	 * @param DataSource_Data_Hybrid_Document $new
+	 */
 	public function onUpdateDocument($old, $new) 
 	{
 		FALSE ? $old OR $new : NULL ;
 	}
 	
+	/**
+	 * 
+	 * @param DataSource_Data_Hybrid_Document $doc
+	 */
 	public function onRemoveDocument($doc) 
 	{
 		FALSE ? $doc : NULL ;

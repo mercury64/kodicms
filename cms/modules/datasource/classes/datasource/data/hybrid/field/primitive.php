@@ -46,14 +46,14 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 		);
 	}
 
-	public function __construct( $data )
+	public function __construct( array $data )
 	{
 		$this->family = self::TYPE_PRIMITIVE;
 		
 		parent::__construct( $data );
 	}
 	
-	public function set( $data )
+	public function set( array $data )
 	{
 		if(!isset($data['isreq']))
 		{

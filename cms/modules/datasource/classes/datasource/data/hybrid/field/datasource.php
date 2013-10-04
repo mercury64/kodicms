@@ -11,7 +11,7 @@ class DataSource_Data_Hybrid_Field_Datasource extends DataSource_Data_Hybrid_Fie
 		'isreq' => TRUE
 	);
 	
-	public function __construct( $data )
+	public function __construct( array $data )
 	{
 		parent::__construct( $data );
 		

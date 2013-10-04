@@ -9,7 +9,7 @@ class KodiCMS_Upload extends Kohana_Upload {
 	 * @return type
 	 * @throws Validation_Exception
 	 */
-	public static function file( $file, array $types = array('jpg', 'jpeg', 'gif', 'png') )
+	public static function file( $file, array $types = array('jpg', 'jpeg', 'gif', 'png'), $path = NULL )
 	{
 		if( ! is_array($file) )
 		{
@@ -31,13 +31,15 @@ class KodiCMS_Upload extends Kohana_Upload {
 		$ext = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
 		$filename = uniqid() . '.' . $ext;
 		
-		if( ! is_dir( TMPPATH ))
+		if( $path === NULL ) $path = TMPPATH;
+		
+		if( ! is_dir( $path ))
 		{
-			mkdir(TMPPATH, 0777);
-			chmod(TMPPATH, 0777);
+			mkdir($path, 0777, TRUE);
+			chmod($path, 0777);
 		}
 
-		$uploadedfile = Upload::save( $file, $filename, TMPPATH, 0777 );
+		$uploadedfile = Upload::save( $file, $filename, $path, 0777 );
 
 		return array(TRUE, $filename);
 	}
@@ -50,7 +52,7 @@ class KodiCMS_Upload extends Kohana_Upload {
 	 * @return string|boolean
 	 * @throws Kohana_Exception
 	 */
-	public static function from_url($url, array $types = array('jpg', 'jpeg', 'gif', 'png') )
+	public static function from_url($url, array $types = array('jpg', 'jpeg', 'gif', 'png'), $path = NULL )
 	{
 		$url = trim($url);
 		$ext = pathinfo($url, PATHINFO_EXTENSION);
@@ -71,14 +73,16 @@ class KodiCMS_Upload extends Kohana_Upload {
 
 		$filename = uniqid() . '.' . $ext;
 		
-		if( ! is_dir( TMPPATH ))
+		if( $path === NULL ) $path = TMPPATH;
+		
+		if( ! is_dir( $path ))
 		{
-			mkdir(TMPPATH, 0777);
-			chmod(TMPPATH, 0777);
+			mkdir($path, 0777, TRUE);
+			chmod($path, 0777);
 		}
 
 		// Make the filename into a complete path
-		$path = TMPPATH.$filename;
+		$path = $path.$filename;
 		
 		$file = fopen($url, 'rb');
 

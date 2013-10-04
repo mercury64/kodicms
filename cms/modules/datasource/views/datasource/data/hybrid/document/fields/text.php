@@ -3,7 +3,7 @@
 	<div class="controls">
 		<?php
 		echo Form::textarea( $field->name, $value, array(
-			'class' => 'span12', 'id' => $field->name, 'rows' => 2
+			'class' => 'input-block-level', 'id' => $field->name, 'rows' => 2
 		) );
 		?>
 	</div>

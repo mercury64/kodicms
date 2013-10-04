@@ -12,7 +12,7 @@ class DataSource_Data_Hybrid_Field_User extends DataSource_Data_Hybrid_Field {
 		'only_current' => FALSE
 	);
 
-	public function __construct( $data )
+	public function __construct( array $data )
 	{
 		parent::__construct( $data );
 		
@@ -25,7 +25,7 @@ class DataSource_Data_Hybrid_Field_User extends DataSource_Data_Hybrid_Field {
 		return 'TINYINT(4)';
 	}
 	
-	public function set( $data )
+	public function set( array $data )
 	{
 		if(!isset($data['only_current']))
 		{

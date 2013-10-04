@@ -11,7 +11,7 @@ class DataSource_Data_Hybrid_Field_Array extends DataSource_Data_Hybrid_Field_Do
 		'one_to_many' => FALSE
 	);
 	
-	public function __construct( $data )
+	public function __construct( array $data )
 	{
 		parent::__construct( $data );
 		

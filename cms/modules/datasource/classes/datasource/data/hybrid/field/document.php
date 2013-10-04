@@ -11,14 +11,14 @@ class DataSource_Data_Hybrid_Field_Document extends DataSource_Data_Hybrid_Field
 		'one_to_one' => FALSE
 	);
 	
-	public function __construct( $data )
+	public function __construct( array $data )
 	{
 		parent::__construct( $data );
 		
 		$this->family = self::TYPE_DOCUMENT;
 	}
 	
-	public function set( $data )
+	public function set( array $data )
 	{
 		if(!isset($data['isreq']))
 		{
