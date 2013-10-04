@@ -176,9 +176,10 @@ class DataSource_Data_Hybrid_Agent {
 		for($i = 0, $l = count($fields); $i < $l; $i++) 
 		{
 			$fid = $fields[$i];
-			$field = $ds_fields[$fid];
 			
-			if(!$field) continue;
+			if(!isset($ds_fields[$fid])) continue;
+			
+			$field = $ds_fields[$fid];
 			
 			if(!isset($t[$field['ds_id']])) 
 			{

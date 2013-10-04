@@ -48,6 +48,8 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 	
 	public $all_doc = TRUE;
 	public $auto_cast = TRUE;
+	
+	public $fields = NULL;
 
 	public function __construct($key = NULL, $parent = NULL)
 	{
@@ -65,21 +67,46 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 	 */
 	public function fields( )
 	{
-		$fields = array(
-			'ID' => 50, 
-			'Header' => NULL,
-			'Section' => 150,
-			'Date' => 150
+		if( is_array($this->fields)) 
+		{
+			return $this->fields;
+		}
+		
+		$this->fields = array(
+			'id' => array(
+				'name' => 'ID',
+				'width' => 50
+			),
+			'header' => array(
+				'name' => 'Header',
+				'width' => NULL,
+				'type' => 'link'
+			),
+			'type' => array(
+				'name' => 'Section',
+				'width' => 150
+			),
+			'date' => array(
+				'name' => 'Date',
+				'width' => 150
+			)
 		);
 		
 		if(!$this->all_doc)
 		{
-			unset($fields['type']);
+			unset($this->fields['type']);
 		}
 		
-		return $fields;
+//		foreach(DataSource_Data_Hybrid_Field_Factory::get_related_fields($this->ds_id) as $key => $field)
+//		{
+//			$this->fields[$field->name] = array(
+//				'name' =>  $field->header
+//			);
+//		}
+		
+		return $this->fields;
 	}
-	
+
 	/**
 	 * 
 	 * @return \DataSource_Data_Hybrid_Section
@@ -384,31 +411,24 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 	{
 		$ds_id = (int) $ds_id;
 		
-		$query = DB::select()
-			->select('d.published', 'd.header', array('d.created_on', 'date'))
-			->order_by('d.created_on', 'desc');
+		$agent = DataSource_Data_Hybrid_Agent::instance($ds_id, $ds_id, FALSE);
 		
-		if($this->all_doc)
+		$fields = array();
+		$ds_fields = DataSource_Data_Hybrid_Field_Factory::get_related_fields($this->ds_id);
+
+		foreach($ds_fields as $key => $field)
 		{
-			$query->select('dss.name', 'ds.id')
-				->from(array('dshybrid_' . $ds_id, 'ds'))
-				->join(array('dshybrid', 'd'))
-					->on('ds.id', '=', 'd.id');
-					
-			if($this->auto_cast)
-			{
-				$query->select(array('d.ds_id', 'ds_id'));
-			}
+			if( array_key_exists( $field->name, $this->fields() ))
+				$fields[] = $field->id;
 		}
-		else
-		{
-			$query->select('d.id')
-					->from(array('dshybrid', 'd'))
-				->where('d.ds_id', '=', $ds_id);
-		}
+		
+		$query = $agent
+			->get_query_props($fields, array())
+			->select(array('d.created_on', 'date'));
 		
 		$query->join(array('datasources', 'dss'))
-				->on('d.ds_id', '=', 'dss.ds_id');
+				->on('d.ds_id', '=', 'dss.ds_id')
+				->select('dss.name');
 		
 		if( ! empty($ids) ) 
 		{
@@ -434,10 +454,19 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 			foreach ( $query as $row )
 			{
 				$hl[$row['id']] = array(
-					'published' => $row['published'] == 1,
+					'id' => $row['id'],
+					'published' => (bool) $row['published'],
 					'header' => $row['header'],
 					'date' => Date::format($row['date'])
 				);
+				
+				foreach($ds_fields as $field)
+				{
+					if(isset($row[$field->id]))
+					{
+						$hl[$row['id']][$field->name] = $row[$field->id];
+					}
+				}
 
 				if($this->auto_cast AND $this->all_doc) 
 				{
