@@ -93,7 +93,7 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 
 		$doc->read_values($this->request->post());
 		$doc->read_files($_FILES);
-
+		
 		if( !empty($doc->id) )
 		{
 			$ds->update_document($doc);
@@ -104,6 +104,8 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 		}
 
 		Messages::success('Document saved');
+		
+		Session::instance()->delete('post_data');
 		
 		// save and quit or save and continue editing?
 		if ( $this->request->post('commit') !== NULL )
