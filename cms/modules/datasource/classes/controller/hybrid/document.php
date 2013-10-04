@@ -85,7 +85,7 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 	{
 		Session::instance()->set('post_data', $this->request->post());
 
-		if(($errors = $doc->validate($this->request->post())) !== TRUE)
+		if(($errors = $doc->validate($this->request->post() + $_FILES)) !== TRUE)
 		{
 			Messages::errors($errors);
 			$this->go_back();

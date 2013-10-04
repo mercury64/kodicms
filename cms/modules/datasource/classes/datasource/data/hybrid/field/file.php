@@ -165,23 +165,6 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 		return !is_dir(PUBLICPATH . $this->folder);
 	}
 	
-	public function validate_file( $file_data = array())
-	{
-		$array = Validation::factory( array($this->name => $file_data ) )
-			->rules( $this->name, array(
-				array('Upload::valid'),
-				array('Upload::type', array(':value', $this->types)),
-				array('Upload::size', array(':value', $this->max_size))
-			) );
-		
-		if(!$array->check())
-		{
-			return $array->errors('validation');
-		}
-		
-		return TRUE;
-	}
-	
 	public function is_image( $path )
 	{
 		$a = getimagesize($path);
@@ -223,26 +206,14 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 
 		$filepath = FALSE;
 
-		if(is_array($new_file))
+		if(is_array($new_file) AND Valid::not_empty( $new_file ))
 		{
-			if(empty($new_file['size']))
-			{
-				$this->set_old_value($old, $new);
-				return;
-			}
-
-			if( is_array($this->validate_file($new_file)))
-			{
-				$this->set_old_value($old, $new);
-				return FALSE;
-			}
-
 			$ext = strtolower( pathinfo( $new_file['name'], PATHINFO_EXTENSION ) );
 			$filename = uniqid() . '.' . $ext;
 
 			$filepath = Upload::save($new->fields[$this->name], $filename, $this->folder());
 		}
-		else if( !empty($new_file) )
+		else if( is_string($new_file) AND Valid::url($new_file) )
 		{
 			list($status, $filename) = Upload::from_url( $new_file, $this->types, $this->folder() );
 
@@ -288,6 +259,62 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 			@unlink(PUBLICPATH . $doc->fields[$this->name]);
 			$doc->fields[$this->name] = '';
 		}
+	}
+	
+	public function document_validation_rules( Validation $validation, DataSource_Data_Hybrid_Document $doc )
+	{
+		if($this->isreq === TRUE)
+		{
+			$validation->rule($this->name, 'not_empty');
+		}
+		
+		$image_url = NULL;
+		$image = NULL;
+		
+		if($validation->offsetExists($this->name))
+		{
+			$image = $validation->offsetGet($this->name );
+		}
+		
+		if($validation->offsetExists($this->name . '_url'))
+		{
+			$image_url = $validation->offsetGet($this->name . '_url');
+		}
+		
+		if($this->isreq === TRUE AND !empty($image))
+		{
+			$validation->rules( $this->name, array(
+				array('Upload::not_empty')
+			) );
+		}
+		elseif($this->isreq === TRUE AND !empty($image_url))
+		{
+			$validation->rules( $this->name . '_url', array(
+				array('Valid::not_empty')
+			) );
+		}
+
+		if(empty($image_url) AND is_array( $image ))
+		{
+			$validation->rules( $this->name, array(
+				array('Upload::valid'),
+				array('Upload::type', array(':value', $this->types)),
+				array('Upload::size', array(':value', $this->max_size))
+			) );
+		}
+		else
+		{
+			$ext = strtolower( pathinfo( $image_url, PATHINFO_EXTENSION ));
+			
+			$validation->rules( $this->name . '_url', array(
+				array('Valid::url'),
+				array('in_array', array(':value', $this->types))
+			) );
+		}
+
+		return $validation
+				->label($this->name . '_url', $this->header)
+				->label($this->name, $this->header);
 	}
 	
 	public function folder()

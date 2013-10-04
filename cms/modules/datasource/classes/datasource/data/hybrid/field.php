@@ -176,12 +176,18 @@ class DataSource_Data_Hybrid_Field {
 	public function set( array $data)
 	{
 		$valid = $this->validate($data);
+		
+		if(!isset($data['isreq']))
+		{
+			$data['isreq'] = FALSE;
+		}
 
 		foreach ( $data as $key => $value )
 		{
 			$this->{$key} = $value;
-		}
 		
+		}
+
 		return $this;
 	}
 
@@ -192,6 +198,13 @@ class DataSource_Data_Hybrid_Field {
 	 */
 	public function __set($key, $value)
 	{
+		switch ($key)
+		{
+			case 'isreq':
+				$value = (bool) $value;
+				break;
+		}
+		
 		$this->_props[$key] = $value;
 	}
 	

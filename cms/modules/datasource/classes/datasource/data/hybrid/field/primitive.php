@@ -54,12 +54,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 	}
 	
 	public function set( array $data )
-	{
-		if(!isset($data['isreq']))
-		{
-			$data['isreq'] = FALSE;
-		}
-				
+	{				
 		switch($this->type) 
 		{
 			case self::PRIMITIVE_TYPE_SLUG:
@@ -102,9 +97,6 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 				}
 				$value = (float) $value;
 				break;
-			case 'isreq':
-				$value = (bool) $value;
-				break;
 		}
 		
 		parent::__set($key, $value);
@@ -118,11 +110,6 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 		}
 
 		return $this->id;
-	}
-	
-	public function validate($data = NULL)
-	{
-		return parent::validate($data);
 	}
 	
 	public function onCreateDocument($doc) 
