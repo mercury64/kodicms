@@ -76,7 +76,7 @@ class DataSource_Data_Hybrid_Field_Document extends DataSource_Data_Hybrid_Field
 	{
 		if( $new->fields[$this->name] == -1 ) 
 		{
-			if($this->one_to_one AND $this->is_valid($old->fields[$this->name])) 
+			if($this->one_to_one) 
 			{
 				$ds = DataSource_Data_Hybrid_Field_Utils::load_ds($this->ds_id);
 				$ds->delete($old->fields[$this->name]);
@@ -86,15 +86,12 @@ class DataSource_Data_Hybrid_Field_Document extends DataSource_Data_Hybrid_Field
 			return;
 		}
 
-		if( ! $this->is_valid($new->fields[$this->name]))
-		{
-			$new->fields[$this->name] = $old->fields[$this->name];
-		}
+		$new->fields[$this->name] = $old->fields[$this->name];
 	}
 	
 	public function onRemoveDocument( $doc )
 	{
-		if($this->is_valid($doc->fields[$this->name]) AND  $this->one_to_one) 
+		if($this->one_to_one) 
 		{
 			$ds = DataSource_Data_Hybrid_Field_Utils::load_ds($this->ds_id);
 			$ds->delete($doc->fields[$this->name]);
@@ -113,11 +110,6 @@ class DataSource_Data_Hybrid_Field_Document extends DataSource_Data_Hybrid_Field
 	public function convert_to_plain($doc) 
 	{
 		$doc->fields[$this->name] = Arr::path($doc->fields, $this->name . '.header');
-	}
-	
-	public function is_valid($value) 
-	{
-		return $this->isreq ? $value > 0 : $value >= 0;
 	}
 	
 	public function get_type()

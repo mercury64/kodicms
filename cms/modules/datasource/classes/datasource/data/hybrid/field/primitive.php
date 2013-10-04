@@ -67,6 +67,11 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 				{
 					$data['from_header'] = FALSE;
 				}
+				
+				if(!isset($data['unique']))
+				{
+					$data['unique'] = FALSE;
+				}
 				break;
 		}
 		
@@ -117,13 +122,6 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 	
 	public function validate($data = NULL)
 	{
-		switch($this->type) 
-		{
-			case self::PRIMITIVE_TYPE_SLUG:
-					if(!isset($data['from_header']))
-				break;
-		}
-
 		return parent::validate($data);
 	}
 	
@@ -161,11 +159,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 	public function onUpdateDocument($old, $new) 
 	{
 		$this->onCreateDocument($new);
-
-		if(!$this->is_valid($new->fields[$this->name]))
-		{
-			$new->fields[$this->name] = $old->fields[$this->name];
-		}
+//		$new->fields[$this->name] = $old->fields[$this->name];
 	}
 	
 	public function fetch_value($doc) 
@@ -197,27 +191,54 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 		return $html;
 	}
 	
-	public function is_valid($value) 
+	
+	public function document_validation_rules( Validation $validation, DataSource_Data_Hybrid_Document $doc )
 	{
 		switch($this->type) 
 		{
 			case self::PRIMITIVE_TYPE_DATE: 
 			case self::PRIMITIVE_TYPE_DATETIME:
-				return Valid::date( $value );
+				$validation->rule( $this->name, 'date' );
+				break;
 			case self::PRIMITIVE_TYPE_EMAIL:
-				return Valid::email( $value );
+				$validation->rule( $this->name, 'email');
+				break;
 			case self::PRIMITIVE_TYPE_INTEGER:
-				return Valid::digit($value);
+				$validation->rule($this->name, 'digit');
+				break;
 			case self::PRIMITIVE_TYPE_FLOAT:
-				return Valid::numeric($value);
+				$validation->rule($this->name, 'numeric');
+				break;
+			case self::PRIMITIVE_TYPE_SLUG:
+				if(!empty($this->unique))
+				{
+					$validation->rule($this->name, array($this, 'check_unique'), array(':value', $doc));
+				}
+				break;
+		}
+		
+		if(!empty($this->min) AND !empty($this->max))
+		{
+			$validation->rule($this->name, array('range', array(':value', $this->min, $this->max)));
 		}
 		
 		if(!empty($this->regexp))
 		{
-			return Valid::regex($value, $this->regexp);
+			$validation->rule($this->name, array('regex', array(':value', $this->regexp)));
 		}
-
-		return TRUE;
+			
+		return parent::document_validation_rules($validation, $doc);
+	}
+	
+	public function check_unique($value, $doc) 
+	{
+		return ! (bool) DB::select($this->name)
+			->from($this->ds_table)
+			->where($this->name, '=', $value)
+			->where('id', '!=', $doc->id)
+			->limit(1)
+			->execute()
+			->count();
 	}
 	
 	public function get_type() 

@@ -180,39 +180,7 @@ class DataSource_Data_Hybrid_Document {
 
 		foreach ($this->record->fields as $name => $field)
 		{
-			$array
-				->label($name, $field->header);
-			
-			if($field->isreq === TRUE)
-			{
-				$array->rule($name, 'not_empty');
-			}
-			
-			if(!empty($field->regexp))
-			{
-				$array->rule($name, array('regex', array(':value', $field->regexp)));
-			}
-			
-			if(!empty($field->min) AND !empty($field->max))
-			{
-				$array->rule($name, array('range', array(':value', $field->min, $field->max)));
-			}
-			
-			switch($field->type) 
-			{
-				case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_DATE: 
-				case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_DATETIME:
-					$array->rule($name, 'date');
-					break;
-				case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_EMAIL:
-					$array->rule($name, 'email');
-					break;
-				case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_INTEGER:
-					$array->rule($name, 'digit');
-					break;
-				case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_FLOAT:
-					$array->rule($name, 'numeric');
-			}
+			$field->document_validation_rules($array, $this);
 		}
 
 		if(!$array->check())

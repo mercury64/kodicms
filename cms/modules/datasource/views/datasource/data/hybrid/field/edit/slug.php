@@ -15,4 +15,11 @@
 			<?php echo Form::checkbox('from_header', 1, $field->from_header == 1, array('id' => 'from_header' )); ?>
 		</div>
 	</div>
+	
+	<div class="control-group">
+		<label class="control-label" for="unique"><?php echo __('Unique value'); ?></label>
+		<div class="controls">
+			<?php echo Form::checkbox('unique', 1, $field->unique == 1, array('id' => 'unique' )); ?>
+		</div>
+	</div>
 </div>

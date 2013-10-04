@@ -347,22 +347,29 @@ class DataSource_Data_Hybrid_Field {
 	 */
 	public function get_sql($doc)
 	{
-		if($this->is_valid($doc->fields[$this->name]))
-		{
-			return array($this->name, $doc->fields[$this->name]);
-		}
-		
-		return NULL;
+		return array($this->name, $doc->fields[$this->name]);
 	}
 	
 	public function get_type()
 	{
 		return NULL;
 	}
-
-	public function is_valid($value) 
+	
+	/**
+	 * 
+	 * @param Validation $validation
+	 * @param DataSource_Data_Hybrid_Document
+	 * @return \Validation
+	 */
+	public function document_validation_rules( Validation $validation, DataSource_Data_Hybrid_Document $doc )
 	{
-		return TRUE;
+		if($this->isreq === TRUE)
+		{
+			$validation->rule($this->name, 'not_empty');
+		}
+
+		return $validation
+				->label($this->name, $this->header);
 	}
 	
 	public function fetch_value($doc) 

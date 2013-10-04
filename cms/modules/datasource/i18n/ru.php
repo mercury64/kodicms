@@ -53,7 +53,8 @@ return array(
 	'Allowed types :types' => 'Разрешенные форматы :types',
 	'' => '',
 	'Create hybrid section' => 'Создать гибридный раздел',
-	'' => '',
-	'' => '',
-	'' => '',
+	'Slug separator' => 'Разделитель',
+	'Slug from header' => 'Брать значение из Заголовка',
+	'Unique value' => 'Уникальное',
+	'":field" field must be unique' => 'Поле ":field" должно быть уникальным'
 );
