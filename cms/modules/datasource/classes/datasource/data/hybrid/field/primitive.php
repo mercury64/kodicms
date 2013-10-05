@@ -24,7 +24,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 		'min' => NULL, 
 		'max' => NULL,
 		'length' => 0,
-		'allowed_tags' => NULL,
+		'allowed_tags' => '<b><i><u><p><ul><li><ol>',
 		'regexp' => NULL,
 		'isreq' => FALSE,
 	);
@@ -66,6 +66,12 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 				if(!isset($data['unique']))
 				{
 					$data['unique'] = FALSE;
+				}
+				break;
+			case self::PRIMITIVE_TYPE_TEXT:
+				if(!isset($data['allow_html']))
+				{
+					$data['allow_html'] = FALSE;
 				}
 				break;
 		}
@@ -122,9 +128,12 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 				break;
 
 			case self::PRIMITIVE_TYPE_HTML:
-				$doc->fields[$this->name] = $this->clean_html($doc->fields[$this->name]); 
+				$doc->fields[$this->name] = Kses::filter( $doc->fields[$this->name], $this->allowed_tags );
 				break;
-
+			case self::PRIMITIVE_TYPE_TEXT:
+				if( ! $this->allow_html)
+					$doc->fields[$this->name] = strip_tags( $doc->fields[$this->name] ); 
+				break;
 			case self::PRIMITIVE_TYPE_BOOLEAN:
 				$doc->fields[$this->name] = $doc->fields[$this->name] ? 1 : 0; 
 				break;
@@ -170,14 +179,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 			? date($this->type == self::PRIMITIVE_TYPE_DATE 
 				? $format : $format.' H:i:s', $time) 
 			: $value;
-	}
-	
-	// TODO Сделать очистку HTML данных
-	public function clean_html($html)
-	{
-		return $html;
-	}
-	
+	}	
 	
 	public function document_validation_rules( Validation $validation, DataSource_Data_Hybrid_Document $doc )
 	{

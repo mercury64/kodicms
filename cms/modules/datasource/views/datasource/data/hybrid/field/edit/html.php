@@ -10,4 +10,12 @@
 			</select>
 		</div>
 	</div>
+	<?php
+	echo Bootstrap_Form_Element_Control_Group::factory(array(
+			'element' => Bootstrap_Form_Element_Textarea::factory(array(
+				'name' => 'allowed_tags', 'body' => $field->allowed_tags
+			))
+			->label(__('Allowed tags'))
+		));
+	?>
 </div>

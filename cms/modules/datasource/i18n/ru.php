@@ -51,7 +51,7 @@ return array(
 	'View file' => 'Посмотреть файл',
 	'Set current user' => 'Установить текущего пользователя',
 	'Allowed types :types' => 'Разрешенные форматы :types',
-	'' => '',
+	'Allow HTML tags' => 'Разрешить HTML теги',
 	'Create hybrid section' => 'Создать гибридный раздел',
 	'Slug separator' => 'Разделитель',
 	'Slug from header' => 'Брать значение из Заголовка',
