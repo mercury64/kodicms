@@ -182,6 +182,9 @@ https://github.com/butschster/kodicms/issues
 
 ## Changelog
 
+ * [bug] При работе с Context из backend в нем не работал Request
+ * [bug] Исправлен механизм установки виджетов для всех страниц (issue #181)
+
 ### 6.0.0
 
  * Добавлен раздел "Роли"
