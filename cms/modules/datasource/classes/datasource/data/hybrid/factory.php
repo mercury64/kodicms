@@ -23,7 +23,7 @@ class DataSource_Data_Hybrid_Factory {
 	 * @param integer $parent
 	 * @return null|\DataSource_Data_Hybrid_Section
 	 */
-	public function create($key, $name, $description, $parent) 
+	public function create($key, $name, $description, $parent = 0) 
 	{
 		$parent = (int) $parent;
 

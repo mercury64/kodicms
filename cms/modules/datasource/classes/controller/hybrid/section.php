@@ -75,7 +75,7 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 			$this->go_back();
 		}
 		
-		$result = $dsf->create($array['ds_key'], $array['ds_name'], $array['ds_description'], $array['ds_parent']);
+		$result = $dsf->create($array['ds_key'], $array['ds_name'], $array['ds_description']);
 		
 		if($result !== NULL)
 		{
