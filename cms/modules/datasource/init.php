@@ -36,3 +36,34 @@ Model_Navigation::get_section('Datasources')
 		'icon' => 'plus',
 		'divider' => TRUE
 	)), 999);
+
+Observer::observe('scheduler_callbacks', function() {
+	scheduler::add(function($from, $to) {
+		$from = date('Y-m-d', $from);
+		$to = date('Y-m-d', $to);
+
+		$docs = DB::select()
+			->from('dshybrid')
+			->where(DB::expr('DATE(created_on)'), 'between', array($from, $to))
+			->as_object()
+			->execute();
+
+		$data = array();
+		foreach ($docs as $doc)
+		{
+			$data[] = array(
+				'title' => $doc->header,
+				'start' => strtotime($doc->created_on),
+				'url' => Route::url('datasources', array(
+					'controller' => 'document',
+					'directory' => 'hybrid',
+					'action' => 'view'
+				)) . URL::query(array(
+					'ds_id' => $doc->ds_id, 'id' => $doc->id
+				)),
+				'allDay' => FALSE
+			);
+		}
+		return $data;
+	});
+});
