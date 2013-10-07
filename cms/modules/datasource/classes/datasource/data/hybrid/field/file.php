@@ -167,6 +167,8 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	
 	public function is_image( $path )
 	{
+		if(!file_exists( $path ) OR is_dir( $path )) return FALSE;
+
 		$a = getimagesize($path);
 		$image_type = $a[2];
 
