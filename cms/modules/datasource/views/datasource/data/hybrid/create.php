@@ -39,6 +39,7 @@
 			</div>
 		</div>
 	</div>
+	<?php /*
 	<div class="widget-header">
 		<h4><?php echo __('Properties'); ?></h4>
 	</div>
@@ -54,8 +55,10 @@
 			</div>
 		</div>
 	</div>
+	 */
+	?>
 	<div class="widget-footer form-actions">
-		<?php echo UI::button( __('Create hybrid'), array(
+		<?php echo UI::button( __('Create hybrid section'), array(
 			'icon' => UI::icon( 'plus'), 'class' => 'btn btn-large'
 		)); ?>
 	</div>

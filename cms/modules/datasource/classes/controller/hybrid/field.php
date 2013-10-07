@@ -59,7 +59,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 				'action' => 'edit',
 				'id' => $ds->ds_id
 			)))
-			->add(__(':action field', array(':action' => __(ucfirst($this->request->action())))));
+			->add(__('Edit field'));
 
 		$type = $this->field->family == DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE 
 				? $this->field->type 
@@ -125,7 +125,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 				'action' => 'edit',
 				'id' => $ds->ds_id
 			)))
-			->add(__(':action field', array(':action' => __(ucfirst($this->request->action())))));
+			->add(__('Add field'));
 		
 		$this->template->content = View::factory('datasource/data/hybrid/field/add', array(
 			'ds' => $ds,

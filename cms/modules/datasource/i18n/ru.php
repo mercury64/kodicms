@@ -24,7 +24,7 @@ return array(
 	'Remove fields' => 'Удалить выделенные',
 	'' => '',
 	'Add field' => 'Новое поле',
-	'Edit field' => 'Редактирование',
+	'Edit field' => 'Редактирование поля',
 	'Field header' => 'Название',
 	'Field type' => 'Тип поля',
 	'Primitive type' => 'Тип примитива',
