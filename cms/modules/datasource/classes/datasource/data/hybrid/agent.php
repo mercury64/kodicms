@@ -132,6 +132,12 @@ class DataSource_Data_Hybrid_Agent {
 					'type' => DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE, 
 					'name' => 'd.header', 
 					'sys' => TRUE
+				),
+				'created_on' => array(
+					'ds_id' => $this->ds_id, 
+					'type' => DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE, 
+					'name' => 'd.created_on', 
+					'sys' => TRUE
 				)
 			);
 		}
@@ -162,7 +168,7 @@ class DataSource_Data_Hybrid_Agent {
 	 */
 	public function get_query_props($fields, $fetched_objects = array(), $order = array(), $filter = array())
 	{
-		$result = DB::select('d.id', 'd.ds_id', 'd.header', 'd.published')
+		$result = DB::select('d.id', 'd.ds_id', 'd.header', 'd.published', 'd.created_on')
 			->from(array('dshybrid_' . $this->ds_id,  'ds'))
 			->join(array('dshybrid', 'd'))
 				->on('d.id', '=', 'ds.id');
