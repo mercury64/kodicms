@@ -7,11 +7,22 @@
 			<?php if(Acl::check($ds->ds_type.$ds->ds_id.'.field.remove')): ?>
 			<col width="30px" />
 			<?php endif; ?>
-			
 			<col width="100px" />
-			<col width="300px" />
+			<col width="200px" />
+			<col width="100px" />
 			<col />
 		</colgroup>
+		<thead>
+			<tr>
+				<?php if(Acl::check($ds->ds_type.$ds->ds_id.'.field.remove')): ?>
+				<th></th>
+				<?php endif; ?>
+				<th><?php echo __('Field key'); ?></th>
+				<th><?php echo __('Field header'); ?></th>
+				<th><?php echo __('Field type'); ?></th>
+				<th><?php echo __('Show in headline'); ?></th>
+			</tr>
+		</thead>
 		<tbody>
 			<tr>
 				<?php if(Acl::check($ds->ds_type.$ds->ds_id.'.field.remove')): ?>
@@ -23,7 +34,8 @@
 				<?php endif; ?>
 				<td class="sys">ID</td>
 				<td>ID</td>
-				<td></td>
+				<td><?php echo UI::label('integer'); ?></td>
+				<td><?php echo Form::checkbox('', 1, TRUE, array('disabled' => 'disabled')); ?></td>
 			</tr>
 			<tr>
 				<?php if(Acl::check($ds->ds_type.$ds->ds_id.'.field.remove')): ?>
@@ -35,7 +47,8 @@
 				<?php endif; ?>
 				<td class="sys">header</td>
 				<td><?php echo __('Header'); ?></td>
-				<td></td>
+				<td><?php echo UI::label('string'); ?></td>
+				<td><?php echo Form::checkbox('', 1, TRUE, array('disabled' => 'disabled')); ?></td>
 			</tr>
 
 			<?php foreach($record->fields as $f): ?>
@@ -69,6 +82,13 @@
 				<td>
 					<?php echo UI::label($f->type); ?>
 				</td>
+				<td>
+					<?php 
+					$attrs = array();
+					if(!Acl::check($ds->ds_type.$ds->ds_id.'.field.edit')) $attrs['disabled'] = 'disabled';
+					
+					echo Form::checkbox('in_headline['.$f->id.']', 1, (bool) $f->in_headline, $attrs); ?>
+				</td>
 			</tr>
 			<?php endforeach; ?>
 		</tbody>
@@ -97,5 +117,8 @@
 		<?php endif; ?>
 	</div>
 </div>
-
+<?php echo View::factory('widgets/backend/blocks/sorting', array(
+	'ds_id' => $ds->ds_id,
+	'doc_order' => $ds->doc_order
+));?>
 

@@ -56,5 +56,11 @@ return array(
 	'Slug separator' => 'Разделитель',
 	'Slug from header' => 'Брать значение из Заголовка',
 	'Unique value' => 'Уникальное',
-	'":field" field must be unique' => 'Поле ":field" должно быть уникальным'
+	'":field" field must be unique' => 'Поле ":field" должно быть уникальным',
+	
+	'Documents order' => 'Сортировка документов',
+	'Available fields' => 'Доступные поля',
+	'Order by' => 'Сортировать',
+	'Show in headline' => 'Показывать в списке',
+	'Date of creation' => 'Дата создания'
 );

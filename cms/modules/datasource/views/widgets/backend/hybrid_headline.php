@@ -68,7 +68,8 @@
 )); ?>
 
 <?php echo View::factory('widgets/backend/blocks/sorting', array(
-	'widget' => $widget
+	'ds_id' => $widget->ds_id,
+	'doc_order' => $widget->doc_order
 )); ?>
 
 <?php echo View::factory('widgets/backend/blocks/filters', array(

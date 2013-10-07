@@ -1,8 +1,8 @@
 <?php
-$fields = DataSource_Data_Hybrid_Field_Factory::get_related_fields($widget->ds_id);
+$fields = DataSource_Data_Hybrid_Field_Factory::get_related_fields($ds_id);
 
 $order_fields = array();
-foreach ($widget->doc_order as $data)
+foreach ($doc_order as $data)
 {
 	$order_fields[key($data)] = $data[key($data)];
 }
@@ -22,6 +22,13 @@ $fields[] = DataSource_Data_Hybrid_Field::factory(DataSource_Data_Hybrid_Field::
 	'name' => 'id',
 	'id' => 'id',
 	'header' => __('ID')
+));
+
+$fields[] = DataSource_Data_Hybrid_Field::factory(DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE, array(
+	'type' => DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_STRING,
+	'name' => 'created_on',
+	'id' => 'created_on',
+	'header' => __('Created on')
 ));
 
 foreach ($fields as $field)
@@ -49,7 +56,7 @@ foreach ($fields as $field)
 	}
 }
 
-foreach ($widget->doc_order as $data)
+foreach ($doc_order as $data)
 {
 	if(isset($ids[key($data)]))
 		$selected_fields[key($data)] = (($data[key($data)] == Model_Widget_Decorator::ORDER_ASC) ? '+' : '-') .' '. $ids[key($data)];
@@ -132,7 +139,7 @@ jQuery.fn.swapWith = function(to) {
 };
 </script>
 <div class="widget-header">
-	<h4><?php echo __('Document order'); ?></h4>
+	<h4><?php echo __('Documents order'); ?></h4>
 </div>
 <div class="widget-content">
 
@@ -161,7 +168,7 @@ jQuery.fn.swapWith = function(to) {
 					)); ?>
 					
 					<?php 
-					foreach($widget->doc_order as $data) 
+					foreach($doc_order as $data) 
 					{
 						echo Form::hidden('doc_order[]['.key($data).']', $data[key($data)], array(
 							'id' => 'sf_' . key($data)

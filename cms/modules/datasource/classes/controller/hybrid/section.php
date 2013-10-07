@@ -129,11 +129,30 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 		}
 		
 		$ds->name = $this->request->post('ds_name');
-		$ds->description = $this->request->post('ds_description');	
-		
-		$ds->fields();
-		
+		$ds->description = $this->request->post('ds_description');
+		$ds->doc_order = Arr::get($this->request->post(), 'doc_order', array());
+
 		$ds->save();
+		
+		$headline_fields = $this->request->post('in_headline');
+		if(!empty($headline_fields))
+		{
+			$fields = $this->ds->get_record()->fields;
+
+			foreach($fields as $f)
+			{
+				$value = Arr::get($this->request->post('in_headline'), $f->id, 0);
+
+				$field = DataSource_Data_Hybrid_Field_Factory::get_field($f->id);
+				$old_field = clone($field);
+
+				$field->set(array(
+					'in_headline' => $value
+				));
+
+				DataSource_Data_Hybrid_Field_Factory::update_field($old_field, $field);
+			}
+		}
 
 		// save and quit or save and continue editing?
 		if ( $this->request->post('commit') )

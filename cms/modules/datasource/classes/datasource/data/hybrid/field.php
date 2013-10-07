@@ -175,11 +175,19 @@ class DataSource_Data_Hybrid_Field {
 	 */
 	public function set( array $data)
 	{
-		$valid = $this->validate($data);
+		if($this->id === NULL)
+		{
+			$valid = $this->validate($data);
+		}
 		
 		if(!isset($data['isreq']))
 		{
 			$data['isreq'] = FALSE;
+		}
+		
+		if(!isset($data['in_headline']))
+		{
+			$data['in_headline'] = FALSE;
 		}
 
 		foreach ( $data as $key => $value )

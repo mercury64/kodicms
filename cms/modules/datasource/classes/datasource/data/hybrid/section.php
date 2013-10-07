@@ -35,6 +35,14 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 	 * @var string
 	 */
 	public $path = NULL;
+	
+	/**
+	 *
+	 * @var boolean
+	 */
+	public $doc_order = array(
+		array('created_on' => 'desc')
+	);
 
 	/**
 	 *
@@ -67,29 +75,16 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 	 */
 	public function fields( )
 	{
-		if( is_array($this->fields)) 
-		{
-			return $this->fields;
-		}
-		
 		$this->fields = array(
-			'id' => array(
-				'name' => 'ID',
-				'width' => 50
-			),
+//			'id' => array(
+//				'name' => 'ID',
+//				'width' => 50
+//			),
 			'header' => array(
 				'name' => 'Header',
 				'width' => NULL,
 				'type' => 'link'
 			),
-			'type' => array(
-				'name' => 'Section',
-				'width' => 150
-			),
-			'date' => array(
-				'name' => 'Date',
-				'width' => 150
-			)
 		);
 		
 		if(!$this->all_doc)
@@ -97,12 +92,26 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 			unset($this->fields['type']);
 		}
 		
-//		foreach(DataSource_Data_Hybrid_Field_Factory::get_related_fields($this->ds_id) as $key => $field)
-//		{
-//			$this->fields[$field->name] = array(
-//				'name' =>  $field->header
-//			);
-//		}
+		$fields = DataSource_Data_Hybrid_Field_Factory::get_related_fields($this->ds_id);
+		
+		foreach($fields as $key => $field)
+		{
+			if(!$field->in_headline) continue;
+
+			$this->fields[$field->name] = array(
+				'name' =>  $field->header
+			);
+		}
+		
+		$this->fields['date'] = array(
+			'name' => 'Date of creation',
+			'width' => 150
+		);
+		
+//		$this->fields['type'] = array(
+//			'name' => 'Section',
+//			'width' => 150
+//		);
 		
 		return $this->fields;
 	}
@@ -423,7 +432,7 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 		}
 		
 		$query = $agent
-			->get_query_props($fields, array())
+			->get_query_props($fields, array(), (array) $this->doc_order)
 			->select(array('d.created_on', 'date'));
 		
 		$query->join(array('datasources', 'dss'))
@@ -447,6 +456,7 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 		$result = array(0, array());
 
 		$query = $query->execute();
+
 		if($query->count() > 0)
 		{
 			$result[0] = $query->count();
@@ -462,9 +472,64 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 				
 				foreach($ds_fields as $field)
 				{
+					$_field = &$hl[$row['id']][$field->name];
 					if(isset($row[$field->id]))
 					{
-						$hl[$row['id']][$field->name] = $row[$field->id];
+						switch ($field->family)
+						{
+							case DataSource_Data_Hybrid_Field::TYPE_FILE:
+								if($field->is_image(PUBLICPATH . $row[$field->id]))
+								{
+									$_field = HTML::anchor(PUBLIC_URL . $row[$field->id], __('File'), array('class' => 'popup fancybox'));
+								}
+								else if(!empty($row[$field->id]))
+								{
+									$_field = HTML::anchor(PUBLIC_URL . $row[$field->id], __('File'), array('target' => 'blank'));
+								}
+								else
+								{
+									$_field = $row[$field->id];
+								}
+								break;
+							case DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE:
+								switch ($field->type)
+								{
+									case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_BOOLEAN:
+										$_field = $row[$field->id] == 1 ? __('TRUE') : __('FALSE');
+										break;
+									case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_TEXT:
+									case DataSource_Data_Hybrid_Field_Primitive::PRIMITIVE_TYPE_HTML:
+										$_field = substr(strip_tags($row[$field->id]), 0, 500) . ' ...';
+										break;
+									default:
+										$_field = $row[$field->id];
+								}
+								break;
+							case DataSource_Data_Hybrid_Field::TYPE_ARRAY:
+								if(!empty($row[$field->id]))
+								{
+									$docs = explode(',', $row[$field->id]);
+									foreach($docs as $i => $id)
+									{
+										$docs[$i] = HTML::anchor(Route::url('datasources', array(
+											'controller' => 'document',
+											'directory' => 'hybrid',
+											'action' => 'view'
+										)) . URL::query(array(
+											'ds_id' => $ds_id, 'id' => $id
+										)), $id, array('target' => 'blank'));
+									}
+									$_field = implode(', ', $docs);
+								}
+								else
+								{
+									$hl[$row['id']][$field->name] = $row[$field->id];
+								}
+								break;
+							default:
+								$_field = $row[$field->id];
+						}
+						
 					}
 				}
 
