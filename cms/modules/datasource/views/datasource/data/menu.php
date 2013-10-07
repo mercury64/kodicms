@@ -49,20 +49,7 @@
 			'directory' => 'datasources',
 		)) . URL::query(array('ds_id' => $id), FALSE), $title, array('class' => 'list-group-item-link'));
 
-		if(ACL::check($section.$ds_id.'.section.edit'))
-		{
-			$result .= UI::button(NULL, array(
-				'href' => Route::url('datasources', array(
-					'controller' => 'section',
-					'directory' => $section,
-					'action' => 'remove',
-					'id' => $id
-				)),
-				'icon' => UI::icon( 'trash icon-white' ),
-				'class' => 'btn btn-danger btn-confirm btn-mini action'
-			));
-		}
-
+		$result .= '<div class="btn-group action">';
 		if(ACL::check($section.$ds_id.'.section.edit'))
 		{
 			$result .= UI::button(NULL, array(
@@ -73,9 +60,23 @@
 					'id' => $id
 				)),
 				'icon' => UI::icon( 'wrench' ),
-				'class' => 'btn btn-mini action'
+				'class' => 'btn btn-mini'
 			));
 		}
+		if(ACL::check($section.$ds_id.'.section.edit'))
+		{
+			$result .= UI::button(NULL, array(
+				'href' => Route::url('datasources', array(
+					'controller' => 'section',
+					'directory' => $section,
+					'action' => 'remove',
+					'id' => $id
+				)),
+				'icon' => UI::icon( 'trash icon-white' ),
+				'class' => 'btn btn-danger btn-confirm btn-mini'
+			));
+		}
+		$result .= '</div>';
 		
 		if(!empty($name['description']))
 			$result .= '<p class="muted list-group-item-text">'.$name['description'].'</p>';
