@@ -16,10 +16,8 @@ class Controller_Datasources_Data extends Controller_System_Datasource
 		
 		$this->template->content = View::factory('datasource/data/index');
 		$this->template->menu = View::factory('datasource/data/menu', array(
-			'tree' => Datasource_Data_Manager::get_tree(),
+			'tree' => $tree,
 		));
-		
-		$this->template->toolbar = View::factory('datasource/data/toolbar');
 		
 		if($ds) 
 		{

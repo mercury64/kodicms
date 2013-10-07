@@ -11,11 +11,11 @@ Route::set( 'datasources', ADMIN_DIR_NAME.'/<directory>(/<controller>(/<action>(
 
 foreach (Datasource_Data_Manager::get_tree() as $type => $sections)
 {
-	foreach ($sections as $id => $title)
+	foreach ($sections as $id => $section)
 	{
 		Model_Navigation::get_section('Datasources')
 			->add_page(new Model_Navigation_Page(array(
-				'name' => $title,
+				'name' => $section['name'],
 				'url' => Route::url('datasources', array(
 					'controller' => 'data',
 					'directory' => 'datasources',

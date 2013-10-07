@@ -34,7 +34,7 @@ class Datasource_Data_Manager {
 		$result = array();
 		$dsh = array();
 		
-		$query = DB::select(array('ds.ds_id', 'id'), array('ds_type', 'type'), 'name', 'parent')
+		$query = DB::select(array('ds.ds_id', 'id'), array('ds_type', 'type'), 'name', 'description', 'parent')
 			->from(array('datasources', 'ds'))
 			->join(array('hybriddatasources', 'hds'), 'left')
 				->on('ds.ds_id', '=', 'hds.ds_id')
@@ -49,37 +49,7 @@ class Datasource_Data_Manager {
 		{
 			if( ! self::$first ) self::$first = $r['id'];
 
-			if($r['type'] == self::DS_HYBRID)
-			{
-				if($r['parent'] == 0) 
-				{
-					$result[$r['type']][$r['id']] = $r['name'];
-			
-					$dsh[$r['id']] = & $result[$r['type']][$r['id']];
-				} 
-				else 
-				{
-					if(is_array($dsh[$r['parent']]))
-					{
-						$dsh[$r['parent']][$r['id']] = $r['name'];
-					}
-					else 
-					{
-						$name = $dsh[$r['parent']];
-						$dsh[$r['parent']] = array(
-							$name => array($r['id'] => $r['name'])
-						);
-						
-						$dsh[$r['parent']] = & $dsh[$r['parent']][$name];
-					}
-
-					$dsh[$r['id']] = & $dsh[$r['parent']][$r['id']];
-				}
-			} 
-			else
-			{
-				$result[$r['type']][$r['id']] = $r['name'];
-			}
+			$result[$r['type']][$r['id']] = array('name' => $r['name'], 'description' => $r['description']);
 		}
 		
 		return $result;
