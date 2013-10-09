@@ -3,6 +3,9 @@
 		var filter = $('#sample_filter .filter')
 			.clone()
 			.appendTo(filters_container);
+	
+		$('.select2-container', filter).remove()
+		$("select", filter).select2();
 			
 		filter.on('click', '.remove_filter', function() {
 			filter.remove();
@@ -15,7 +18,7 @@
 	var set_condition = function(filters_container, data) {
 		$('.select2-container', filters_container).remove()
 		$("select", filters_container).select2();
-			
+		
 		for(key in data) {
 			if(key == 'invert' && data[key] == 1) {
 				$('input[name="doc_filter[' + key +'][]"]', filters_container).check()
