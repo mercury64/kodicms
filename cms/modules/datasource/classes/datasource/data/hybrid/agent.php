@@ -215,7 +215,6 @@ class DataSource_Data_Hybrid_Agent {
 				
 				$dds[$fid] = TRUE;
 			}
-			
 			elseif($field['type'] == DataSource_Data_Hybrid_Field::TYPE_USER) 
 			{
 				$result->join('users', 'left')
@@ -358,7 +357,7 @@ class DataSource_Data_Hybrid_Agent {
 				$t[$field['ds_id']] = TRUE;
 			}
 	
-			$field = isset($sys_fields[$field_id]) 
+			$field_name = isset($sys_fields[$field_id]) 
 					? $field['name']
 					: DataSource_Data_Hybrid_Field::PREFFIX . $field['name'];
 	
@@ -374,6 +373,10 @@ class DataSource_Data_Hybrid_Agent {
 						$in = TRUE;
 					else
 						$value = $value[0];
+					break;
+				case self::COND_CONTAINS:
+					$value = explode(',', $value);
+					$in = TRUE;
 					break;
 				case self::COND_BTW:
 					$value = explode('|', $value);
@@ -402,9 +405,34 @@ class DataSource_Data_Hybrid_Agent {
 					$value = DB::expr($value);
 				}
 	
-			$conditions = array($in, 'BETWEEN', '>', '<', '>=', '<=', '>', 'LIKE');
+			$conditions = array($in, 'BETWEEN', '>', '<', '>=', '<=', 'IN', 'LIKE');
 			
-			$result->where($field, $conditions[$condition], $value);
+			$type = NULL;
+			$fid = NULL;
+			foreach($ds_fields as $id => $f) 
+			{
+				if($f['name'] == $field['name']) 
+				{
+					$type = $f['type'];
+					$fid = $id;
+				}
+			}
+	
+			switch($type) 
+			{
+				case DataSource_Data_Hybrid_Field::TYPE_TAGS:
+					$result
+						->join(array(DataSource_Data_Hybrid_Field_Tags::TABLE_NAME, $fid.'_f_ht'), 'inner')
+						->on($fid.'_f_ht.field_id', '=', DB::expr( $fid ))
+						->on($fid.'_f_ht.doc_id', '=', 'd.id')
+						->join(array(Model_Tag::TABLE_NAME, $fid.'_f_tags'), 'inner')
+						->on($fid.'_f_tags.id', '=', $fid.'_f_ht.tag_id')
+						->where($fid.'_f_tags.name', $conditions[$condition], $value);
+					break;
+				default:
+					$result->where($field_name, $conditions[$condition], $value);
+			}
+			
 		}
 	}
 
