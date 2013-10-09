@@ -444,7 +444,7 @@ abstract class Model_Widget_Decorator {
 	 * 
 	 * @param type $crumbs
 	 */
-	public function change_crumbs(&$crumbs) {}
+	public function change_crumbs( Breadcrumbs &$crumbs) {}
 	
 	/**
 	 * @return array
