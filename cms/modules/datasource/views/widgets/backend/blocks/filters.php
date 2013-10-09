@@ -109,8 +109,8 @@
 						<td><?php echo __('Conition value')?></td>
 						<td>
 							<?php echo Form::select('doc_filter[type][]', array(
-								DataSource_Data_Hybrid_Agent::VALUE_CTX =>		__('Context'),
-								DataSource_Data_Hybrid_Agent::VALUE_PLAIN =>		__('Plain')
+								DataSource_Data_Hybrid_Agent::VALUE_CTX => __('Context'),
+								DataSource_Data_Hybrid_Agent::VALUE_PLAIN => __('Plain')
 							)); ?>
 							<?php echo Form::input('doc_filter[value][]', NULL, array(
 								'class' => Bootstrap_Form_Element_Input::MEDIUM

@@ -13,9 +13,13 @@
 		</div>
 	</div>
 
+	<?php /*
 	<div class="control-group">
 		<div class="controls">
 			<label class="checkbox"><?php echo Form::checkbox('only_sub', 1, $widget->only_sub); ?> <?php echo __('Use subsections only'); ?></label>
 		</div>
 	</div>
+	 * 
+	 */
+	?>
 </div>
