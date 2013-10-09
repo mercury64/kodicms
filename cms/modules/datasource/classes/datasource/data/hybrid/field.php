@@ -13,6 +13,7 @@ class DataSource_Data_Hybrid_Field {
 	const TYPE_HYBRID = 'hybrid';
 	const TYPE_DOCUMENT = 'document';
 	const TYPE_USER = 'user';
+	const TYPE_TAGS = 'tags';
 	
 	const PREFFIX = 'f_';
 	
@@ -84,6 +85,7 @@ class DataSource_Data_Hybrid_Field {
 	{
 		return array(
 			self::TYPE_PRIMITIVE => __('Primitive'),
+			self::TYPE_TAGS => __('Tags'),
 			self::TYPE_FILE => __('File'),
 			self::TYPE_DOCUMENT => __('Document'),
 			self::TYPE_ARRAY => __('Array of documents'),

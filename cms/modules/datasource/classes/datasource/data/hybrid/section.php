@@ -505,6 +505,15 @@ class DataSource_Data_Hybrid_Section extends Datasource_Section {
 										$_field = $row[$field->id];
 								}
 								break;
+							case DataSource_Data_Hybrid_Field::TYPE_TAGS:
+								$tags = explode(',', $row[$field->id]);
+								foreach($tags as $i => $tag)
+								{
+									$tags[$i] = UI::label($tag);
+								}
+	
+								$hl[$row['id']][$field->name] = implode(' ', $tags);
+								break;
 							case DataSource_Data_Hybrid_Field::TYPE_ARRAY:
 								if(!empty($row[$field->id]))
 								{

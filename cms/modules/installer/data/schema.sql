@@ -257,6 +257,14 @@ CREATE TABLE IF NOT EXISTS `TABLE_PREFIX_dshfields` (
   KEY `family` (`family`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `TABLE_PREFIX_hybrid_tags` (
+  `field_id` int(11) unsigned NOT NULL,
+  `doc_id` int(11) NOT NULL,
+  `tag_id` int(11) unsigned NOT NULL,
+  KEY `tag_id` (`tag_id`),
+  KEY `field_id` (`field_id`,`doc_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE IF NOT EXISTS `TABLE_PREFIX_dshybrid` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `ds_id` int(11) unsigned NOT NULL DEFAULT '0',

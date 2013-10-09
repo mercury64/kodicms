@@ -189,6 +189,10 @@ https://github.com/butschster/kodicms/issues
  * [feature] Метод Model_Page_Front::children() теперь всегда выводит массив
  * [feature] Класс Meta для вставки в шаблон сайта meta информации, js и css.
  * [bug] Исправлена проблема с сохранением настроек после установки системы.
+ * [bug] Исправлены ошибки в работе плагина Archive
+ * [bug] Исправлены ошибки в работе плагина Tagsinput
+ * [bug] Класс Record некорректно сохранял данные, если в таблице не было поля id
+ * [feature] Поле в Datasource - теги (issue #188)
 
 ### 6.0.0
 

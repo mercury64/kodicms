@@ -53,26 +53,6 @@ $(function() {
 		<?php endforeach; ?>
 	</div>
 	<?php endif ;?>
-		
-	<?php if(!empty($record->struct[DataSource_Data_Hybrid_Field::TYPE_USER] )): ?>
-	<div class="widget-header widget-no-border-radius">
-		<h4>
-			<small><?php echo __('Section'); ?> </small>
-			<?php echo DataSource_Data_Hybrid_Field::TYPE_USER; ?>
-		</h4>
-	</div>
-	<div id="user_fields" class="widget-content">
-		<?php foreach($record->struct[DataSource_Data_Hybrid_Field::TYPE_USER] as $type => $fields): ?>
-			<?php foreach($fields as $key): ?>
-			<?php echo View::factory('datasource/data/hybrid/document/fields/user', array(
-				'value' => $doc->fields[$key], 
-				'field' => $record->fields[$key],
-				'doc' => $doc
-			)); ?>
-			<?php endforeach; ?>
-		<?php endforeach; ?>
-	</div>
-	<?php endif ;?>
 
 	<?php if(!empty($record->struct[DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE] )): ?>
 	<div class="widget-header widget-no-border-radius">
@@ -164,6 +144,46 @@ $(function() {
 					)); ?>
 				</div>
 			</div>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
+	</div>
+	<?php endif ;?>
+		
+	<?php if(!empty($record->struct[DataSource_Data_Hybrid_Field::TYPE_USER] )): ?>
+	<div class="widget-header widget-no-border-radius">
+		<h4>
+			<small><?php echo __('Section'); ?> </small>
+			<?php echo DataSource_Data_Hybrid_Field::TYPE_USER; ?>
+		</h4>
+	</div>
+	<div id="user_fields" class="widget-content">
+		<?php foreach($record->struct[DataSource_Data_Hybrid_Field::TYPE_USER] as $type => $fields): ?>
+			<?php foreach($fields as $key): ?>
+			<?php echo View::factory('datasource/data/hybrid/document/fields/user', array(
+				'value' => $doc->fields[$key], 
+				'field' => $record->fields[$key],
+				'doc' => $doc
+			)); ?>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
+	</div>
+	<?php endif ;?>
+		
+	<?php if(!empty($record->struct[DataSource_Data_Hybrid_Field::TYPE_TAGS] )): ?>
+	<div class="widget-header widget-no-border-radius">
+		<h4>
+			<small><?php echo __('Section'); ?> </small>
+			<?php echo DataSource_Data_Hybrid_Field::TYPE_TAGS; ?>
+		</h4>
+	</div>
+	<div id="tags_fields" class="widget-content">
+		<?php foreach($record->struct[DataSource_Data_Hybrid_Field::TYPE_TAGS] as $type => $fields): ?>
+			<?php foreach($fields as $key): ?>
+			<?php echo View::factory('datasource/data/hybrid/document/fields/tags', array(
+				'value' => $doc->fields[$key], 
+				'field' => $record->fields[$key],
+				'doc' => $doc
+			)); ?>
 			<?php endforeach; ?>
 		<?php endforeach; ?>
 	</div>
