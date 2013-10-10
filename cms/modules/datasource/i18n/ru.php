@@ -87,5 +87,7 @@ return array(
 	'Date of creation' => 'Дата создания',
 	'Set each new value appear in a new line'
 		=> 'Каждое новое значение пишите в новой строке',
-	'Field options' => 'Значения поля'
+	'Field options' => 'Значения поля',
+	'Field validation' => 'Валидация поля',
+	'Regular expression or Valid class method :link' => 'Регулярное выражение или метод класса Valid :link'
 );

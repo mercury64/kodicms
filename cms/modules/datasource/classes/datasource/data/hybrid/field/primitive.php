@@ -231,7 +231,24 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 		
 		if(!empty($this->regexp))
 		{
-			$validation->rule($this->name, 'regex', array(':value', $this->regexp));
+			if(  strpos( $this->regexp, '::' ) !== FALSE )
+			{
+				list($class, $method) = explode('::', $this->regexp);
+			}
+			else
+			{
+				$class = 'Valid';
+				$method = $this->regexp;
+			}
+			
+			if(method_exists($class, $method))
+			{
+				$validation->rule($this->name, array($class, $method));
+			}
+			else
+			{
+				$validation->rule($this->name, 'regex', array(':value', $this->regexp));
+			}
 		}
 			
 		return parent::document_validation_rules($validation, $doc);
