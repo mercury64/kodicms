@@ -27,7 +27,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 		'allowed_tags' => '<b><i><u><p><ul><li><ol>',
 		'regexp' => NULL,
 		'isreq' => FALSE,
-		'select' => array()
+		'select_array' => array()
 	);
 	
 	public static function types()
@@ -77,17 +77,10 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 				}
 				break;
 			case self::PRIMITIVE_TYPE_SELECT:
-				if(!isset($data['select']))
+				if(isset($data['select']) AND !is_array($data['select']))
 				{
-					$data['select'] = array();
-				}
-				else
-				{
-					if(!is_array($data['select']))
-					{
-						$data['select'] = preg_split('/\\r\\n|\\r|\\n/', $data['select']);
-						$data['select'] = array_combine($data['select'], $data['select']);
-					}
+					$data['select'] = preg_split('/\\r\\n|\\r|\\n/', $data['select']);
+					$data['select'] = array_combine($data['select'], $data['select']);
 				}
 				break;
 		}
