@@ -120,7 +120,7 @@ Kohana::init( array(
 
 define('CMS_NAME',			'KodiCMS');
 define('CMS_SITE',			'http://www.kodicms.ru');
-define('CMS_VERSION',		'6.5.20');
+define('CMS_VERSION',		'7.5.21');
 
 if(PHP_SAPI != 'cli')
 {
