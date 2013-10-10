@@ -155,7 +155,7 @@ class Controller_Hybrid_Section extends Controller_System_Datasource
 		}
 
 		// save and quit or save and continue editing?
-		if ( $this->request->post('commit') )
+		if ( $this->request->post('commit') !== NULL )
 		{
 			$this->go( Route::url('datasources', array(
 				'directory' => 'datasources',

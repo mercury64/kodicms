@@ -42,6 +42,7 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 	public function action_view()
 	{
 		$id = (int) $this->request->query('id');
+		$action = $this->request->action();
 
 		if( empty($id) )
 		{
@@ -70,8 +71,16 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 			->add($this->ds->name, Route::url('datasources', array(
 				'directory' => 'datasources',
 				'controller' => 'data'
-			)) . URL::query(array('ds_id' => $this->ds->ds_id), FALSE))
-			->add(__(':action document', array(':action' => __(ucfirst($this->request->action())))));
+			)) . URL::query(array('ds_id' => $this->ds->ds_id), FALSE));
+		
+		if($action == 'create')
+		{
+			$this->breadcrumbs->add(__('New document'));
+		}
+		else
+		{
+			$this->breadcrumbs->add($doc->header);
+		}
 		
 		$this->template->content = View::factory('datasource/data/hybrid/document/edit', array(
 			'record' => $this->ds->get_record(),
@@ -117,7 +126,6 @@ class Controller_Hybrid_Document extends Controller_System_Datasource
 		}
 		else
 		{
-			
 			$this->go(Route::url('datasources', array(
 				'directory' => 'hybrid',
 				'controller' => 'document',

@@ -24,6 +24,7 @@ return array(
 	'Remove fields' => 'Удалить выделенные',
 	'Hybrid Headline' => 'Список гибридных документов',
 	'Hybrid document' => 'Гибридный документ',
+	'New document' => 'Новый документ',
 	'Add field' => 'Новое поле',
 	'Edit field' => 'Редактирование поля',
 	'Field header' => 'Название',

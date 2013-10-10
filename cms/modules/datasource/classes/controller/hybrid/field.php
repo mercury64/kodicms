@@ -59,7 +59,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 				'action' => 'edit',
 				'id' => $ds->ds_id
 			)))
-			->add(__('Edit field'));
+			->add($this->field->header);
 
 		$type = $this->field->family == DataSource_Data_Hybrid_Field::TYPE_PRIMITIVE 
 				? $this->field->type 
