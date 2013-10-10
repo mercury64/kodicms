@@ -245,4 +245,20 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Hybrid {
 	{
 		return 1;
 	}
+	
+	public function fetch_backend_content()
+	{
+		try
+		{
+			$content = View::factory( 'widgets/backend/' . $this->backend_template(), array(
+					'widget' => $this
+				))->set($this->backend_data());
+		}
+		catch( Kohana_Exception $e)
+		{
+			$content = NULL;
+		}
+		
+		return $content;
+	}
 }
