@@ -17,7 +17,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 	const PRIMITIVE_TYPE_FLOAT = 'float';
 	const PRIMITIVE_TYPE_STRING = 'string';
 	const PRIMITIVE_TYPE_SLUG = 'slug';
-	
+	const PRIMITIVE_TYPE_SELECT = 'select';
 
 	protected $_props = array(
 		'default' => NULL,
@@ -27,6 +27,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 		'allowed_tags' => '<b><i><u><p><ul><li><ol>',
 		'regexp' => NULL,
 		'isreq' => FALSE,
+		'select' => array()
 	);
 	
 	public static function types()
@@ -42,7 +43,8 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 			self::PRIMITIVE_TYPE_HTML		=> __('HTML'),
 			self::PRIMITIVE_TYPE_TEXT		=> __('Text'),
 			self::PRIMITIVE_TYPE_EMAIL		=> __('Email'),
-			self::PRIMITIVE_TYPE_SLUG		=> __('Slug')
+			self::PRIMITIVE_TYPE_SLUG		=> __('Slug'),
+			self::PRIMITIVE_TYPE_SELECT		=> __('Select')
 		);
 	}
 
@@ -72,6 +74,20 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 				if(!isset($data['allow_html']))
 				{
 					$data['allow_html'] = FALSE;
+				}
+				break;
+			case self::PRIMITIVE_TYPE_SELECT:
+				if(!isset($data['select']))
+				{
+					$data['select'] = array();
+				}
+				else
+				{
+					if(!is_array($data['select']))
+					{
+						$data['select'] = preg_split('/\\r\\n|\\r|\\n/', $data['select']);
+						$data['select'] = array_combine($data['select'], $data['select']);
+					}
 				}
 				break;
 		}
@@ -120,42 +136,48 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 	
 	public function onCreateDocument($doc) 
 	{
-		switch($this->type) 
-		{
-			case self::PRIMITIVE_TYPE_DATE: 
-			case self::PRIMITIVE_TYPE_DATETIME:
-				$doc->fields[$this->name] = $this->format_date($doc->fields[$this->name]); 
-				break;
-
-			case self::PRIMITIVE_TYPE_HTML:
-				$doc->fields[$this->name] = Kses::filter( $doc->fields[$this->name], $this->allowed_tags );
-				break;
-			case self::PRIMITIVE_TYPE_TEXT:
-				if( ! $this->allow_html)
-					$doc->fields[$this->name] = strip_tags( $doc->fields[$this->name] ); 
-				break;
-			case self::PRIMITIVE_TYPE_BOOLEAN:
-				$doc->fields[$this->name] = $doc->fields[$this->name] ? 1 : 0; 
-				break;
-
-			case self::PRIMITIVE_TYPE_INTEGER:
-				$doc->fields[$this->name] = (int) $doc->fields[$this->name];
-				break;
-
-			case self::PRIMITIVE_TYPE_FLOAT:
-					$doc->fields[$this->name] = (float) $doc->fields[$this->name];
-				break;
-			
-			case self::PRIMITIVE_TYPE_SLUG:
-					$doc->fields[$this->name] = URL::title($doc->fields[$this->name]);
-				break;
-		}
+		$this->onUpdateDocument($doc, $doc);
 	}
 	
 	public function onUpdateDocument($old, $new) 
 	{
-		$this->onCreateDocument($new);
-//		$new->fields[$this->name] = $old->fields[$this->name];
+		switch($this->type) 
+		{
+			case self::PRIMITIVE_TYPE_DATE: 
+			case self::PRIMITIVE_TYPE_DATETIME:
+				$new->fields[$this->name] = $this->format_date($new->fields[$this->name]); 
+				break;
+
+			case self::PRIMITIVE_TYPE_HTML:
+				$new->fields[$this->name] = Kses::filter( $new->fields[$this->name], $this->allowed_tags );
+				break;
+			case self::PRIMITIVE_TYPE_TEXT:
+				if( ! $this->allow_html)
+					$new->fields[$this->name] = strip_tags( $new->fields[$this->name] ); 
+				break;
+			case self::PRIMITIVE_TYPE_BOOLEAN:
+				$new->fields[$this->name] = $new->fields[$this->name] ? 1 : 0; 
+				break;
+
+			case self::PRIMITIVE_TYPE_INTEGER:
+				$new->fields[$this->name] = (int) $new->fields[$this->name];
+				break;
+
+			case self::PRIMITIVE_TYPE_FLOAT:
+					$new->fields[$this->name] = (float) $new->fields[$this->name];
+				break;
+			
+			case self::PRIMITIVE_TYPE_SLUG:
+					$new->fields[$this->name] = URL::title($new->fields[$this->name]);
+				break;
+			
+			case self::PRIMITIVE_TYPE_SELECT:
+					if( in_array($new->fields[$this->name], (array) $this->select))
+						$new->fields[$this->name] = $this->select[$new->fields[$this->name]];
+					else
+						$new->fields[$this->name] = $old->fields[$this->name];
+				break;
+		}
 	}
 	
 	public function fetch_value($doc) 
@@ -204,16 +226,19 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 					$validation->rule($this->name, array($this, 'check_unique'), array(':value', $doc));
 				}
 				break;
+			case self::PRIMITIVE_TYPE_SELECT:
+				$validation->rule($this->name, 'in_array', array(':value', $this->select));
+				break;
 		}
 		
 		if(!empty($this->min) AND !empty($this->max))
 		{
-			$validation->rule($this->name, array('range', array(':value', $this->min, $this->max)));
+			$validation->rule($this->name, 'range', array(':value', $this->min, $this->max));
 		}
 		
 		if(!empty($this->regexp))
 		{
-			$validation->rule($this->name, array('regex', array(':value', $this->regexp)));
+			$validation->rule($this->name, 'regex', array(':value', $this->regexp));
 		}
 			
 		return parent::document_validation_rules($validation, $doc);
@@ -239,6 +264,7 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 			case self::PRIMITIVE_TYPE_TIME:		return 'TIME NOT NULL';
 			case self::PRIMITIVE_TYPE_DATETIME:	return 'DATETIME NOT NULL';
 			
+			case self::PRIMITIVE_TYPE_SELECT:
 			case self::PRIMITIVE_TYPE_TEXT:
 			case self::PRIMITIVE_TYPE_HTML:		return 'TEXT NOT NULL';
 				

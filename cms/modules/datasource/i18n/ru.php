@@ -84,5 +84,8 @@ return array(
 	'Available fields' => 'Доступные поля',
 	'Order by' => 'Сортировать',
 	'Show in headline' => 'Показывать в списке',
-	'Date of creation' => 'Дата создания'
+	'Date of creation' => 'Дата создания',
+	'Set each new value appear in a new line'
+		=> 'Каждое новое значение пишите в новой строке',
+	'Field options' => 'Значения поля'
 );
