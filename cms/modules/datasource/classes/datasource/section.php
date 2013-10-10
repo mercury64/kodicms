@@ -608,10 +608,10 @@ class Datasource_Section {
 	
 	public function __sleep()
 	{
-		$vars = array_keys(get_object_vars($this));
+		$vars = get_object_vars($this);
 		unset($vars['docs'], $vars['is_indexable']);
 
-		return $vars;
+		return array_keys($vars);
 	}
 	
 	public function __wakeup()
