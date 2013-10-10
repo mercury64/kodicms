@@ -13,6 +13,7 @@
 			<label class="control-label" for="name"><?php echo __('Field key'); ?></label>
 			<div class="controls">
 				<?php echo Form::hidden( 'name', Arr::get($post_data, 'name', $field->name)); ?>
+				<?php echo Form::hidden( 'in_headline', Arr::get($post_data, 'in_headline', $field->in_headline)); ?>
 				<span class="input-xlarge uneditable-input"><?php echo $field->name; ?></span>
 			</div>
 		</div>
