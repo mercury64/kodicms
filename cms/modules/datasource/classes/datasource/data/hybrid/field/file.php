@@ -321,7 +321,7 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 			
 			$validation->rules( $this->name . '_url', array(
 				array('Valid::url'),
-				array('in_array', array(':value', $this->types))
+				array('in_array', array($ext, $this->types))
 			) );
 		}
 
