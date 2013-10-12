@@ -76,6 +76,12 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 					$data['allow_html'] = FALSE;
 				}
 				break;
+			case self::PRIMITIVE_TYPE_HTML:
+				if(!isset($data['filter_html']))
+				{
+					$data['filter_html'] = FALSE;
+				}
+				break;
 			case self::PRIMITIVE_TYPE_SELECT:
 				if(isset($data['select']) AND !is_array($data['select']))
 				{
@@ -142,7 +148,8 @@ class DataSource_Data_Hybrid_Field_Primitive extends DataSource_Data_Hybrid_Fiel
 				break;
 
 			case self::PRIMITIVE_TYPE_HTML:
-				$new->fields[$this->name] = Kses::filter( $new->fields[$this->name], $this->allowed_tags );
+				if($this->filter_html)
+					$new->fields[$this->name] = Kses::filter( $new->fields[$this->name], $this->allowed_tags );
 				break;
 			case self::PRIMITIVE_TYPE_TEXT:
 				if( ! $this->allow_html)
