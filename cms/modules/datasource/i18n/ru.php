@@ -80,7 +80,9 @@ return array(
 	'Slug from header' => 'Брать значение из Заголовка',
 	'Unique value' => 'Уникальное',
 	'":field" field must be unique' => 'Поле ":field" должно быть уникальным',
-	
+	'Upload new file' => 'Загрузить новый файл',
+	'Remove file' => 'Удалить файл',
+	'Or paste URL to file' => 'Или укажите ссылку на файл',
 	'Documents order' => 'Сортировка документов',
 	'Available fields' => 'Доступные поля',
 	'Order by' => 'Сортировать',

@@ -204,9 +204,24 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	{
 		$new_file = $new->fields[$this->name];
 		
-		if(empty($new_file))
+		if(empty($new_file)) 
+		{
+			$this->set_old_value($old, $new);
+			return FALSE;
+		}
+		elseif( $new_file == -1)
+		{
+			$this->onRemoveDocument($old);
+			
+			$new->fields[$this->name] = '';
+			return FALSE;
+		}
+		elseif($new_file == $old->fields[$this->name])
+		{
+			return FALSE;
+		}
 
-		$filepath = FALSE;
+		$filepath = NULL;
 
 		if(is_array($new_file) AND Valid::not_empty( $new_file ))
 		{
@@ -225,15 +240,13 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 			}
 		}
 
-		if( $filepath === FALSE) 
+		if( empty($filepath) ) 
 		{
 			$this->set_old_value($old, $new);
 			return FALSE;
 		}
-		else
-		{
-			$this->onRemoveDocument($old);
-		}
+		
+		$this->onRemoveDocument($old);
 		
 		if($this->is_image( $filepath ))
 		{
@@ -254,11 +267,6 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 		
 		$new->fields[$this->name] = $this->folder . $filename;
 		
-		if($new->fields[$this->name] == -1)
-		{
-			$this->onRemoveDocument($old);
-		}
-		
 		return TRUE;
 	}
 	
@@ -273,11 +281,6 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 	
 	public function document_validation_rules( Validation $validation, DataSource_Data_Hybrid_Document $doc )
 	{
-		if($this->isreq === TRUE)
-		{
-			$validation->rule($this->name, 'not_empty');
-		}
-		
 		$image_url = NULL;
 		$image = NULL;
 		
