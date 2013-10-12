@@ -230,6 +230,10 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 			$this->set_old_value($old, $new);
 			return FALSE;
 		}
+		else
+		{
+			$this->onRemoveDocument($old);
+		}
 		
 		if($this->is_image( $filepath ))
 		{
@@ -249,7 +253,11 @@ class DataSource_Data_Hybrid_Field_File extends DataSource_Data_Hybrid_Field {
 		}
 		
 		$new->fields[$this->name] = $this->folder . $filename;
-		$this->onRemoveDocument($old);
+		
+		if($new->fields[$this->name] == -1)
+		{
+			$this->onRemoveDocument($old);
+		}
 		
 		return TRUE;
 	}
