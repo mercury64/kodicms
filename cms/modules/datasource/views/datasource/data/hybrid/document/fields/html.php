@@ -5,6 +5,6 @@
 </script>
 <?php
 echo Form::textarea( $field->name, $value, array(
-	'class' => 'input-plarge', 'id' => $field->name
+	'class' => 'input-plarge', 'id' => $field->name, 'data-height' => '265'
 ) );
 ?>
