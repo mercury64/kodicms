@@ -42,10 +42,10 @@
 					</span>
 					<?php endif; ?>
 				</div>
-				<div class="span8">
+				<div class="span7 input-append">
 					<?php echo Form::input( $field->name . '_url', NULL, array(
 						'id' => $field->name . '_url', 'placeholder' => __('Or paste URL to file'),
-						'class' => 'input-block-level'
+						'class' => 'input-block-level input-filemanager'
 					) ); ?>
 				</div>
 			</div>
