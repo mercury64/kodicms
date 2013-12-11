@@ -1,5 +1,10 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS
+ * @category	Controller
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_Login extends Controller_System_Frontend {
 
 	public $template = 'layouts/frontend';
@@ -66,10 +71,7 @@ class KodiCMS_Controller_Login extends Controller_System_Frontend {
 
 				Session::instance()->delete('install_data');
 				
-				Kohana::$log->add(Log::INFO, 'User log in with :field: :value', array(
-					':field' => $fieldname,
-					':value' => $array['username']
-				))->write();
+				Kohana::$log->add(Log::INFO, ':user login')->write();
 
 				if( $next_url = Flash::get( 'redirect') )
 				{
@@ -162,8 +164,8 @@ class KodiCMS_Controller_Login extends Controller_System_Frontend {
 			'link' => HTML::anchor( URL::frontend( Route::url( 'reflink', array('code' => $reflink) ), TRUE ) )
 		));
 
-		$email = Email::factory(__('Forgot password from :site_name', array(':site_name' => Setting::get('site_title'))))
-			->from(Setting::get('default_email'), Setting::get('site_title'))
+		$email = Email::factory(__('Forgot password from :site_name', array(':site_name' => Config::get('site', 'title'))))
+			->from(Config::get('email', 'default'), Config::get('site', 'title'))
 			->to($user->email)
 			->message($message, 'text/html');
 

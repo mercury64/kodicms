@@ -249,6 +249,42 @@ var __ = function (str, values) {
     return values == undefined ? str : strtr(str, values);
 };
 
+cms.navigation = {
+	counter: {
+		init: function() {
+			$('#site_nav .dropdown').each(function() {
+				var total = 0;
+
+				$('.dropdown-menu a', this).each(function() {
+					if($(this).data('counter') > 0) {
+						total += $(this).data('counter');
+						$(this).append('<span class="counter">' + $(this).data('counter') + '</span>');
+					}
+				});
+
+				if(total > 0)
+					$('.dropdown-toggle', this).append('<span class="counter">' + total + '</span>');
+			});
+			
+			$('#subnav a').each(function() {
+				if($(this).data('counter') > 0) {
+					$(this).append('<span class="counter">' + $(this).data('counter') + '</span>');
+				}
+			});
+		},
+		add: function(href, count) {
+			$('.dropdown-menu a[href*="'+href+'"]').data('counter', count);
+			$('#subnav a[href*="'+href+'"]').data('counter', count);
+			this.init();
+		},
+		remove: function(href) {
+			$('.dropdown-menu a[href*="'+href+'"]').removeData('counter');
+			$('#subnav a[href*="'+href+'"]').removeData('counter');
+			this.init();
+		}
+	}
+}
+
 cms.ui = {
     callbacks:[],
     add:function (module, callback) {
@@ -290,6 +326,8 @@ cms.init = {
 			cms.init.callbacks.push([rout, callback]);
 		else
 			return false;
+		
+		cms.init.callbacks.reverse();
 	},
 	run:function () {
 		var body_id = $('body:first').attr('id').toString();
@@ -310,10 +348,58 @@ cms.ui.add('btn-confirm', function() {
 
 		return false;
 	});
+}).add('nav-counter', function() {
+
+	cms.navigation.counter.init();
+
 }).add('outline', function() {
 	$('.widget')
 		.addClass('outline_inner')
 		.wrap('<div class="outline"></div>');
+}).add('tabable', function() {
+	if($('.tabbable').length > 0) {
+		$('#content .widget-header').each(function(i) {
+			if($(this).hasClass('widget-section')) {
+				$('<li class="nav-section"><h5><i class="icon-arrow-down"></i> ' + $(this).text() + '</h5></li>').appendTo($('.tabbable .nav'));
+			} else {
+				$('<li><a href="#tab' + i + '" data-toggle="tab">' + $(this).text() + '</a></li>').appendTo($('.tabbable .nav'));
+				
+				if($(this).hasClass('widget-header-onlytab'))
+					$('<div class="tab-pane" id="tab' + i + '">' + $(this).next().html() + '</div>').appendTo($('.tabbable .tab-content'));
+				else 
+					$('<div class="tab-pane" id="tab' + i + '"><h2>'+$(this).text()+'</h2><hr />' + $(this).next().html() + '</div>').appendTo($('.tabbable .tab-content'));
+
+				$(this).next().remove();
+			}
+			
+			$(this).remove();
+			
+			
+		});
+		$('.tabbable .nav li a').on('click', function() {
+			window.location.hash = $(this).attr('href');
+		})
+
+		if(window.location.hash.length > 0 && $('.tabbable .nav li a[href='+window.location.hash+']').length > 0) {
+			$('.tabbable .nav li a[href='+window.location.hash+']').parent().addClass('active');
+			$('.tabbable ' + window.location.hash).addClass('active');
+		} else {
+			$('.tabbable .nav li:first-child').addClass('active');
+			$('.tabbable .tab-pane:first-child').addClass('active');
+		}
+
+		$('.tabbable .tab-pane').css({
+			'min-height': cms.calculateContentHeight() - 130
+		});
+		
+		$(window).resize(function() {
+			$('.tabbable .tab-pane').css({
+				'min-height': cms.calculateContentHeight() - 130
+			});
+		});
+	}
+	
+	$(window).trigger('tabbable');
 }).add('calculate_height', function() {
 	cms.calculateContentHeight();
 
@@ -441,6 +527,36 @@ cms.ui.add('btn-confirm', function() {
 	});
 }).add('focus', function() {
 	$('.focus').focus();
+}).add('dropzone', function() {
+	cms.uploader = new Dropzone('.dropzone', {
+		success: function(file, r) {
+			var response = $.parseJSON(r);
+			var self = this;
+			if(response.code != 200) {
+				$(file.previewElement).fadeOut(500, function() {
+					self.removeFile(file);
+				})
+				cms.message(response.message, 'error');
+				
+			} else {
+				cms.message(response.response);
+			}
+		},
+		error: function(file, message) {
+			cms.message(message, 'error');
+			this.removeFile(file);
+		},
+        dictDefaultMessage: __("Drop files here to upload"),
+        dictFallbackMessage: __("Your browser does not support drag'n'drop file uploads."),
+        dictFallbackText: __("Please use the fallback form below to upload your files like in the olden days."),
+        dictFileTooBig: __("File is too big ({{filesize}}MB). Max filesize: {{maxFilesize}}MB."),
+        dictInvalidFileType: __("You can't upload files of this type."),
+        dictResponseError: __("Server responded with {{statusCode}} code."),
+        dictCancelUpload: __("Cancel upload"),
+        dictCancelUploadConfirmation: __("Are you sure you want to cancel this upload?"),
+        dictRemoveFile: __("Remove file"),
+        dictMaxFilesExceeded: __("You can only upload {{maxFiles}} files."),
+	});
 }).add('loader', function() {
     cms.loader.init();
 }).add('fancybox', function() {
@@ -487,6 +603,20 @@ cms.ui.add('btn-confirm', function() {
 	})
 }).add('select2', function() {
 	$('select').not('.no-script').select2();
+}).add('ajax_form', function() {
+	$('body').on('submit', 'form.form-ajax', function() {
+		var $self = $(this);
+		var $buttons = $('button', $self)
+			.attr('disabled', 'disabled');
+
+		Api.post($self.attr('action'), $self.serialize(), function(response) {
+			setTimeout(function() {
+				$buttons.removeAttr('disabled');
+			}, 5000);
+		});
+
+		return false;
+	})
 });
 
 var Api = {
@@ -514,11 +644,15 @@ var Api = {
 		return this.response();
 	},
 
-	request: function(method, uri, data, callback) {
+	request: function(method, uri, data, callback, show_loader) {
 		if(uri.indexOf('-') == -1) uri = '-' + uri;
 		else if(uri.indexOf('-') > 0 && uri.indexOf('/') == -1)  uri = '/' + uri;
 		
-		uri = '/api' + uri;
+		if(uri.indexOf('/api') == -1)
+			uri = '/api' + uri;
+		
+		if(show_loader == 'undefined')
+			show_loader = true;
 		
 		$.ajaxSetup({
 			contentType : 'application/json'
@@ -534,13 +668,17 @@ var Api = {
 			dataType: 'json',
 //			cache: false,
 			beforeSend: function(){
-				cms.loader.show();
+				if(show_loader) cms.loader.show();
 			},
 			success: function(response) {
 				if(response.code != 200) return Api.exception(response);
 				
 				if (response.message) {
-					cms.message(response.message);
+					if(response.message instanceof Object) {
+						parse_messages(response.message)
+					} else {
+						cms.message(response.message);
+					}
 				}
 	
 				if(response.redirect) {
@@ -552,6 +690,7 @@ var Api = {
 				this._response = response;
 				
 				var $event = method + uri.replace(/\//g, ':');
+				console.log($event);
 				window.top.$('body').trigger($event.toLowerCase(), [this._response.response]);
 
 				if(typeof(callback) == 'function') callback(this._response);
@@ -589,7 +728,6 @@ function updateQueryStringParameter(uri, key, value) {
 
 function parse_messages($messages, $type) {
 	for(text in $messages) {
-		console.log(text);
 		if(text == '_external') {
 			parse_messages($messages[text], $type);
 			continue;

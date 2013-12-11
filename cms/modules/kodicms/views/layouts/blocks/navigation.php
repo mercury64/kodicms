@@ -10,20 +10,19 @@ if($navigation !== NULL)
 
 		$menu_nav = Bootstrap_Nav::factory()
 			->attributes('id', 'site_nav');
+		
 		foreach ( $navigation as $section )
 		{ 
 			if(count($section) == 0) continue;
 
 			$dropdown = Bootstrap_Navbar_Dropdown::factory(array(
-				'title' => $section->name() . UI::counter($section->counter),
+				'title' => $section->name(),
 			));
 			
 			$is_active = FALSE;
 
 			foreach ( $section as $item )
 			{
-//				if( ! AuthUser::hasPermission($item->permissions) ) continue;
-
 				if($item->divider === TRUE)
 				{
 					$dropdown->add_divider();
@@ -31,7 +30,7 @@ if($navigation !== NULL)
 
 				$dropdown->add(Bootstrap_Element_Button::factory(array(
 						'href' => $item->url(), 'title' => $item->name()
-				))->icon($item->icon), $item->is_active());
+				))->attributes('data-counter', $item->counter)->icon($item->icon), $item->is_active());
 				
 				if($item->is_active())
 				{
@@ -51,8 +50,15 @@ if($navigation !== NULL)
 					'title' => UI::label(UI::icon( 'user icon-white' ) . ' <span class="text">' .  AuthUser::getUserName() . '</span>')
 				))
 				->add(
+					Bootstrap_Helper_HTML::factory(array(
+						'string' => AuthUser::getRecord()->gravatar(90, NULL, array('class' => 'img-circle'))
+					)),
+					FALSE, array('class' => 'navigation-avatar')
+				)
+				->add_divider()
+				->add(
 					Bootstrap_Element_Button::factory(array(
-						'href' => Route::url('backend', array('controller' => 'users', 'action' => 'edit', 'id' => AuthUser::getId())),
+						'href' => Route::url('backend', array('controller' => 'users', 'action' => 'profile')),
 						'title' => __( 'Profile' )
 					))->icon('eye-open')
 				)
@@ -86,13 +92,11 @@ if($navigation !== NULL)
 		$nav = Bootstrap_Nav::factory();
 		foreach ( $section as $item )
 		{
-//			if( ! AuthUser::hasPermission($item->permissions) ) continue;
-
 			if($item->divider === TRUE) $nav->add_divider();
 
 			$nav->add(Bootstrap_Element_Button::factory(array(
-				'href' => $item->url(), 'title' => $item->name() . UI::counter($item->counter)
-			))->icon($item->icon), $item->is_active());
+				'href' => $item->url(), 'title' => $item->name()
+			))->attributes('data-counter', $item->counter)->icon($item->icon), $item->is_active());
 		}
 
 		$navbar->add($nav);

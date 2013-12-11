@@ -1,7 +1,9 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
 /**
- * @package    Kodi/Api
+ * @package		KodiCMS
+ * @category	Model/Api
+ * @author		ButscHSter
  */
 class KodiCMS_Model_API_Page_Tag extends Model_API {
 	
@@ -31,7 +33,7 @@ class KodiCMS_Model_API_Page_Tag extends Model_API {
 		
 		return $tags
 			->cache_tags( array('page_tags') )
-			->cached((int)Kohana::$config->load('global.cache.tags'))
+			->cached( (int) Config::get('cache', 'tags') )
 			->execute()
 			->as_array();
 	}

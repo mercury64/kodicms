@@ -2,6 +2,9 @@
 
 /**
  * Задача отправки отложенных писем
+ * @package		KodiCMS/EmailQueue
+ * @category	Task
+ * @author		ButscHSter
  */
 class Task_Email_Queue extends Minion_Task
 {
@@ -11,8 +14,6 @@ class Task_Email_Queue extends Minion_Task
 
 	protected function _execute(array $params)
 	{
-		ORM::factory('email_queue')->clean_old();
-
 		try
 		{
 			if($params['use_sleep'] == 1)

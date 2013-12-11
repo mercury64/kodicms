@@ -1,5 +1,10 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS
+ * @category	System Controller
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_System_Download extends Controller {
 	
 	public $auto_render = FALSE;
@@ -8,10 +13,8 @@ class KodiCMS_Controller_System_Download extends Controller {
 	{
 		$path = $this->request->param('path');
 		$path = Download::decode_path($path);
-		
-		$full_path = DIRECTORY_SEPARATOR . trim($path, '/');
 
-		if( ! file_exists( $full_path ))
+		if( ! file_exists( $path ))
 		{
 			if(IS_BACKEND)
 			{
@@ -26,7 +29,7 @@ class KodiCMS_Controller_System_Download extends Controller {
 		}
 		
 		$this->response
-			->send_file($full_path);
+			->send_file($path);
 	}
 	
 }

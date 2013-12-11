@@ -57,14 +57,14 @@ return array(
 			'description' => 'Delete layout'
 		),
 	),
-	'setting' => array(
+	'system' => array(
 		array(
-			'action' => 'index',
+			'action' => 'settings',
 			'description' => 'View settings'
 		),
 		array(
-			'action' => 'clear_cache',
-			'description' => 'Clear cache'
+			'action' => 'information',
+			'description' => 'View system information'
 		),
 	),
 );

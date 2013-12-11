@@ -1,8 +1,14 @@
+<div class="widget-header widget-section">
+	<h2><?php echo __('Section permissions'); ?></h2>
+</div>
+
+<?php foreach($permissions as $title => $actions):?>
+
 <div class="widget-header">
-	<h3><?php echo __('Permissions'); ?></h3>
+	<h3><?php echo __(ucfirst($title)); ?></h3>
 </div>
 <div class="widget-content widget-nopad">
-<?php foreach($permissions as $title => $actions): ?>
+
 	<table class="table table-hover" id="permissions-list">
 		<colgroup>
 			<col width="20px" />
@@ -10,16 +16,8 @@
 		</colgroup>
 		<thead class="highlight">
 			<tr>
-				<th>
-					<?php echo Bootstrap_Form_Element_Checkbox::factory(array(
-						'name' => 'check_all', 'value' => 1
-					)); ?>
-				</th>
-				<th>
-					<h4>
-						<small><?php echo __('Section'); ?></small> 
-						<?php echo __(ucfirst($title)); ?>
-					</h4>
+				<th colspan="2">
+					<label class="check_all"><?php echo __('Select all'); ?></label>
 				</th>
 			</tr>
 		</thead>
@@ -38,6 +36,7 @@
 		<?php endforeach; ?>
 		</tbody>
 	</table>
-<?php endforeach; ?>
+
 </div>
+<?php endforeach; ?>
 	

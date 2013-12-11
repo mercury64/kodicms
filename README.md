@@ -180,8 +180,17 @@ RewriteRule .* index.php/$0 [PT]# Set environment
 
 https://github.com/butschster/kodicms/issues
 
-## Changelog
+### 7.10.40
+ * [feature] Замена класса Setting на Config_Database, в связи с этим замена таблицы Setting на Config
+ * [feature] Добавлен раздел с настройкой модуля Email
+ * [update] Обновление плагина Сообщения
+ * [refactoring] Доработан класс Api_Response
+ * [fix] Исправлено отображения коунтрера в навигации
+ * [fix] Исправление мелких ошибок
 
+### 6.8.27
+
+ * [feature] Кнопка обновления кеша в настройках теперь сбрасывает кеш через ajax
  * [fix] Исправлены ошибки в плагине Archive
  * [feature] В страницах поле Robots (issue #186)
  * [feature] Адаптация меню админ панели под ширину экрана
@@ -193,6 +202,9 @@ https://github.com/butschster/kodicms/issues
  * [feature] Добавлен плагин типографа http://mdash.ru/ , доступен в redactor.js
  * [feature] Добавлен плагин в redactor.js для открытия во весь экран
  * [fix] Исправлена ошибка с открытием редактора Ace во весь экран
+ * [feature] Замена jquery.uploader на jquery.dropzone (http://www.dropzonejs.com/)
+ * [fix] Исправление плагина Backup
+ * [fix] Исправление мелких ошибок
 
 ### 6.4.21
 

@@ -1,17 +1,28 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct script access.' );
 
+/**
+ * @package		KodiCMS/Users
+ * @category	API
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_API_Users extends Controller_System_Api {
-	
+
 	public function get_get()
 	{		
 		$uids = $this->param('uids');
 		
+		if(!empty($uids))
+			$uids = explode(',', $uids);
+
 		$users = Model_API::factory('api_user')
 			->get_all($uids, $this->fields);
 
 		$this->response($users);
 	}
 	
+	/**
+	 * @link /api-users.like
+	 */
 	public function get_like()
 	{
 		$query = $this->param('key', NULL, TRUE);

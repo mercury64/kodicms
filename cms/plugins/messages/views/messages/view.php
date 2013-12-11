@@ -1,28 +1,41 @@
-<div class="map widget">
+<script>
+	var MESSAGE_ID = <?php echo $message->id; ?>;
+</script>
+<style>
+	.widget-content.new-message {
+		background: #e8efcf
+	}
+	.widget-content.own-message {
+		background: #FCF8E3
+	}
+	
+	.message-text {
+		border-top: 1px solid #ddd;
+		padding-top: 5px;
+	}
+</style>
+
+<div class="widget">
 	<div class="widget-header">
-		<h3><?php echo $message->title; ?></h3>
+		<h3><small><?php echo __('Subject'); ?>:</small> <?php echo $message->title; ?></h3>
 	</div>
 	
-	<?php if($message->from_user_id != AuthUser::getId()): ?>
-	<div class="widget-title widget-no-border-radius">
+	<?php echo $tpl->set('message', $message); ?>
+	
+	<div class="widget-content widget-no-border-radius">
 		<?php echo Form::open(); ?>
+		<h4><?php echo __('Answer'); ?></h4>
 		<?php echo Form::hidden('parent_id', $message->id); ?>
-		<div class="row-fluid">
-			<?php echo Form::textarea('content', NULL, array('class' => 'span12')); ?>
-		</div>
+		<?php echo Form::textarea('content', NULL, array('id' => 'message-conent')); ?>
+		<script>
+		$(function() {
+			cms.filters.switchOn( 'message-conent', '<?php echo Config::get('site', 'default_filter_id'); ?>');
+		});
+		</script>
+		<br />
 		<?php echo UI::button(__('Send message')); ?>
 		<?php echo Form::close(); ?>
 	</div>
-	<?php endif; ?>
 	
-	<?php foreach ($messages as $msg): ?>
-	<?php if($msg->is_read == Model_API_Message::STATUS_NEW): ?>
-	<?php Api::post('user-messages.mark_read', array(
-			'id' => $msg->id, 'uid' => AuthUser::getId()
-		)); ?>
-	<?php endif; ?>
-	<?php echo $tpl->set('message', $msg); ?>
-	<?php endforeach; ?>
-
-	<?php echo $tpl->set('message', $message); ?>
+	<div id="messages"></div>
 </div>

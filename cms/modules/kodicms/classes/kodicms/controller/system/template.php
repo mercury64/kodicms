@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS
+ * @category	System Controller
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_System_Template extends Controller_System_Security
 {
 	/**
@@ -70,7 +75,7 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 			if( isset($routes['backend']) )
 			{
 				$this->breadcrumbs
-						->add(__('Home'), Route::url( 'backend' ));
+						->add(UI::icon('home'), Route::url( 'backend' ));
 			}
 		}
 	}

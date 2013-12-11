@@ -1,5 +1,6 @@
 cms.init.add(['users_edit', 'users_add'], function () {
-	$('input[name="user_permission"]').select2({
+	$(window).on('tabbable', function() {
+		$('input[name="user_permission"]').select2({
 		placeholder: __("Click to get list of roles"),
 		minimumInputLength: 0,
 		multiple: true,
@@ -54,7 +55,16 @@ cms.init.add(['users_edit', 'users_add'], function () {
 			});
 		}
 	});
+	});
+	
 });
+
+cms.init.add('users_profile', function () {
+	var toolbar = $('.profile-toolbar');
+	var toolbar_l = toolbar.text().replace(/\t/g, '').replace(/\n/g, '').replace(/&nbsp;/g, '').replace(/ /g, '').length;
+	
+	if(!toolbar_l) toolbar.css({'padding': 0});
+})
 
 cms.init.add('users_add', function () {
 	$(function() {

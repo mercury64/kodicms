@@ -1,5 +1,9 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
+/**
+ * @package		KodiCMS/Api
+ * @author		ButscHSter
+ */
 Route::set('api', 'api(/<directory>)-<controller>(.<action>)(/<id>)', array('directory' => '.*'))
 	->filter(function($route, $params, $request) {
 		if (strpos($params['directory'], 'Api') === FALSE)
@@ -21,11 +25,9 @@ if(IS_BACKEND)
 
 function behavior_api_mode_settings_save( $post )
 {
-	if(!isset($post['setting']['api_mode']))
+	if(!isset($post['setting']['api']['mode']))
 	{
-		Setting::saveFromData(array(
-			'api_mode' => 'no'
-		));
+		Config::set('api', 'mode', Config::NO);
 	}
 }
 

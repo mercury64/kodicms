@@ -39,6 +39,7 @@ Kohana::modules( array(
 	'assets'		=> MODPATH . 'assets',		// Asset Manager
 	'cache'			=> MODPATH . 'cache',		// Cache manager
 	'database'		=> MODPATH . 'database',	// Database access
+	'logs'			=> MODPATH . 'logs',
 	'auth'			=> MODPATH . 'auth',		// Basic authentication
 	'orm'			=> MODPATH . 'orm',			// Object Relationship Mapping,
 	'oauth'			=> MODPATH . 'oauth',
@@ -65,6 +66,9 @@ Kohana::modules( array(
 	'behavior'		=> MODPATH . 'behavior',
 	'plugins'		=> MODPATH . 'plugins',
 ) );
+
+Kohana::$config->attach(new Config_Database);
+Kohana::$log->attach(new Log_Database('logs'));
 
 Observer::notify('modules::afer_load');
 
@@ -104,7 +108,7 @@ Route::set( 'downloader', '('.ADMIN_DIR_NAME.'/)download/<path>', array(
 
 Route::set( 'backend', ADMIN_DIR_NAME.'(/<controller>(/<action>(/<id>)))')
 	->defaults( array(
-		'controller' => Setting::get('default_tab'),
+		'controller' => Config::get('site', 'default_tab'),
 		'action' => 'index',
 	) );
 

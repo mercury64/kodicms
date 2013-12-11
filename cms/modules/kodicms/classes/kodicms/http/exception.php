@@ -1,5 +1,10 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct script access.' );
 
+/**
+ * @package		KodiCMS
+ * @category	Exception
+ * @author		ButscHSter
+ */
 class KodiCMS_HTTP_Exception extends Kohana_HTTP_Exception {
 	
 	/**
@@ -15,7 +20,7 @@ class KodiCMS_HTTP_Exception extends Kohana_HTTP_Exception {
 		// Lets log the Exception, Just in case it's important!
 		Kohana_Exception::log($this);
 
-		if ( Setting::get('debug') == 'yes')
+		if ( Config::get('site', 'debug') == Config::YES)
 		{
 			// Show the normal Kohana error page.
 			return parent::get_response();

@@ -1,5 +1,10 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct script access.' );
 
+/**
+ * @package		KodiCMS/Api
+ * @category	Controller
+ * @author		ButscHSter
+ */
 class Controller_System_API extends Controller_System_Ajax {
 
 	/**
@@ -22,6 +27,12 @@ class Controller_System_API extends Controller_System_Ajax {
 	
 	/**
 	 *
+	 * @var bool
+	 */
+	protected $_check_token = FALSE;
+
+	/**
+	 *
 	 * @var boolean 
 	 */
 	protected $_is_backend = FALSE;
@@ -29,7 +40,6 @@ class Controller_System_API extends Controller_System_Ajax {
 	public function __construct(\Request $request, \Response $response) 
 	{
 		parent::__construct($request, $response);
-
 		$this->_is_backend = URL::match(ADMIN_DIR_NAME, Request::initial()->referrer());
 	}
 
@@ -82,7 +92,7 @@ class Controller_System_API extends Controller_System_Ajax {
 	 */
 	public function params(array $new_params = NULL)
 	{
-		$this->_params = Arr::merge($this->request->query(), $this->request->post(), $this->request->param());
+		$this->_params = Arr::merge($this->request->query(), $this->request->post(), $this->request->param(), $_FILES);
 		
 		if(is_array($new_params))
 		{
@@ -99,28 +109,33 @@ class Controller_System_API extends Controller_System_Ajax {
 	 */
 	public function execute()
 	{
-		if( ! $this->_is_backend AND Setting::get('api_mode') == 'no')
-		{
-			throw new HTTP_Exception_403('Forbiden');
-		}
-
-		// Execute the "before action" method
-		$this->before();
-
-		if($this->request->action() == 'index' OR $this->request->action() == '')
-		{
-			$action = 'rest_'.$this->request->method();
-		}
-		else
-		{
-			// Determine the action to use
-			$action = $this->request->method() . '_' . $this->request->action();
-		}
-		
-		$action = strtolower($action);
-
 		try 
 		{
+			if( ! $this->_is_backend AND Config::get('api', 'mode') == 'no')
+			{
+				throw new HTTP_Exception_403('Forbiden');
+			}
+
+			// Execute the "before action" method
+			$this->before();
+			
+			if( $this->_check_token !== FALSE )
+			{
+				$this->_check_token();
+			}
+
+			if($this->request->action() == 'index' OR $this->request->action() == '')
+			{
+				$action = 'rest_'.$this->request->method();
+			}
+			else
+			{
+				// Determine the action to use
+				$action = $this->request->method() . '_' . $this->request->action();
+			}
+
+			$action = strtolower($action);
+		
 			// If the action doesn't exist, it's a 404
 			if ( ! method_exists($this, $action))
 			{
@@ -134,6 +149,10 @@ class Controller_System_API extends Controller_System_Ajax {
 			$this->{$action}();
 		}
 		catch (HTTP_API_Exception $e)
+		{
+			$this->json = $e->get_response();
+		}
+		catch (Token_Validation_Exception $e)
 		{
 			$this->json = $e->get_response();
 		}
@@ -186,6 +205,15 @@ class Controller_System_API extends Controller_System_Ajax {
 	{
 		$this->json['redirect'] = URL::backend($uri);
 	}
+	
+	/**
+	 * 
+	 * @param string $uri
+	 */
+	public function message( $message )
+	{
+		$this->json['message'] = $message;
+	}
 
 	/**
 	 * 
@@ -195,5 +223,16 @@ class Controller_System_API extends Controller_System_Ajax {
 	{
 		$this->json['type'] = $this->request->method();
 		$this->json['response'] = $data;
+	}
+	
+	protected function _check_token()
+	{
+		$token = $this->param('token', NULL, TRUE);
+
+		if( ! Security::check($token))
+		{
+			Kohana::$log->add(Log::NOTICE, 'Error security token')->write();
+			throw HTTP_API_Exception::factory(API::ERROR_TOKEN, 'Error security token');
+		}
 	}
 }

@@ -1,7 +1,7 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
 /**
- * @package    Kodi/Api
+ * @package    KodiCMS/Api
  */
 class Model_API_Message extends Model_API {
 	
@@ -50,13 +50,6 @@ class Model_API_Message extends Model_API {
 			
 			$query->select(array($min_status, 'is_read'))
 				->order_by('is_read', 'asc');
-		}
-
-		$query->limit( (int) $this->get('limit', 10) );
-		
-		if( isset($this->offset) )
-		{
-			$query->offset( (int) $this->offset );
 		}
 		
 		return $query
@@ -145,6 +138,13 @@ class Model_API_Message extends Model_API {
 
 				$insert->execute($this->_db);
 				
+				if($from !== NULL)
+				{
+					Api::post('user-messages.mark_read', array(
+						'id' => $message_id, 'uid' => $from
+					));
+				}
+				
 				return $message_id;
 			}
 		}
@@ -189,7 +189,10 @@ class Model_API_Message extends Model_API {
 
 		$delete = DB::delete('messages_users')
 			->where('user_id', '=', (int) $user_id)
-			->where('message_id', '=', (int) $message_id)
+			->where_open()
+				->where('message_id', '=', (int) $message_id)
+				->or_where('parent_id', '=', (int) $message_id)
+			->where_close()
 			->execute();
 		
 		$count = DB::select(array(DB::expr( 'COUNT(*)'), 'total'))
@@ -210,9 +213,11 @@ class Model_API_Message extends Model_API {
 	
 	public function delete_by_id($id)
 	{
-		return DB::delete('messages')
+		DB::delete('messages')
 			->where('id', '=', (int) $id)
 			->execute();
+		 
+		return TRUE;
 	}
 
 	protected static function clear_cache($user_id)

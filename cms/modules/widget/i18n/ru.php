@@ -60,9 +60,9 @@ return array(
 	'Field error message' => 'Текст ошишки',
 	'Field error' => 'Ошибки',
 	
-	'Copy widgets from' => 'Скопировать выджеты у страницы',
+	'Copy widgets from' => 'Скопировать виджеты у страницы',
 	'Cache time' => 'Время кеширования',
-	
+	'--Remove from page--' => '--Убрать со страницы--',
 	'Pagination' => 'Постраничная навигация',
 	'Widget' => 'Виджет',
 	'Query key (GET)' => 'GET параметр текущей страницы',

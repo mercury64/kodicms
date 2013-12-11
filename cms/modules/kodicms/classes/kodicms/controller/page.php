@@ -1,5 +1,10 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS
+ * @category	Controller
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_Page extends Controller_System_Backend {
 	
 	public $allowed_actions = array(
@@ -58,7 +63,7 @@ class KodiCMS_Controller_Page extends Controller_System_Backend {
 		$data = Flash::get( 'post_data' );
 		$page = new Model_Page( $data );
 		$page->parent_id = $parent_id;
-		$page->status_id = Setting::get( 'default_status_id' );
+		$page->status_id = Config::get('site', 'default_status_id' );
 		$page->needs_login = Model_Page::LOGIN_INHERIT;
 		$page->published_on = date( 'Y-m-d H:i:s' );
 		
@@ -89,12 +94,12 @@ class KodiCMS_Controller_Page extends Controller_System_Backend {
 		Flash::set( 'post_data', (object) $data );
 		Flash::set( 'page_tag', $tags );
 
-		if ( Setting::get( 'allow_html_title' ) == 'off' )
+		if ( Config::get('site', 'allow_html_title' ) == 'off' )
 		{
 			$data['title'] = Kses::filter( trim( $data['title'] ), array( ) );
 		}
 
-		$data['status_id'] = Setting::get( 'default_status_id' );
+		$data['status_id'] = Config::get('site', 'default_status_id' );
 
 		$page = new Model_Page( $data, array('tags') );
 		$page->parent_id = $parent_id;
@@ -119,7 +124,7 @@ class KodiCMS_Controller_Page extends Controller_System_Backend {
 				$page->save_permissions( $permissions );
 			}
 			
-			Kohana::$log->add(Log::INFO, 'Page :id added', array(
+			Kohana::$log->add(Log::INFO, 'Page :id added by :user', array(
 				':id' => $page->id
 			))->write();
 
@@ -202,7 +207,7 @@ class KodiCMS_Controller_Page extends Controller_System_Backend {
 	{
 		$data = $this->request->post('page');
 
-		if ( Setting::get( 'allow_html_title' ) == 'off' )
+		if ( Config::get('site', 'allow_html_title' ) == 'off' )
 		{
 			$data['title'] = Kses::filter( trim( $data['title'] ), array( ) );
 		}
@@ -239,7 +244,7 @@ class KodiCMS_Controller_Page extends Controller_System_Backend {
 				$page->save_permissions( $permissions );
 			}
 			
-			Kohana::$log->add(Log::INFO, 'Page :id edited', array(
+			Kohana::$log->add(Log::INFO, 'Page :id edited by :user', array(
 				':id' => $page->id
 			))->write();
 
@@ -287,7 +292,7 @@ class KodiCMS_Controller_Page extends Controller_System_Backend {
 				// check for permission to delete this page
 				if ( !AuthUser::hasPermission( $page->get_permissions() ) )
 				{
-					Kohana::$log->add(Log::ALERT, 'Trying to delete page  :id', array(
+					Kohana::$log->add(Log::ALERT, 'Trying to delete page :id by :user', array(
 						':id' => $page_id
 					))->write();
 					
@@ -299,7 +304,7 @@ class KodiCMS_Controller_Page extends Controller_System_Backend {
 
 				if ( $page->delete() )
 				{
-					Kohana::$log->add(Log::INFO, 'Page :id deleted', array(
+					Kohana::$log->add(Log::INFO, 'Page :id deleted by :user', array(
 						':id' => $page_id
 					))->write();
 					

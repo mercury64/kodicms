@@ -1,12 +1,21 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Users
+ * @category	Controller
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_Users extends Controller_System_Backend {
+
+	public $allowed_actions = array(
+		'profile'
+	);
 
 	public function before()
 	{
-		if($this->request->action() == 'edit' AND AuthUser::getId() == $this->request->param('id'))
+		if(in_array($this->request->action(), array('edit')) AND AuthUser::getId() == $this->request->param('id'))
 		{
-			$this->allowed_actions[] = 'edit';
+			$this->allowed_actions[] = $this->request->action();
 		}
 
 		parent::before();
@@ -56,7 +65,8 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 
 		$this->template->content = View::factory( 'users/edit', array(
 			'action' => 'add',
-			'user' => $user
+			'user' => $user,
+			'permissions' => array()
 		) );
 	}
 
@@ -85,8 +95,16 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 				$user->profile
 					->values($data)
 					->create();
+				
+				Kohana::$log->add(Log::INFO, 'User :new_user has been added by :user', array(
+					':new_user' => HTML::anchor(Route::url('backend', array(
+						'controller' => 'users',
+						'action' => 'profile',
+						'id' => $user->id
+					)), $user->username),
+				))->write();
 
-				Messages::success(__( 'User has been added!' ) );
+				Messages::success(__( '!' ) );
 				Observer::notify( 'user_after_add', $user );
 			}
 		}
@@ -109,6 +127,36 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 			));
 		}
 	}
+	
+	
+	
+	public function action_profile()
+	{
+		$id = $this->request->param('id');
+		
+		if(empty($id) AND AuthUser::isLoggedIn())
+		{
+			$id = AuthUser::getId();
+		}
+		
+		$user = ORM::factory('user', $id);
+		
+		if( ! $user->loaded() )
+		{
+			Messages::errors( __('User not found!') );
+			$this->go();
+		}
+		
+		$this->template->title = __(':user profile', array(':user' => $user->username));
+		$this->breadcrumbs
+			->add($this->template->title);
+		
+		$this->template->content = View::factory( 'users/profile', array(
+			'user' => $user,
+			'permissions' => $user->permissions_list()
+		) );
+	}
+
 
 	public function action_edit( )
 	{
@@ -132,6 +180,11 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 
 		$this->template->title = __('Edit user');
 		$this->breadcrumbs
+			->add(__(':user profile', array(':user' => $user->username)), Route::url('backend', array(
+				'controller' => 'users',
+				'action' => 'profile',
+				'id' => $user->id
+			)))
 			->add($this->template->title);
 
 		$this->template->content = View::factory( 'users/edit', array(
@@ -180,6 +233,14 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 					$permissions = $this->request->post('user_permission');
 					$user->update_related_ids('roles', explode(',', $permissions));
 				}
+				
+				Kohana::$log->add(Log::INFO, 'User :new_user has been updated by :user', array(
+					':new_user' => HTML::anchor(Route::url('backend', array(
+						'controller' => 'users',
+						'action' => 'profile',
+						'id' => $user->id
+					)), $user->username),
+				))->write();
 
 				Messages::success( __( 'User has been saved!' ) );
 				Observer::notify( 'user_after_edit', $user );
@@ -213,6 +274,10 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		// security (dont delete the first admin)
 		if ( $id <= 1 )
 		{
+			Kohana::$log->add(Log::INFO, ':user trying to delete administrator', array(
+				':user_id' => $id,
+			))->write();
+			
 			throw new Kohana_Exception( 'Action disabled!' );
 		}
 
@@ -227,6 +292,10 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 
 		if ( $user->delete() )
 		{
+			Kohana::$log->add(Log::INFO, 'User with id :user_id has been deleted by :user', array(
+				':user_id' => $id,
+			))->write();
+			
 			Messages::success( __( 'User has been deleted!' ) );
 			Observer::notify( 'user_after_delete', $id );
 		}

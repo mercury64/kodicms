@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS
+ * @category	System Controller
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_System_Backend extends Controller_System_Template
 {
 	public $auth_required = TRUE;
@@ -33,13 +38,13 @@ class KodiCMS_Controller_System_Backend extends Controller_System_Template
 				$navigation = NULL;
 				$this->template->footer = NULL;
 				$this->template->breadcrumbs = NULL;
-				Setting::set( 'profiling', 'no' );
+				Config::set('site', 'profiling', 'no');
 				
 				$this->query_params = array('type' => 'iframe');
 			}
 			else
 			{
-				$this->template->breadcrumbs = Setting::get( 'breadcrumbs' ) == 'yes' ? $this->breadcrumbs : NULL;
+				$this->template->breadcrumbs = Config::get('site', 'breadcrumbs' ) == Config::YES ? $this->breadcrumbs : NULL;
 				$this->template->footer = View::factory('layouts/blocks/footer');
 			}
 			
@@ -52,6 +57,9 @@ class KodiCMS_Controller_System_Backend extends Controller_System_Template
 			
 			Assets::js('underscore', ADMIN_RESOURCES . 'libs/underscore-min.js', 'jquery-ui');
 			Assets::js('backbone', ADMIN_RESOURCES . 'libs/backbone-min.js', 'underscore');
+			
+			Assets::css('dropzone', ADMIN_RESOURCES . 'libs/dropzone/css/basic.css', 'jquery');
+			Assets::js('dropzone', ADMIN_RESOURCES . 'libs/dropzone/dropzone.min.js', 'jquery');
 			
 			Assets::css('jgrowl', ADMIN_RESOURCES . 'libs/jgrowl/jquery.jgrowl.css', 'jquery');
 			Assets::js('jgrowl', ADMIN_RESOURCES . 'libs/jgrowl/jquery.jgrowl_minimized.js', 'jquery');

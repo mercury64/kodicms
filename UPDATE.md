@@ -40,3 +40,28 @@ ALTER TABLE `TABLE_PREFIX_roles_permissions` ADD CONSTRAINT `roles_permissions_i
 ### 6.5.21
 
  * ALTER TABLE  `pages` ADD  `robots` VARCHAR( 100 ) NOT NULL DEFAULT  'INDEX,FOLLOW' AFTER  `meta_description`;
+
+### 7.7.21
+
+	CREATE TABLE IF NOT EXISTS `config` (
+		`group_name` varchar(128) NOT NULL,
+		`config_key` varchar(128) NOT NULL,
+		`config_value` text NOT NULL,
+		PRIMARY KEY (`group_name`,`config_key`)
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+### 7.10.21
+
+ * ALTER TABLE  `page_parts` ADD  `is_expanded` INT( 1 ) NOT NULL DEFAULT  '1';
+
+### 8.0.0
+
+	CREATE TABLE IF NOT EXISTS `logs` (
+		`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+		`created_on` datetime NOT NULL,
+		`user_id` int(11) unsigned DEFAULT NULL,
+		`level` tinytext NOT NULL,
+		`message` text NOT NULL,
+		`additional` text NOT NULL,
+		PRIMARY KEY (`id`)
+	) ENGINE=InnoDB  DEFAULT CHARSET=utf8;

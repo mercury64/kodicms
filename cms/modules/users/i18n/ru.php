@@ -20,7 +20,6 @@ return array(
 	'Password' => 'Пароль',
 	'Password:' => 'Пароль:',
 	'Roles' => 'Роли',
-	'Profile' => 'Профиль',
 	'User has been deleted!' => 'Пользователь удален!',
 	'User has been saved!' => 'Пользователь сохранен!',
 	'User not found!' => 'Пользователь не найден!',
@@ -35,6 +34,11 @@ return array(
 	
 	'Section :section' => 'Раздел :section',
 	
+	//============Profile============//
+	'Profile' => 'Профиль',
+	'Edit profile' => 'Редактировать профиль',
+	'Activity' => 'Активность',
+	
 	//============Permissions============//
 	'View users' => 'Видеть раздел',
 	'Add new users' => 'Добавлять новых пользователей',
@@ -47,5 +51,7 @@ return array(
 	'Edit roles' => 'Редактировать информацию',
 	'Change role permissions' => 'Редактировать привелегии',
 	'Delete roles' => 'Удалять роли',
-	'Section' => 'Раздел'
+	'Section' => 'Раздел',
+	'Section permissions' => 'Доступ к разделам',
+	'Notifications' => 'Уведомления'
 );

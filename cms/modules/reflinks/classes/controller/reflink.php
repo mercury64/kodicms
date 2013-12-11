@@ -1,5 +1,10 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Reflink
+ * @category	Controller
+ * @author		ButscHSter
+ */
 class Controller_Reflink extends Controller_System_Controller {
 
 	public function action_index()
@@ -43,8 +48,8 @@ class Controller_Reflink extends Controller_System_Controller {
 			'password' => $new_password
 		));
 
-		$email = Email::factory(__('New password for :site_name', array(':site_name' => Setting::get('site_title'))))
-			->from(Setting::get('default_email'), Setting::get('site_title'))
+		$email = Email::factory(__('New password for :site_name', array(':site_name' => Config::get('site', 'title'))))
+			->from(Config::get('email', 'default'), Config::get('site', 'title'))
 			->to($reflink->user->email)
 			->message($message, 'text/html');
 

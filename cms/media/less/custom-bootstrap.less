@@ -1,3 +1,34 @@
+h1, h2, h3, h4 ,h5, h6 {
+	font-weight: normal;
+}
+
+.well {
+	.box-shadow(none);
+}
+
+.check_all {
+	color: @blue;
+	border-bottom: 1px dashed @blue;
+	font-size: 14px;
+	display: inline-block;
+}
+
+.alert {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	
+	&.alert-warning {
+		color: #ac8643;
+		border-color: #e6dba2;
+	}
+	
+	.icon {
+		font-size: 20px;
+		margin-right: 10px;
+		color: #666
+	}
+}
+
 /* ===================================================
 	Spoiler
  ===================================================*/
@@ -53,6 +84,9 @@
 	.nav {
 		& > li {
 			& > .dropdown-menu {
+				
+				#gradient > .vertical(#fff, #f1f1f1);
+				
 				li {
 					position: relative;
 				}
@@ -111,6 +145,83 @@
 	margin: 0;
 }
 
+/* ===================================================
+	Span sidebar border
+ ===================================================*/
+.span-sidebar-right {
+	border-left: 1px solid #DDD;
+	padding-left: 20px;
+}
+
+.span-sidebar-left {
+	border-right: 1px solid #DDD;
+	padding-right: 20px;
+}
+
+/* ===================================================
+	Tabs
+ ===================================================*/
+.tabbable {
+	background: rgb(255, 252, 245);
+	border-bottom: 1px solid #ddd;
+	
+	.nav {
+		margin-top: 20px;
+		margin-right: 0;
+		border-right-width: 0;
+		width: 250px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+		
+		li {
+			margin: 5px 0 5px 15px;
+			font-size: 14px;
+			
+			
+			h5 {
+				margin-left: -5px;
+				color: #666;
+				font-size: 15px;
+				font-weight: normal;
+			}
+			
+			&.active {
+				font-weight: bold;
+				
+				a {
+					.box-shadow(-3px 0px 6px 0px #ddd);
+				}
+				
+			}
+			
+			&.nav-section {
+				margin: 15px 0 0;
+				padding: 1px 15px;
+				border-top: 1px solid #ddd;
+			}
+		}
+	}
+	
+	.tab-content {
+		padding: 10px 20px 20px 40px;
+		background: #fff;
+		border-left: 1px solid #ddd;
+		
+		.tab-pane h2 {
+			font-weight: normal;
+			
+			+ hr {
+				margin-top: 0;
+			}
+			
+			&:last-child {
+				margin-top: 0; 
+			}
+		}
+	}
+}
 /* ===================================================
 	Table design
  ===================================================*/
@@ -237,10 +348,43 @@ table.table {
 
 .breadcrumb {
 	margin: 0;
+	padding: 0 20px;
 	.border-radius(0);
 	border-top: 1px solid #fff;
 	border-bottom: 1px solid #D4D4D4;
+	background: #fff;
+	
+	li {
+		a, span {
+			float: left;
+			padding: 5px 0px;
+			line-height: 20px;
+		}
+		
+		&:first-child a {
+			font-size: 20px;
+		}
+		
+		&:after {
+			position: relative;
+			top: 3px;
+			content: '';
+			display: inline-block;
+			width: 22px;
+			height: 23px;
+			border-top: 1px solid #E5E5E5;
+			border-right: 1px solid #E5E5E5;
+			transform: rotate(45deg);
+			-ms-transform: rotate(45deg);
+			-webkit-transform: rotate(45deg);
+		}
+		
+		& + li {
+			padding-left: 15px;
+		}
+	}
 }
+
 
 input.input-title {
 	font-size: 20px;
@@ -282,105 +426,6 @@ legend {
 	}
 }
 
-//
-// List groups
-// --------------------------------------------------
-
-// Easily usable on <ul>, <ol>, or <div>.
-.list-group {
-	// No need to set list-style: none; since .list-group-item is block level
-	margin-left: 0;
-	margin-bottom: 20px;
-	padding-left: 0; // reset padding because ul and ol
-}
-
-// Individual list items
-// -------------------------
-
-.list-group-item {
-	position: relative;
-	display: block;
-	padding: 10px 15px;
-	// Place the border on the list items and negative margin up for better styling
-	margin-bottom: -1px;
-	background-color: @white;
-	border: 1px solid @navbarBorder;
-
-	// Round the first and last items
-	&:first-child {
-		.border-top-radius(@baseBorderRadius);
-	}
-	&:last-child {
-	  margin-bottom: 0;
-	  .border-bottom-radius(@baseBorderRadius);
-	}
-
-	// Align badges within list items
-	> .action, .badge, .label {
-	  float: right;
-	}
-
-	> .action, .badge, .label {
-		&  + .action {
-			margin-right: 5px;
-		}
-	}
-
-	> a.list-group-item-link {
-		color: @linkColor;
-	}
-
-	// Linked list items
-	a& {
-		color: @linkColor;
-
-		.list-group-item-heading {
-			color: @linkColor;
-		}
-
-		// Hover state
-		&:hover,
-		&:focus {
-			text-decoration: none;
-			background-color: @grayLighter;
-		}
-	}
-
-	// Active class on item itself, not parent
-	&.active,
-	&.active:hover,
-	&.active:focus {
-		z-index: 2; // Place active items above their siblings for proper border styling
-		color: @white;
-		background-color: @linkColor;
-		border-color: @linkColor;
-
-		// Force color to inherit for custom content
-		.list-group-item-heading {
-			color: inherit;
-		}
-		.list-group-item-text {
-			color: lighten(@linkColor, 40%);
-		}
-
-		> .list-group-item-link {
-			color: @white;
-		}
-	}
-}
-
-// Custom content options
-// -------------------------
-
-.list-group-item-heading {
-	margin-top: 0;
-	margin-bottom: 5px;
-}
-.list-group-item-text {
-	margin-bottom: 0;
-	line-height: 1.3;
-}
-
 // List groups in panels
 //
 // By default, space out list group content from panel headings to account for
@@ -410,6 +455,158 @@ legend {
 	& + .list-group {
 		.list-group-item:first-child {
 			border-top-width: 0;
+		}
+	}
+}
+
+.chat-box {
+	list-style: none;
+	margin: 0;
+	font-size: 11px;
+	line-height: 20px;
+	color: #5f5f5f; 
+	
+	.avatar {
+		display: inline-block;
+		position: absolute;
+		top: 0;
+		font-size: 25px;
+		
+		img {
+			.border-radius(50%);
+			.box-shadow(0 1px 3px 0px rgba(0, 0, 0, 0.3));
+		}
+	}
+
+	.arrow-box-left {
+		margin: 15px 15px 15px 65px;
+		padding: 5px 10px;
+		
+		.avatar {
+			left: -50px; 
+		}
+		
+		&.gray .info .name strong {
+			color: #393939; 
+		}
+	}
+	
+	.info {
+		*zoom: 1;
+		padding: 5px;
+		margin-bottom: 5px;
+		
+		&:before, &:after {
+			display: table;
+			content: "";
+			line-height: 0; 
+		}
+		
+		&:after {
+			clear: both; 
+		}
+		
+		.name {}
+	}
+	
+	.time {
+		float: right;
+		color: #949494;
+	}
+}
+
+/* line 56, /home/andrei/core-admin-release/core-admin/source/stylesheets/_arrow.scss */
+.arrow-box-left {
+	position: relative;
+	border: 1px solid #b5cdd7;
+	.box-sizing(content-box);
+	
+	.box-shadow( 0px 1px 3px -1px rgba(0, 0, 0, 0.1));
+
+	&:after, &:before {
+		right: 100%;
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none; 
+	}
+	
+	&:after {
+		border-right-color: #fafeff;
+		border-width: 6px;
+		top: 7px; 
+	}
+	
+	&:before {
+		border-right-color: #b5cdd7;
+		border-width: 7px;
+		top: 6px; 
+	}
+	
+	&.gray {
+		border-color: #d8d8d8;
+		
+		&:before {
+			border-right-color: #d8d8d8; 
+		}
+	}
+	
+	&.log-level-0 {
+		.label {
+			color: #fff;
+			background: #000;
+		}
+	}
+
+	&.log-level-1 {
+		
+		.label {
+			color: #fff;
+			background: #c58f2e;
+		}
+	}
+
+	&.log-level-2 {
+		.label {
+			color: #fff;
+			background: red;
+		}
+	}
+
+	&.log-level-3 {
+		.label {
+			color: #fff;
+			background: #b75959;
+		}
+	}
+
+	&.log-level-4 {
+		.label {
+			color: #fff;
+			background: #f6e1a4;
+		}
+	}
+
+	&.log-level-5 {
+		.label {
+			color: #fff;
+			background: #ccc;
+		}
+	}
+
+	&.log-level-6 {
+		.label {
+			color: #fff;
+			background: #49a3cb;
+		}
+	}
+
+	&.log-level-7 {
+		.label {
+			color: #fff;
+			background: #728092;
 		}
 	}
 }

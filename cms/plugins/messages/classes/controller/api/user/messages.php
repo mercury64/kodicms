@@ -12,6 +12,30 @@ class Controller_API_User_Messages extends Controller_System_Api {
 		$this->response($messages);
 	}
 	
+	public function get_list()
+	{		
+		$this->get_get();
+		$messages = $this->json['response'];
+		
+		$response_messages = array();
+		foreach($messages as $msg)
+		{
+			$msg = (object) $msg;
+			
+			if($msg->is_read == Model_API_Message::STATUS_NEW)
+			{
+				Api::post('user-messages.mark_read', array(
+					'id' => $msg->id, 'uid' => AuthUser::getId()
+				));
+			}
+	
+			$response_messages[] = (string) View::factory('messages/item')
+				->set('message', (object) $msg);
+		}
+		
+		$this->response($response_messages);
+	}
+	
 	public function get_get_by_id()
 	{
 		$id = $this->param('id', NULL, TRUE);

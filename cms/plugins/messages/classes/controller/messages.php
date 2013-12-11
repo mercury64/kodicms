@@ -10,14 +10,12 @@ class Controller_Messages extends Controller_System_Backend {
 	}
 	
 	public function action_index()
-	{		
-		$messages = Api::get('user-messages.get', array('uid' => AuthUser::getId(), 'fields' => 'author,title,is_read,created_on'))
-			->as_object();
-		
+	{
 		$this->template->title = __('Messages');
 
 		$this->template->content = View::factory('messages/index', array(
-			'messages' => $messages->response
+			'messages' => Api::get('user-messages.get', array('uid' => AuthUser::getId(), 'fields' => 'author,title,is_read,created_on'))
+				->as_object()->get('response')
 		));
 	}
 
@@ -38,15 +36,19 @@ class Controller_Messages extends Controller_System_Backend {
 			$post['to_user_id'] = $user->id;
 			return $this->_send(Api::put('user-messages', $post));
 		}
+		
+		$to = $this->request->query('to');
+		$to = ORM::factory('user', $to)->id;
 
 		$this->template->content = View::factory('messages/add', array(
-			'user_id' => AuthUser::getId()
+			'user_id' => AuthUser::getId(),
+			'to' => $to
 		));
 		
 		$this->template->title = __('Send message');
 		
 		$this->breadcrumbs
-			->add(__('Send message'));
+			->add($this->template->title);
 	}
 	
 	public function action_view()
@@ -67,9 +69,11 @@ class Controller_Messages extends Controller_System_Backend {
 		
 		if($this->request->method() === Request::POST)
 		{
+			$this->auto_render = FALSE;
 			$post = $this->request->post();
 			$post['from_user_id'] = $user_id;
 			$post['parent_id'] = $id;
+			
 			return $this->_send(Api::put('user-messages', $post), $id);
 		}
 		
@@ -87,10 +91,9 @@ class Controller_Messages extends Controller_System_Backend {
 		
 		$messages = Api::get('user-messages.get', array(
 			'uid' => $user_id, 
-			'fields' => 'author,title,is_read,created_on,text',
+			'fields' => 'author,from_user_id,title,is_read,created_on,text',
 			'pid' => $id
-		))
-			->as_object();
+		))->as_object();
 		
 		$this->template->content = View::factory('messages/view', array(
 			'tpl' => View::factory('messages/item'),
@@ -106,11 +109,12 @@ class Controller_Messages extends Controller_System_Backend {
 	
 	private function _send($send, $parent_id = 0)
 	{
-		$status = $send->as_object()->response;
-
-		if((int) $status > 0)
+		$status = $send->response;
+		$id = $parent_id > 0 ? $parent_id : $status;
+	
+		if((int) $id > 0)
 		{
-			$this->go('messages/view/' . (int) $status);
+			$this->go(Route::url('backend', array('controller' => 'messages', 'action' => 'view', 'id' => (int) $id)));
 		}
 		
 		$this->go_back();

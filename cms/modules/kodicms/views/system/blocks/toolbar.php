@@ -1,7 +1,7 @@
 <?php 
 	Observer::notify('front_page_toolbar');
 
-	if(Setting::get( 'profiling' ) == 'yes')
+	if(Config::get('site', 'profiling' ) == Config::YES)
 	{
 		echo View::factory( 'profiler/stats' );
 	}

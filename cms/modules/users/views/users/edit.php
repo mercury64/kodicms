@@ -7,6 +7,10 @@
 )); ?>
 	<?php echo Form::hidden('token', Security::token()); ?>
 	<div class="widget">
+		<div class="tabbable tabs-left">
+			<ul class="nav nav-tabs"></ul>
+			<div class="tab-content"></div>
+		</div>
 		<div class="widget-header">
 			<h3><?php echo __('General information'); ?></h3>
 		</div>
@@ -42,27 +46,9 @@
 					)); 
 				?>
 				</div>
-				<div class="span4 align-right">
-					<?php if($user->id !== NULL): ?>
-					<div id="UserGravatar">
-						<?php echo HTML::anchor('http://gravatar.com/emails/', $user->gravatar(150, NULL, array(
-							'class' => 'img-polaroid')), array(
-							'target' => '_blank'
-						)); ?>
-					</div>
-					<?php endif; ?>
-				</div>
 			</div>
 			
 			<hr />
-			
-			<?php echo Bootstrap_Form_Element_Control_Group::factory(array(
-				'element' => Bootstrap_Form_Element_Checkbox::factory(array(
-					'name' => 'user[notice]', 'value' => 1
-				))
-				->checked($user->profile->notice == 1)
-				->label(__('Subscribe to email notifications'))
-			)); ?>
 			
 			<?php echo Bootstrap_Form_Element_Control_Group::factory(array(
 				'element' => Bootstrap_Form_Element_Select::factory(array(
@@ -72,13 +58,34 @@
 				->label(__('Interface language'))
 			)); ?>
 		</div>
+		
+		<div class="widget-header">
+			<h3><?php echo __('Notifications'); ?></h3>
+		</div>
+		
+		<div class="widget-content">
+			<?php echo Bootstrap_Form_Element_Control_Group::factory(array(
+				'element' => Bootstrap_Form_Element_Checkbox::factory(array(
+					'name' => 'user[notice]', 'value' => 1
+				))
+				->checked($user->profile->notice == 1)
+				->label(__('Subscribe to email notifications'))
+			)); ?>
+			
+			<?php Observer::notify('view_user_edit_notifications', $user->id); ?>
+		</div>
 
 		<?php if( ACL::check('users.change_password') OR $user->id == AuthUser::getId() ): ?>
 		<div class="widget-header spoiler-toggle" data-spoiler=".password-spoiler">
 			<h3><?php echo __('Password'); ?></h3>
 		</div>
 		<div class="widget-content spoiler password-spoiler">
-		<?php
+			<?php if($action == 'edit'): ?>
+			<div class="alert alert-warning">
+				<i class="icon icon-lightbulb"></i> <?php echo __('Leave password blank for it to remain unchanged.'); ?>
+			</div>
+			<?php endif; ?>
+			<?php
 			echo Bootstrap_Form_Element_Control_Group::factory(array(
 				'element' => Bootstrap_Form_Element_Password::factory(array(
 					'name' => 'user[password]'
@@ -98,12 +105,10 @@
 					'autocomplete' => 'off', 'placeholder' => __('Confirm Password')))
 				->label(__('Confirm Password'))
 			)); 
-		?>
-			<?php if($action == 'edit'): ?>
-			<div class="alert alert-info">
-				<?php echo __('Leave password blank for it to remain unchanged.'); ?>
-			</div>
-			<?php endif; ?>
+			?>
+			
+			
+			<?php Observer::notify('view_user_edit_password', $user->id); ?>
 		</div>
 		<?php endif; ?>
 
@@ -123,39 +128,6 @@
 				)); 
 			?>
 			</div>
-		</div>
-		<?php endif; ?>
-		
-		<?php if ( $user->id === NULL OR $user->id > 1): ?>
-		<div class="widget-header spoiler-toggle" data-spoiler=".permissions-spoiler">
-			<h3><?php echo __('Permissions'); ?></h3>
-		</div>
-		<div class="widget-content widget-nopad spoiler permissions-spoiler">
-			<?php foreach(Acl::get_permissions() as $title => $actions): ?>
-			<table class='table' id="permissions-list">
-				<thead class="highlight">
-					<tr>
-						<th>
-							<h4>
-								<small><?php echo __('Section'); ?></small> 
-								<?php echo __(ucfirst($title)); ?>
-							</h4>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th>
-						<?php foreach($actions as $action => $title): ?>
-						<?php if( in_array( $action, $user->permissions())): ?>
-						<?php echo UI::label(__($title)); ?>
-						<?php endif; ?>
-						<?php endforeach; ?>
-						</th>
-					</tr>
-				</tbody>
-			</table>
-			<?php endforeach; ?>
 		</div>
 		<?php endif; ?>
 		

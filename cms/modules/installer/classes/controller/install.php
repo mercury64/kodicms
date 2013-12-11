@@ -1,5 +1,10 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Installer
+ * @category	Controller
+ * @author		ButscHSter
+ */
 class Controller_Install extends Controller_System_Frontend 
 {
 	public $template = 'layouts/frontend';
@@ -216,7 +221,7 @@ class Controller_Install extends Controller_System_Frontend
 
 		// Create tables
 		$schema_content = file_get_contents( $schema_file );
-		$schema_content = str_replace( 'TABLE_PREFIX_', $post['table_prefix'], $schema_content );
+		$schema_content = str_replace( '__TABLE_PREFIX__', $post['table_prefix'], $schema_content );
 
 		if ( !empty( $schema_content ) )
 		{
@@ -239,10 +244,10 @@ class Controller_Install extends Controller_System_Frontend
 		$dump_content = file_get_contents( $dump_file );
 		
 		$replace = array(
-			'__SITE_NAME__'			=> Arr::get($post, 'site_name'),
+			'__SITE_NAME__'			=> serialize(Arr::get($post, 'site_name')),
 			'__EMAIL__'				=> Arr::get($post, 'email'),
 			'__USERNAME__'			=> Arr::get($post, 'username'),
-			'TABLE_PREFIX_'			=> $post['table_prefix'],
+			'__TABLE_PREFIX__'		=> $post['table_prefix'],
 			'__ADMIN_PASSWORD__'	=> Auth::instance()->hash($post['password_field']),
 			'__DATE__'				=> date('Y-m-d H:i:s'),
 			'__LANG__'				=> Arr::get($post, 'locale'),

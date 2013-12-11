@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
+/**
+ * @package		KodiCMS/Users
+ * @category	Model
+ * @author		ButscHSter
+ */
 class KodiCMS_Model_User extends Model_Auth_User {
 	
 	/**
@@ -11,7 +16,7 @@ class KodiCMS_Model_User extends Model_Auth_User {
 	public static function get_password_validation($values)
 	{
 		return Validation::factory($values)
-			->rule('password', 'min_length', array(':value', Kohana::$config->load('auth')->get( 'password_length' )))
+			->rule('password', 'min_length', array(':value', Config::get('auth', 'password_length')))
 			->rule('password_confirm', 'matches', array(':validation', ':field', 'password'));
 	}
 	
@@ -91,18 +96,7 @@ class KodiCMS_Model_User extends Model_Auth_User {
 	
 	public function gravatar($size = 40, $default = NULL, $attributes = array())
 	{
-		if($default === NULL)
-		{
-			$default = 'mm';
-		}
-	
-		$hash = md5( strtolower( trim( $this->email ) ) );
-		$query_params = URL::query(array(
-			'd' => $default,
-			's' => $size
-		));
-		
-		return HTML::image('http://www.gravatar.com/avatar/' . $hash . $query_params, $attributes);
+		return Gravatar::load($this->email, $size, $default, $attributes );
 	}
 
 	public function roles()
@@ -132,6 +126,24 @@ class KodiCMS_Model_User extends Model_Auth_User {
 		}
 		
 		return array_unique($permissions);
+	}
+	
+	public function permissions_list()
+	{
+		$permissions = array();
+
+		foreach(Acl::get_permissions() as $section_title => $actions)
+		{
+			foreach($actions as $action => $title)
+			{
+				if( Acl::check($action, $this) )
+				{
+					$permissions[$section_title][$action] = $title;
+				}
+			}
+		}
+		
+		return $permissions;
 	}
 
 	public function complete_login()

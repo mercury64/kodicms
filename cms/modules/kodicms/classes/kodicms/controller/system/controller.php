@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS
+ * @category	System Controller
+ * @author		ButscHSter
+ */
 class KodiCMS_Controller_System_Controller extends Controller
 {
 	public $query_params = FALSE;
@@ -25,7 +30,7 @@ class KodiCMS_Controller_System_Controller extends Controller
 	public function go_backend()
 	{
 		$this->go( Route::get( 'backend' )->uri(array(
-			'controller' => str_replace(ADMIN_DIR_NAME . '/', '', Setting::get('default_tab')),
+			'controller' => str_replace(ADMIN_DIR_NAME . '/', '', Config::get('site', 'default_tab')),
 		) ) );
 	}
 

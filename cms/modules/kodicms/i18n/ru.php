@@ -24,7 +24,7 @@ return array(
 	'Remove' => 'Удалить',
 	'Save and Close' => 'Сохранить и Закрыть',
 	'Save and Continue editing' => 'Сохранить и Продолжить',
-	'Save setting' => 'Сохранить настройки',
+	'Save settings' => 'Сохранить настройки',
 	'Save changes' => 'Сохранить изменения',
 	'System' => 'Система',
 	'inherit' => 'наследовать',
@@ -37,6 +37,7 @@ return array(
 	'View Site' => 'Просмотреть сайт',
 	'Are you sure?' => 'Вы уверены?',
 	'Something went wrong!' => 'Что то пошло не так',
+	'Select all' => 'Выбрать все',
 	
 	'Failed to validate array' => 'Ошибка',
 	'KodiCMS succefully installed!' => 'KodiCMS успешно установлена',
@@ -112,11 +113,13 @@ return array(
 	'Show field select' => 'Выбрать из списка',
 	'Hide field select' => 'Скрыть список полей',
 	'inherit ( :layout )' => 'Наследовать ( :layout )',
+	'Metadata' => 'Метаданные',
 
 	/*********************** Settings *******************/
 	'General settings' => 'Главные настройки',
 	'Interface language' => 'Язык интерфейса',
 	'Clear cache' => 'Очистить кеш',
+	'Cache has been cleared!' => 'Кеш успешно очищен!',
 	'Site information' => 'Информация о сайте',
 	'Site title' => 'Заголовок',
 	'Site description' => 'Описание',
@@ -131,9 +134,11 @@ return array(
 	'Show breadcrumbs' => 'Показывать хлебные крошки',
 	'Yes' => 'Да',
 	'No' => 'Нет',
+	'Enabled' => 'Включен',
+	'Disabled' => 'Выключен',
 	'Find similar pages' => 'Похожая страница',
 	'This text will be present at backend and can be used in frontend pages.' 
-		=> 'Этот текс будет использоваться в Backend, а также использоваться во Frontend',
+		=> 'Этот текст будет использоваться в Backend, а также использоваться во Frontend',
 	'If requested page url is incorrect, then find similar page.' 
 		=> 'Если запрашиваемая страница не найдена, то показать наиболее похожую страницу',
 	'This allows you to specify which section you will see by default after login.' 
@@ -142,7 +147,9 @@ return array(
 	'Default filter' => 'Фильтр по-умолчанию',
 	'Default page status' => 'Статус страницы по-умолчанию',
 	'Settings has been saved!' => 'Настройки сохранены!',
-	'Site options' => 'Опции сайта',
+	'Site settings' => 'Настройки сайта',
+	'Page settings' => 'Настройки страницы',
+	'Check page date' => 'Проверять дату создания страницы',
 	'For detailed profiling use Kohana::$enviroment = Kohana::DEVELOPMENT or SetEnv KOHANA_ENV DEVELOPMENT in .htaccess' => 'Для детального профилирования используйте Kohana::$enviroment = Kohana::DEVELOPMENT или SetEnv KOHANA_ENV DEVELOPMENT в файле .htaccess',
 	
 	/*********************** Autorization *******************/
@@ -249,5 +256,18 @@ return array(
 	
 	'Manage api' => 'Управлять API сайта',
 	'Manage social accounts' => 'Управлять аккаунтами соц. сетей',
-	'View settings' => 'Видеть раздел'
+	'View settings' => 'Видеть раздел',
+    
+    //============Dropzone============//
+    'Drop files here to upload' => 'Перетащите сюда файлы для загрузки на сервер',
+    "Your browser does not support drag'n'drop file uploads." 
+        => "Ваш браузер не поддерживает drag'n'drop загрузку",
+    "File is too big ({{filesize}}MB). Max filesize: {{maxFilesize}}MB."
+        => 'Размер файла ({{filesize}}MB) слишком большой. Максимальный размер {{maxFilesize}}MB.',
+    "You can't upload files of this type." => 'Вы не можете загружать файлы этого типа.',
+    "Server responded with {{statusCode}} code." => 'Сервер ответил с кодом {{statusCode}}.',
+    "Cancel upload" => 'Отмена загрузки',
+    "Are you sure you want to cancel this upload?" => 'Вы уверены, что хотите отменить загрузку?',
+    "Remove file" => 'Удалить файл',
+    "You can only upload {{maxFiles}} files." => 'Вы можете загрузить только {{maxFiles}} файла(-ов).'
 );

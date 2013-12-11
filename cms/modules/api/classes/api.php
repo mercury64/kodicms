@@ -1,11 +1,16 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
+/**
+ * @package		KodiCMS/Api
+ * @author		ButscHSter
+ */
 class API {
 	
 	const NO_ERROR = 200;
 	const ERROR_MISSING_PAPAM = 110;
 	const ERROR_VALIDATION = 120;
 	const ERROR_UNKNOWN = 130;
+	const ERROR_TOKEN = 140;
 	const ERROR_PERMISSIONS = 220;
 	const ERROR_PAGE_NOT_FOUND = 404;
 	

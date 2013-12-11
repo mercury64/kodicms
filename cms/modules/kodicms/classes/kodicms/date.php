@@ -1,5 +1,10 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS
+ * @category	Helper
+ * @author		ButscHSter
+ */
 class KodiCMS_Date extends Kohana_Date 
 {
 	/**
@@ -58,7 +63,7 @@ class KodiCMS_Date extends Kohana_Date
 	{
 		if( $format === NULL )
 		{
-			$format = Setting::get('date_format', 'Y-m-d H:I:s');
+			$format = Config::get('site', 'date_format', 'Y-m-d H:I:s');
 		}
 
 		if( ! Valid::numeric( $date ) )
