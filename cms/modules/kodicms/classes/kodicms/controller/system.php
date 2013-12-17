@@ -44,38 +44,27 @@ class KodiCMS_Controller_System extends Controller_System_Backend {
 	
 	public function action_settings()
 	{
-		// check if trying to save
-		if ( Request::current()->method() == Request::POST )
+		$this->template->title = __('Settings');
+		
+		$site_pages = array();
+
+		foreach ( Model_Navigation::get()->sections() as $section )
 		{
-			return $this->_save();
+			foreach ( $section->get_pages() as $item )
+			{
+				$site_pages[$section->name()][trim(str_replace(ADMIN_DIR_NAME, '', $item->url()), '/')] = $item->name();
+			}
 		}
 
 		$this->template->content = View::factory( 'system/settings', array(
-			'filters' => Arr::merge(array('--none--'), Filter::findAll()),
-			'dates' => Date::formats()
-		) );
-		
-		$this->template->title = __('Settings');
-	}
-
-	private function _save()
-	{
-		$data = $this->request->post('setting');
-
-		if ( !isset( $data['site']['allow_html_title'] ) )
-		{
-			$data['site']['allow_html_title'] = 'off';
-		}
-		
-		Config::set_from_array($data);
-
-		Observer::notify( 'save_settings', $this->request->post() );
-
-		Kohana::$log->add(Log::INFO, ':user change settings')->write();
-		
-		Messages::success( __( 'Settings has been saved!' ) );
-
-		$this->go_back();
+			'filters' => Arr::merge(array('--none--'), WYSIWYG::findAll()),
+			'dates' => Date::formats(),
+			'site_pages' => $site_pages,
+			'default_status_id' => array(
+				Model_Page::STATUS_DRAFT => __( 'Draft' ),
+				Model_Page::STATUS_PUBLISHED => __( 'Published' )
+			)
+		) );		
 	}
 	
 	public function action_phpinfo()

@@ -56,17 +56,21 @@ var cms = {
 		if(!type) type = 'success';
 		
 		window.top.$.jGrowl(decodeURI(msg), {theme: 'alert alert-' + type});
-		
-		if(type == 'error') {
-			cms.error_field(name, msg)
-		}
 	},
 	error_field: function(name, message) {
-		return input = $('input[name*="' + name + '"]:not(:hidden)', $('.control-group:not(.error)'))
-			.after('<span class="help-inline">' + message + '</span>')
+		name = name.indexOf('.') !== -1 ? '['+name.replace(/\./g, '][') + ']' : name;
+		var gpoups = $('.control-group:not(.error)');
+		
+		return input = $(':input[name*="' + name + '"]', gpoups)
+			.after('<span class="help-inline error-message">' + message + '</span>')
 			.parentsUntil( '.control-group' )
 			.parent()
 			.addClass('error');
+	},
+	clear_error: function() {
+		$('.control-group')
+			.removeClass('error')
+			.find('.error-message').remove();
 	},
 	// Convert slug
 	convert_dict: {
@@ -350,6 +354,7 @@ cms.ui.add('btn-confirm', function() {
 	});
 }).add('nav-counter', function() {
 
+	$('.dropdown-submenu .caret').remove();
 	cms.navigation.counter.init();
 
 }).add('outline', function() {
@@ -362,7 +367,16 @@ cms.ui.add('btn-confirm', function() {
 			if($(this).hasClass('widget-section')) {
 				$('<li class="nav-section"><h5><i class="icon-arrow-down"></i> ' + $(this).text() + '</h5></li>').appendTo($('.tabbable .nav'));
 			} else {
-				$('<li><a href="#tab' + i + '" data-toggle="tab">' + $(this).text() + '</a></li>').appendTo($('.tabbable .nav'));
+				var text = $(this).text();
+				
+				if($(this).data('icon')) {
+					text = '<i class="icon-'+$(this).data('icon')+'"></i> ' + text;
+				}
+				
+				$('<li><a href="#tab' + i + '" data-toggle="tab">' + text + '</a></li>')
+					.appendTo($('.tabbable .nav'));
+			
+				
 				
 				if($(this).hasClass('widget-header-onlytab'))
 					$('<div class="tab-pane" id="tab' + i + '">' + $(this).next().html() + '</div>').appendTo($('.tabbable .tab-content'));
@@ -671,9 +685,15 @@ var Api = {
 				if(show_loader) cms.loader.show();
 			},
 			success: function(response) {
-				if(response.code != 200) return Api.exception(response);
+
+				if(response.code != 200) {
+					if(typeof(callback) == 'function') callback(response);
+					return Api.exception(response);
+				}
 				
 				if (response.message) {
+					cms.clear_error();
+
 					if(response.message instanceof Object) {
 						parse_messages(response.message)
 					} else {
@@ -683,17 +703,18 @@ var Api = {
 	
 				if(response.redirect) {
 					$.get(window.top.CURRENT_URL, function(resp){
-//						window.top.$('#content').html(resp);
 						window.location = response.redirect + '?type=iframe';
 					});
 				}
 				this._response = response;
 				
 				var $event = method + uri.replace(/\//g, ':');
-				console.log($event);
 				window.top.$('body').trigger($event.toLowerCase(), [this._response.response]);
 
 				if(typeof(callback) == 'function') callback(this._response);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if(typeof(callback) == 'function') callback(textStatus);
 			}
 		}).always(function() { 
 			cms.loader.hide();

@@ -38,6 +38,8 @@ return array(
 	'Are you sure?' => 'Вы уверены?',
 	'Something went wrong!' => 'Что то пошло не так',
 	'Select all' => 'Выбрать все',
+	'Next' => 'Далее',
+	'Previous' => 'Назад',
 	
 	'Failed to validate array' => 'Ошибка',
 	'KodiCMS succefully installed!' => 'KodiCMS успешно установлена',
@@ -118,6 +120,7 @@ return array(
 	/*********************** Settings *******************/
 	'General settings' => 'Главные настройки',
 	'Interface language' => 'Язык интерфейса',
+	'Default interface language' => 'Язык интерфейса по умолчанию',
 	'Clear cache' => 'Очистить кеш',
 	'Cache has been cleared!' => 'Кеш успешно очищен!',
 	'Site information' => 'Информация о сайте',
@@ -253,7 +256,8 @@ return array(
 	'Manage custom fields' => 'Управлять дополнительными полями',
 	'Manage parts' => 'Управлять частями страниц',
 	'Delete pages' => 'Удалять страницы',
-	
+	'Active' => 'Активен',
+	'Inactive' => 'Неактивен',
 	'Manage api' => 'Управлять API сайта',
 	'Manage social accounts' => 'Управлять аккаунтами соц. сетей',
 	'View settings' => 'Видеть раздел',

@@ -205,6 +205,10 @@ class Plugin_Decorator extends Plugin {
 			->values($data)
 			->execute();
 
+		Kohana::modules( Kohana::modules() + array('plugin_' . $this->id() => PLUGPATH . $this->id()) );
+
+		$this->_clear_cache();
+
 		$install_file = $this->path() . 'install' . EXT;
 
 		if( file_exists( $install_file ))
@@ -213,8 +217,6 @@ class Plugin_Decorator extends Plugin {
 		}
 		
 		Plugins::install( $this );
-
-		return $this->_clear_cache();
 	}
 	
 	/**
@@ -343,13 +345,16 @@ class Plugin_Decorator extends Plugin {
 	 */
 	protected function _clear_cache()
 	{
-		$cache = Cache::instance();
-		
-		$cache->delete('Database::cache('.self::CACHE_KEY . '::list)');
-		$cache->delete('Database::cache('.self::CACHE_KEY . '::plugin::' . $this->id() . ')');
-		
-		Kohana::cache('Route::cache()', NULL, -1);
-		Kohana::cache('Kohana::find_file()', NULL, -1);
+		if(Kohana::$caching === TRUE)
+		{
+			$cache = Cache::instance();
+
+			$cache->delete('Database::cache('.self::CACHE_KEY . '::list)');
+			$cache->delete('Database::cache('.self::CACHE_KEY . '::plugin::' . $this->id() . ')');
+
+			Kohana::cache('Route::cache()', NULL, -1);
+			Kohana::cache('Kohana::find_file()', NULL, -1);
+		}
 
 		return $this;
 	}

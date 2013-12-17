@@ -9,16 +9,18 @@ class KodiCMS_Controller_API_Cache extends Controller_System_Api {
 	
 	public function before() 
 	{
-		define('REST_BACKEND', TRUE);
 		parent::before();
 	}
 	
 	public function get_clear()
 	{
-		Cache::instance()->delete_all();
-		Kohana::cache('Kohana::find_file()', NULL, -1);
-		Kohana::cache('Route::cache()', NULL, -1);
-		Kohana::cache('profiler_application_stats', NULL, -1);
+		if(Kohana::$caching === TRUE)
+		{
+			Cache::instance()->delete_all();
+			Kohana::cache('Kohana::find_file()', NULL, -1);
+			Kohana::cache('Route::cache()', NULL, -1);
+			Kohana::cache('profiler_application_stats', NULL, -1);
+		}
 		
 		Kohana::$log->add(Log::INFO, ':user clear cache')->write();
 		

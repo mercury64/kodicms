@@ -1,76 +1,222 @@
-<?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @package		KodiCMS
  * @category	Helper
  * @author		ButscHSter
  */
-class KodiCMS_Filter {
-
+class KodiCMS_Filter implements ArrayAccess {
+	
 	/**
+	 * Creates a new Filter instance.
 	 *
-	 * @var array
+	 * @param   array   $array  array to use for filter
+	 * @return  Filter
 	 */
-	static $filters = array( );
-
-	/**
-	 * Add a new filter to Frog CMS
-	 *
-	 * @param filter_id string  The Filter plugin folder name
-	 * @param file      string  The file where the Filter class is
-	 */
-	public static function add( $filter_id)
+	public static function factory(array $array)
 	{
-		self::$filters[$filter_id] = Inflector::humanize($filter_id);
+		return new Filter($array);
+	}
+	
+	// Array to filter
+	protected $_data = array();
+	
+	// Field rules
+	protected $_rules = array();
+	
+	/**
+	 * Sets the unique "any field" key and creates an ArrayObject from the
+	 * passed array.
+	 *
+	 * @param   array   $array  array to filter
+	 * @return  void
+	 */
+	public function __construct(array $array)
+	{
+		$this->_data = $array;
+	}
+	
+	/**
+	 * Throws an exception because Filter is read-only.
+	 * Implements ArrayAccess method.
+	 *
+	 * @throws  Kohana_Exception
+	 * @param   string   $offset    key to set
+	 * @param   mixed    $value     value to set
+	 * @return  void
+	 */
+	public function offsetSet($offset, $value)
+	{
+		Arr::set_path($this->_data, $offset, $value);
 	}
 
 	/**
-	 * Remove a filter to Frog CMS
+	 * Checks if key is set in array data.
+	 * Implements ArrayAccess method.
 	 *
-	 * @param filter_id string  The Filter plugin folder name
+	 * @param   string  $offset key to check
+	 * @return  bool    whether the key is set
 	 */
-	public static function remove( $filter_id )
+	public function offsetExists($offset)
 	{
-		if ( isset( self::$filters[$filter_id] ) )
+		return Arr::path($this->_data, $offset, '!isset') != '!isset';
+	}
+
+	/**
+	 * Throws an exception because Filter is read-only.
+	 * Implements ArrayAccess method.
+	 *
+	 * @throws  Kohana_Exception
+	 * @param   string  $offset key to unset
+	 * @return  void
+	 */
+	public function offsetUnset($offset)
+	{
+		throw new Kohana_Exception('Filter objects are read-only.');
+	}
+
+	/**
+	 * Gets a value from the array data.
+	 * Implements ArrayAccess method.
+	 *
+	 * @param   string  $offset key to return
+	 * @return  mixed   value from array
+	 */
+	public function offsetGet($offset)
+	{
+		return Arr::path($this->_data, $offset);
+	}
+
+	/**
+	 * Returns the array of data to be filter.
+	 *
+	 * @return  array
+	 */
+	public function data()
+	{
+		return $this->_data;
+	}
+	
+	/**
+	 * @param   string      $field  field name
+	 * @param   callback    $rule   valid PHP callback or closure
+	 * @param   mixed       $default default value
+	 * @return  $this
+	 */
+	public function rule($field, $rule, $default = NULL)
+	{
+		if( ! is_bool($rule) AND ! is_null($rule) )
 		{
-			unset( self::$filters[$filter_id] );
+			// Store the rule and params for this rule
+			$this->_rules[$field]['rules'][] = $rule;
 		}
-	}
 
-	/**
-	 * Find all active filters id
-	 *
-	 * @return array
-	 */
-	public static function findAll()
-	{
-		return self::$filters;
-	}
+		$this->_rules[$field]['default'] = $default;
 
+		return $this;
+	}
+	
 	/**
-	 * Get a instance of a filter
+	 * Add rules using an array.
 	 *
-	 * @param filter_id string  The Filter plugin folder name
-	 *
-	 * @return mixed   if founded an object, else FALSE
+	 * @param   string  $field  field name
+	 * @param   array   $rules  list of callbacks
+	 * @return  $this
 	 */
-	public static function get( $filter_id )
+	public function rules($field, array $rules)
 	{
-		if ( isset( self::$filters[$filter_id] ) )
+		foreach ($rules as $rule)
 		{
-			if ( !class_exists( $filter_id ) )
+			$this->rule($field, $rule[0], Arr::get($rule, 1));
+		}
+
+		return $this;
+	}
+	
+	/**
+	 * Filters a values
+	 */
+	public function run()
+	{
+		if(Kohana::$profiling === TRUE)
+		{
+			$benchmark = Profiler::start('Filter field', $field);
+		}
+		
+		$rules = $this->_rules;
+
+		// Get the filters for this column
+		$wildcards = empty($rules[TRUE]) ? array() : $rules[TRUE];
+
+		foreach ($rules as $field => $data)
+		{
+			$data['rules'] = empty($data['rules']) ? $wildcards : array_merge($wildcards, $data['rules']);
+			
+			if($this->offsetExists($field))
 			{
-				return FALSE;
+				$value = Arr::get($this, $field);
 			}
+			elseif(!$this->offsetExists($field) AND !empty($data['default']))
+			{
+				Arr::set_path($this->_data, $field, $data['default']);
+				continue;
+			}
+			
+			// Bind the field name and model so they can be used in the filter method
+			$_bound = array
+			(
+				':field' => $field,
+				':filter' => $this,
+			);
+			
+			foreach ($data['rules'] as $filter)
+			{
+				// Value needs to be bound inside the loop so we are always using the
+				// version that was modified by the filters that already ran
+				$_bound[':value'] = $value;
+				$params = array(':value');
 
-			return new $filter_id;
+				foreach ($params as $key => $param)
+				{
+					if (is_string($param) AND array_key_exists($param, $_bound))
+					{
+						// Replace with bound value
+						$params[$key] = $_bound[$param];
+					}
+				}
+
+				if (is_array($filter) OR ! is_string($filter))
+				{
+					// This is either a callback as an array or a lambda
+					$value = call_user_func_array($filter, $params);
+				}
+				elseif (strpos($filter, '::') === FALSE)
+				{
+					// Use a function call
+					$function = new ReflectionFunction($filter);
+
+					// Call $function($this[$field], $param, ...) with Reflection
+					$value = $function->invokeArgs($params);
+				}
+				else
+				{
+					// Split the class and method of the rule
+					list($class, $method) = explode('::', $filter, 2);
+
+					// Use a static method call
+					$method = new ReflectionMethod($class, $method);
+
+					// Call $Class::$method($this[$field], $param, ...) with Reflection
+					$value = $method->invokeArgs(NULL, $params);
+				}
+			}
+			
+			Arr::set_path($this->_data, $field, $value);
 		}
-		else
+		
+		if(isset($benchmark))
 		{
-			return FALSE;
+			Profiler::stop($benchmark);
 		}
 	}
-
 }
-
-// end Filter class
