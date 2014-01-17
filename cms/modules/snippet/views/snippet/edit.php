@@ -10,12 +10,12 @@
 
 	<div class="widget widget-nopad">
 		<div class="widget-title">
-			<div class="control-group">
+			<div class="form-group">
 				<label class="control-label title" for="snippetEditNamelabel"><?php echo __('Snippet name'); ?></label>
 				<div class="controls">
-					<div class="row-fluid">
+					<div class="row">
 					<?php echo Form::input('name', $snippet->name, array(
-						'class' => 'slug focus span12 input-title', 'id' => 'snippetEditNamelabel',
+						'class' => 'slug focus col-xs-12 input-title', 'id' => 'snippetEditNamelabel',
 						'tabindex'	=> 1
 					)); ?>
 					</div>

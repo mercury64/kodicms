@@ -13,7 +13,7 @@
 			)); ?>
 
 			<h2 class="profile-username"><?php echo $user->username; ?> <small><?php echo __('Last login'); ?> <?php echo Date::format($user->last_login); ?></small></h2>
-			<?php if(!empty($user->profile->name)): ?><p class="profile-name muted"><?php echo $user->profile->name; ?></p><?php endif; ?>
+			<?php if(!empty($user->profile->name)): ?><p class="profile-name text-muted"><?php echo $user->profile->name; ?></p><?php endif; ?>
 			
 			<div class="clearfix"></div>
 		</div>
@@ -22,9 +22,9 @@
 			<?php Observer::notify('view_user_profile_toolbar', $user->id); ?>
 		</div>
 		
-		<div class="row-fluid">
+		<div class="row">
 			
-			<div class="span5">
+			<div class="col-xs-5">
 				<div class="list-group">
 					<?php if ( Acl::check( 'users.edit') OR $user->id == AuthUser::getId() ): ?>
 					<a href="<?php echo Route::url('backend', array(
@@ -45,7 +45,7 @@
 				</div>
 				<?php Observer::notify('view_user_profile_sidebar', $user->id); ?>
 			</div>
-			<div class="span7">
+			<div class="col-xs-7">
 				<?php Observer::notify('view_user_profile_information', $user->id); ?>
 			</div>
 		</div>

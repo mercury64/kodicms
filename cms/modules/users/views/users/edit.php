@@ -15,8 +15,8 @@
 			<h3><?php echo __('General information'); ?></h3>
 		</div>
 		<div class="widget-content">
-			<div class="row-fluid">
-				<div class="span8">
+			<div class="row">
+				<div class="col-xs-8">
 				<?php 
 					echo Bootstrap_Form_Element_Control_Group::factory(array(
 						'element' => Bootstrap_Form_Element_Input::factory(array(
@@ -117,10 +117,10 @@
 			<h3><?php echo __('Roles'); ?></h3>
 		</div>
 		<div class="widget-content">
-			<div class="row-fluid">
+			<div class="row">
 			<?php 
 				echo Form::hidden('user_permission', (int) $user->id, array(
-					'class' => 'span12'
+					'class' => 'col-xs-12'
 				));
 				
 				echo Bootstrap_Form_Helper_Help::factory(array(

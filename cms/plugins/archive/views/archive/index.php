@@ -58,7 +58,7 @@
 								'action' => 'delete',
 								'id' => $page->id
 							)), 'icon' => UI::icon('remove icon-white'), 
-							'class' => 'btn btn-mini btn-confirm btn-danger'
+							'class' => 'btn btn-xs btn-confirm btn-danger'
 						)); ?>
 						<?php endif; ?>
 					</td>

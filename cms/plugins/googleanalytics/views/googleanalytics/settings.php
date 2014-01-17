@@ -2,7 +2,7 @@
 	<h3><?php echo __('General settings'); ?></h3>
 </div>
 <div class="widget-content">
-	<div class="control-group">
+	<div class="form-group">
 		<?php echo Form::label('setting_counter_id', __('Counter ID'), array('class' => 'control-label')); ?>
 		<div class="controls">
 			<?php echo Form::input('setting[counter_id]', $plugin->get('counter_id', 00000000), array(

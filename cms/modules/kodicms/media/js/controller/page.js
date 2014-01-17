@@ -128,7 +128,7 @@ cms.init.add('page_index', function () {
 				$('#nestable').nestable({
 					group: 1,
 					listNodeName: 'ul',
-					listClass: 'dd-list unstyled',
+					listClass: 'dd-list list-unstyled',
 				}).on('change', function(e, el) {
 					var list   = e.length ? e : $(e.target);
 					Api.post('pages.sort', {'pages': list.nestable('serialize')});

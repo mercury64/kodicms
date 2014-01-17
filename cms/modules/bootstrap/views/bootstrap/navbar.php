@@ -1,5 +1,3 @@
 <div<?php echo $attributes; ?>>
-	<div class="navbar-inner">
-		<?php echo $content; ?>
-	</div>
+	<?php echo $content; ?>
 </div>

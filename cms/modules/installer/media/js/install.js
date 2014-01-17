@@ -28,7 +28,7 @@ $(function() {
 		$('#wizard .wizard-alert').remove();
 
 		$('#wizard .body.current .widget-content')
-			.append('<p class="wizard-alert alert alert-error">'+$error+'</p>');
+			.append('<p class="wizard-alert alert alert-danger">'+$error+'</p>');
 	}
 	
 	$("#wizard").steps({

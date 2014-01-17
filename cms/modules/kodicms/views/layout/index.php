@@ -8,7 +8,7 @@
 
 		<?php echo UI::button(__('Rebuild blocks'), array(
 			'icon' => UI::icon( 'refresh' ), 'href' => Route::url('backend', array('controller' => 'layout', 'action' => 'rebuild')),
-			'class' => 'btn btn-inverse btn-mini'
+			'class' => 'btn btn-inverse btn-xs'
 		)); ?>
 	</div>
 
@@ -46,7 +46,7 @@
 						<?php echo UI::icon('lock'); ?> <?php echo $layout->name; ?>
 						<?php endif; ?>
 						<?php if(count($layout->blocks()) > 0): ?>
-						<span class="muted">
+						<span class="text-muted">
 							<?php echo __('Layout blocks'); ?>: <?php echo implode(', ', $layout->blocks()); ?>
 						</span>
 						<?php endif; ?>
@@ -65,7 +65,7 @@
 						<?php echo UI::button(NULL, array(
 							'icon' => UI::icon( 'remove' ),
 							'href' => Route::url('backend', array('controller' => 'layout', 'action' => 'delete', 'id' => $layout->name)),
-							'class' => 'btn btn-mini btn-confirm'
+							'class' => 'btn btn-xs btn-confirm'
 						)); ?>
 						<?php endif; ?>
 					</td>

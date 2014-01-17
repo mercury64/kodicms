@@ -7,17 +7,17 @@
 			<div class="widget-options pull-right">
 				<?php if( ACL::check('page.parts')): ?>
 				<?php echo UI::button(UI::icon( 'cog' ), array(
-					'class' => 'part-options-button btn btn-mini')
+					'class' => 'part-options-button btn btn-xs')
 				); ?>
 				<?php endif; ?>
 				
 				<% if ( is_expanded == 0 ) { %>
 				<?php echo UI::button(UI::icon( 'chevron-down icon-white' ), array(
-					'class' => 'part-minimize-button btn btn-mini btn-inverse')
+					'class' => 'part-minimize-button btn btn-xs btn-inverse')
 				); ?>		
 				<% } else { %>		
 				<?php echo UI::button(UI::icon( 'chevron-up icon-white' ), array(
-					'class' => 'part-minimize-button btn btn-mini btn-inverse')
+					'class' => 'part-minimize-button btn btn-xs btn-inverse')
 				); ?>
 				<% } %>
 			</div>
@@ -27,8 +27,8 @@
 		<% if ((is_protected == <?php echo Model_Page_Part::PART_PROTECTED; ?> && is_developer == 1) || is_protected == <?php echo Model_Page_Part::PART_NOT_PROTECTED; ?> ) { %>
 		<div class="widget-content part-options">
 		<?php if( ACL::check('page.parts')): ?>
-			<div class="row-fluid">
-				<div class="span4 item-filter-cont form-inline">
+			<div class="row">
+				<div class="col-xs-4 item-filter-cont form-inline">
 					<label><?php echo __( 'WYSIWYG' ); ?></label>
 					<select class="item-filter" name="part_filter">
 						<option value="">&ndash; <?php echo __( '--- none ----' ); ?> &ndash;</option>
@@ -37,17 +37,17 @@
 						<?php endforeach; ?> 
 					</select>
 				</div>
-				<div class="span4">
+				<div class="col-xs-4">
 					<?php echo Observer::notify('part_option'); ?>
 				</div>				
-				<div class="span4 text-right">
+				<div class="col-xs-4 text-right">
 					<% if ( is_developer == 1 ) { %>
 					<label class="checkbox inline">
 							<input type="checkbox" name="is_protected" class="is_protected" <% if (is_protected == <?php echo Model_Page_Part::PART_PROTECTED; ?>) { print('checked="checked"')} %>> <?php echo __( 'Is protected' ); ?>
 					</label>
 					<% } %>
 					<?php echo UI::button(__( 'Remove part :part_name', array( ':part_name' => '<%= name %>' ) ), array(
-						'class' => 'item-remove btn btn-mini btn-danger', 'icon' => UI::icon( 'trash icon-white' )
+						'class' => 'item-remove btn btn-xs btn-danger', 'icon' => UI::icon( 'trash icon-white' )
 					) ); ?>
 				</div>
 				

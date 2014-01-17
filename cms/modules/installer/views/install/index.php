@@ -32,22 +32,22 @@
 				
 				<p class="lead"><?php echo __('Below you should enter your database connection details. If you’re not sure about these, contact your host.'); ?>
 				<hr />
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installDBServerField"><?php echo __( 'Database server' ); ?></label>
 					<div class="controls inline">
 						<?php echo Form::input( 'install[db_server]', Arr::get( $data, 'db_server' ), array(
-							'class' => 'span3', 'id' => 'installDBServerField'
+							'class' => 'col-xs-3', 'id' => 'installDBServerField'
 						) ); ?>
 
 						<?php echo Form::input( 'install[db_port]', Arr::get( $data, 'db_port' ), array(
-							'class' => 'span1'
+							'class' => 'col-xs-1'
 						) ); ?>
 
 						<?php echo UI::label( __( 'Required' ) ); ?>
 					</div>
 				</div>
 
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installDBUserField"><?php echo __( 'Database user' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[db_user]', Arr::get( $data, 'db_user' ), array(
@@ -56,7 +56,7 @@
 					</div>
 				</div>
 
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installDBPasswordField"><?php echo __( 'Database password' ); ?></label>
 					<div class="controls">
 						<?php echo Form::password( 'install[db_password]', Arr::get( $data, 'db_password' ), array(
@@ -67,7 +67,7 @@
 					</div>
 				</div>
 
-				<div class="control-group well well-small">
+				<div class="form-group well well-small">
 					<label class="control-label" for="installDBNameField"><?php echo __( 'Database name' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[db_name]', Arr::get( $data, 'db_name' ), array(
@@ -76,16 +76,16 @@
 						<p class="help-block"><?php echo __( 'You have to create a database manually and enter its name here.' ); ?></p>
 						
 						<hr />
-						<label id="empty_database" class="checkbox btn btn-mini btn-danger btn-checkbox"><?php echo Form::checkbox( 'install[empty_database]', 1, (bool) Arr::get( $data,'empty_database'));?> <?php echo __('Empty database'); ?></label>
+						<label id="empty_database" class="checkbox btn btn-xs btn-danger btn-checkbox"><?php echo Form::checkbox( 'install[empty_database]', 1, (bool) Arr::get( $data,'empty_database'));?> <?php echo __('Empty database'); ?></label>
 						
 					</div>
 				</div>
 
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installDBPrefixField"><?php echo __( 'Prefix' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[db_table_prefix]', Arr::get( $data, 'db_table_prefix' ), array(
-							'class' => 'input-small', 'id' => 'installDBPrefixField'
+							'class' => 'input-sm', 'id' => 'installDBPrefixField'
 						) ); ?>
 
 						<p class="help-block"><?php echo __( 'Usefull to prevent conflicts if you have, or plan to have, multiple :cms installations with a single database.', array(':cms' => CMS_NAME) ); ?></p>
@@ -99,16 +99,16 @@
     <div>
 		<div class="widget">
 			<div class="widget-content">
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installSiteNameField"><?php echo __( 'Site title' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[site_name]', Arr::get( $data, 'site_name' ), array(
-							'class' => 'span7', 'id' => 'installSiteNameField'
+							'class' => 'col-xs-7', 'id' => 'installSiteNameField'
 						) ); ?> <?php echo UI::label( __( 'Required' ) ); ?>
 					</div>
 				</div>
 
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installUsernameField"><?php echo __( 'Administrator username' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[username]', Arr::get( $data, 'username' ), array(
@@ -116,7 +116,7 @@
 						) ); ?> <?php echo UI::label( __( 'Required' ) ); ?>
 					</div>
 				</div>
-				<div class="control-group well well-small">
+				<div class="form-group well well-small">
 					<label class="control-label" for="userEditPasswordField"><?php echo __('Password'); ?></label>
 					<div class="controls">
 						<div id="password-form">
@@ -140,7 +140,7 @@
 						</label>
 					</div>
 				</div>
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installEmailField"><?php echo __( 'Administrator email' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[email]', Arr::get( $data, 'email' ), array(
@@ -156,19 +156,19 @@
 					->label(__('Interface language'))
 				)); ?>
 				<hr />
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installAdminDirNamexField"><?php echo __( 'Admin dir name' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[admin_dir_name]', Arr::get( $data, 'admin_dir_name' ), array(
-							'class' => 'input-small', 'id' => 'installAdminDirNamexField'
+							'class' => 'input-sm', 'id' => 'installAdminDirNamexField'
 						) ); ?> <?php echo UI::label( __( 'Required' ) ); ?>
 					</div>
 				</div>
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label" for="installURLSuffixField"><?php echo __( 'URL suffix' ); ?></label>
 					<div class="controls">
 						<?php echo Form::input( 'install[url_suffix]', Arr::get( $data, 'url_suffix' ), array(
-							'class' => 'input-small', 'id' => 'installURLSuffixField'
+							'class' => 'input-sm', 'id' => 'installURLSuffixField'
 						) ); ?>
 
 						<p class="help-block"><?php echo __( 'Add a suffix to simulate static html files.' ); ?></p>
@@ -184,7 +184,7 @@
 				
 				<hr />
 				
-				<div class="control-group">
+				<div class="form-group">
 					<label class="control-label"><?php echo __( 'Demo site' ); ?></label>
 					<div class="controls">
 						<label id="insert-test-data" class="checkbox btn btn-success btn-checkbox">

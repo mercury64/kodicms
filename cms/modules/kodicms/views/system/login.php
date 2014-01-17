@@ -20,29 +20,29 @@
 
 	<?php echo Form::hidden( 'token', Security::token() ); ?>
 
-	<div class="control-group">
-		<div class="input-prepend">
-			<span class="add-on"><i class="icon-user"></i></span>
+	<div class="form-group">
+		<div class="input-group">
+			<span class="input-group-addon"><i class="icon-user"></i></span>
 			<?php echo Form::input('login[username]', NULL, array(
 				'id' => 'username', 'class' => 'login-field'
 			)); ?>
 		</div>
 	</div>
 
-	<div class="control-group">
-		<div class="input-prepend  input-append">
-			<span class="add-on">
+	<div class="form-group">
+		<div class="input-group  input-group">
+			<span class="input-group-addon">
 				<i class="icon-lock"></i>
 			</span>
 			<?php echo Form::password('login[password]', NULL, array(
 				'id' => 'password', 'class' => 'login-field'
 			)); ?>
 			
-			<?php echo HTML::anchor(ADMIN_DIR_NAME . '/login/forgot', __('Forgot password?'), array('class' => 'btn btn-large btn-link')); ?>
+			<?php echo HTML::anchor(ADMIN_DIR_NAME . '/login/forgot', __('Forgot password?'), array('class' => 'btn btn-lg btn-link')); ?>
 		</div>
 	</div>
 
-	<div class="control-group">
+	<div class="form-group">
 		<label class="checkbox">
 			<?php echo Form::checkbox('login[remember]', 'checked', TRUE); ?>
 			<?php echo __('Remember me for :num days', array(
@@ -55,7 +55,7 @@
 	<?php Observer::notify('admin_login_form'); ?>
 
 	<?php echo Form::button('sign-in', __('Login') . ' ' . UI::icon('chevron-right'), array(
-		'class' => 'btn btn-large'
+		'class' => 'btn btn-lg'
 	)); ?>
 	
 	<div class="clearfix"></div>

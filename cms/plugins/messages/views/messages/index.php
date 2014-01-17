@@ -1,7 +1,7 @@
 <div class="map widget">
 	
 	<div class="widget-header">
-		<div class="row-fluid">
+		<div class="row">
 			<?php echo UI::button(__('Send message'), array(
 				'href' => Route::url('backend', array('controller' => 'messages', 'action' => 'add')), 'icon' => UI::icon('envelope'),
 				'class' => 'btn'
@@ -35,7 +35,7 @@
 					<td class="actions">
 						<?php echo UI::button(NULL, array(
 							'icon' => UI::icon( 'remove' ),
-							'class' => 'btn btn-mini btn-confirm btn-remove'
+							'class' => 'btn btn-xs btn-confirm btn-remove'
 						)); ?>
 					</td>
 				</tr>

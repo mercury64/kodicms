@@ -155,7 +155,7 @@ $failed = FALSE;
 	</table>
 
 	<?php if ($failed === TRUE): ?>
-		<p id="results" class="alert alert-error lead"><?php echo UI::icon('remove'); ?> <?php echo __('Kohana may not work correctly with your environment.'); ?></p>
+		<p id="results" class="alert alert-danger lead"><?php echo UI::icon('remove'); ?> <?php echo __('Kohana may not work correctly with your environment.'); ?></p>
 	<?php else: ?>
 		<p id="results" class="alert alert-success lead"><?php echo UI::icon('ok'); ?> <?php echo __('Your environment passed all requirements.'); ?></p>
 	<?php endif ?>

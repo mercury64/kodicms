@@ -42,7 +42,7 @@
 		<h3><?php echo __('General information'); ?></h3>
 	</div>
 	<div class="widget-content">
-		<div class="control-group">
+		<div class="form-group">
 			<label class="control-label title" for="name"><?php echo __( 'Email type name' ); ?></label>
 			<div class="controls">
 				<?php
@@ -53,7 +53,7 @@
 			</div>
 		</div>
 		
-		<div class="control-group">
+		<div class="form-group">
 			<label class="control-label" for="code"><?php echo __( 'Email type code' ); ?></label>
 			<div class="controls">
 				<?php if($action == 'add'): ?>
@@ -71,12 +71,12 @@
 		<h3><?php echo __('Email type fileds'); ?></h3>
 	</div>
 	<div class="widget-content" id="type-fields">
-		<div class="control-group">
+		<div class="form-group">
 			<div class="controls">
 				<div class="field-row hidden">
-					<input type="text" name="data[key][]" disabled="disabled" class="input-small slug field_key_input" data-separator="_" placeholder="Field key">
+					<input type="text" name="data[key][]" disabled="disabled" class="input-sm slug field_key_input" data-separator="_" placeholder="Field key">
 					<input type="text" name="data[name][]" disabled="disabled" class="input-xxlarge field_desription_input" placeholder="Desription">
-					<button class="btn btn-mini remove-field"><?php echo UI::icon('trash'); ?></button>
+					<button class="btn btn-xs remove-field"><?php echo UI::icon('trash'); ?></button>
 					<br /><br />
 				</div>
 				<button id="add-field" class="btn"><?php echo UI::icon('plus'); ?></button>
@@ -90,7 +90,7 @@
 	</div>
 	<div class="widget-content">
 		<?php if(count($templates) > 0): ?>
-		<ul class="unstyled">
+		<ul class="list-unstyled">
 		<?php foreach($templates as $tpl): ?>
 			<li><?php echo HTML::anchor(Route::url('email_controllers', array(
 				'controller' => 'templates',

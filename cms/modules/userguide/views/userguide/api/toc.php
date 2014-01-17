@@ -9,7 +9,7 @@
 			var search_regex = new RegExp(search,'gi');
 			
 			// Run through each .class definition
-			$('.span4', this).each(function(k, container){
+			$('.col-xs-4', this).each(function(k, container){
 				if (search == '') {
 					// If search box is empty show everything without doing any regex
 					$(container).show();
@@ -61,9 +61,9 @@ $(document).ready(function(){
 <hr />
 
 <div class="class-list">
-	<div class="row-fluid">
+	<div class="row">
 		<?php $i = 1; foreach ($classes as $class => $methods): $link = $route->uri(array('class' => $class)) ?>
-		<div class="span4">
+		<div class="col-xs-4">
 			<h4><?php echo HTML::anchor($link, $class, NULL, NULL, TRUE) ?></h4>
 			<ul class="methods">
 			<?php foreach ($methods as $method): ?>
@@ -74,7 +74,7 @@ $(document).ready(function(){
 			<?php if(($i % 3) == 0): ?>
 			
 	</div>
-	<div class="row-fluid">
+	<div class="row">
 			<?php endif; ?>
 			<?php $i++; ?>
 		

@@ -13,13 +13,13 @@
 			<% } %>
 		</h5>
 
-		<p class="muted"><%= description %></p>
+		<p class="text-muted"><%= description %></p>
 	</td>
 	<td class="plugin-version"><%= version %></td>
 	<?php if( ACL::check('plugins.change_status')): ?>
 	<td class="plugin-status">
 		<?php echo UI::button(NULL, array(
-			'class' => 'change-status btn btn-mini',
+			'class' => 'change-status btn btn-xs',
 		)); ?>
 	</td>
 	<?php endif; ?>

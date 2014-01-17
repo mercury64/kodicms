@@ -8,7 +8,7 @@
 <?php endif; ?>
 
 <h4>Favorite Sites</h4>
-<ul class="unstyled">
+<ul class="list-unstyled">
 	<li>
 		<?php echo HTML::anchor('https://github.com/butschster/kodicms', 'KodiCMS'); ?>
 	</li>

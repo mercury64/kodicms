@@ -45,7 +45,7 @@
 						<?php echo UI::label($widget->type()); ?>
 					</td>
 					<td class="description">
-						<span class="muted"><?php echo $widget->description; ?></span>
+						<span class="text-muted"><?php echo $widget->description; ?></span>
 					</td>
 					<td class="cache">
 						<?php if($widget->code()->caching === FALSE): ?>
@@ -62,7 +62,7 @@
 								'action' => 'location',
 								'id' => $widget->id)), 
 							'icon' => UI::icon('sitemap'),
-							'class' => 'btn btn-mini btn-primary'
+							'class' => 'btn btn-xs btn-primary'
 						)); ?>
 						<?php endif; ?>
 						<?php if( ACL::check('widgets.delete')): ?>
@@ -72,7 +72,7 @@
 								'action' => 'delete',
 								'id' => $widget->id)), 
 							'icon' => UI::icon('remove'),
-							'class' => 'btn btn-mini btn-danger btn-confirm'
+							'class' => 'btn btn-xs btn-danger btn-confirm'
 						)); ?>
 						<?php endif; ?>
 					</td>

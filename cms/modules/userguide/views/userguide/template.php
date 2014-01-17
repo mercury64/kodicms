@@ -17,20 +17,18 @@
 		<?php Observer::notify( 'layout_backend_head_after' ); ?>
 	</head>
 	<body id="body_<?php echo $page_body_id; ?>">
-		<div id="content-wrapper">
+		<div class="content-wrapper">
 			<?php echo View::factory('system/blocks/navigation'); ?>
 			<?php echo $breadcrumbs; ?>
-			<div class="container-fluid">
-				
-				
+			<div class="container">				
 				<div id="content">
-					<div class="row-fluid">
-						<div class="span3">
+					<div class="row">
+						<div class="col-xs-3">
 							<div id="kodoc-topics">
 								<?php echo $menu ?>
 							</div>
 						</div>
-						<div class="span9">
+						<div class="col-xs-9">
 							<?php if(!empty($title)): ?>
 							<?php echo UI::page_header($title); ?>
 							<?php endif; ?>

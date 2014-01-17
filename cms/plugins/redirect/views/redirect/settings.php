@@ -3,7 +3,7 @@
 	<h3><?php echo __('General settings'); ?></h3>
 </div>
 <div class="widget-content">
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label" for="domain"><?php echo __( 'Domain' ); ?></label>
 		<div class="controls">
 
@@ -13,7 +13,7 @@
 		</div>
 	</div>
 
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label" for="check_url_suffix"><?php echo __('Check url suffix (<strong>:url_suffix</strong>)', array(':url_suffix' => URL_SUFFIX)); ?></label>
 		<div class="controls">
 

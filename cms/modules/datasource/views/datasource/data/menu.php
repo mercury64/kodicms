@@ -4,7 +4,7 @@
 	<div class="widget-header">
 	<h4><?php echo __(ucfirst($section)); ?></h4>
 	</div>
-	<ul class="list-group unstyled">
+	<ul class="list-group list-unstyled">
 	<?php foreach ($data as $id => $name): ?>
 		<?php echo recurse_menu($id, $name, $ds_id, $section); ?>
 	<?php endforeach; ?>
@@ -60,7 +60,7 @@
 					'id' => $id
 				)),
 				'icon' => UI::icon( 'wrench' ),
-				'class' => 'btn btn-mini'
+				'class' => 'btn btn-xs'
 			));
 		}
 		if(ACL::check($section.$ds_id.'.section.edit'))
@@ -73,13 +73,13 @@
 					'id' => $id
 				)),
 				'icon' => UI::icon( 'trash icon-white' ),
-				'class' => 'btn btn-danger btn-confirm btn-mini'
+				'class' => 'btn btn-danger btn-confirm btn-xs'
 			));
 		}
 		$result .= '</div>';
 		
 		if(!empty($name['description']))
-			$result .= '<p class="muted list-group-item-text">'.$name['description'].'</p>';
+			$result .= '<p class="text-muted list-group-item-text">'.$name['description'].'</p>';
 
 		$result .= '</li>';
 		

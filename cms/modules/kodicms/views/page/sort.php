@@ -1,6 +1,6 @@
  <div class="sort-pages">
 	<?php foreach($pages as $page): ?>
-	<ul class="dd-list unstyled">
+	<ul class="dd-list list-unstyled">
 		<li class="dd-item" data-id="<?php echo $page['id']; ?>">
 			<div class="dd-root">
 				<?php echo UI::icon('folder-open'); ?>
@@ -24,7 +24,7 @@ function recurse_sort_pages(array $childs) {
 	$data = '';
 	if(empty($childs)) return $data;
 	
-	$data = '<ul class="dd-list unstyled">';
+	$data = '<ul class="dd-list list-unstyled">';
 	foreach ($childs as $page)
 	{
 		$data .= (string) View::factory('page/sortitem', array(

@@ -9,8 +9,9 @@ if( AuthUser::isLoggedIn() )
 
 function less_compile($plugin) 
 {
-	try
-	{
+	set_time_limit(0);
+//	try
+//	{
 		$less_folder_path = trim( $plugin->get('less_folder_path'), '/');
 		$css_folder_path = trim( $plugin->get('css_folder_path'), '/');
 				
@@ -47,12 +48,12 @@ function less_compile($plugin)
 				$less_file = $less_path.$file->getFilename();
 				$css_file = $css_path.DIRECTORY_SEPARATOR.$pathinfo['filename'].'.css';
 				
-				$less->checkedCompile( $less_file, $css_file, $params);
+				$less->checkedCompile( $less_file, $css_file);
 			}
 		}
-	}
-	catch (Exception $e ) 
-	{
-		return;
-	}
+//	}
+//	catch (Exception $e ) 
+//	{
+//		return;
+//	}
 }

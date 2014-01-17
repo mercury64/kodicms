@@ -8,7 +8,7 @@
 		<?php echo UI::icon('lock'); ?> <?php echo $widget->name; ?>
 		<?php endif; ?>
 		<?php if(!empty($widget->description)): ?>
-		<p class="muted"><?php echo $widget->description; ?></p>
+		<p class="text-muted"><?php echo $widget->description; ?></p>
 		<?php endif; ?>
 	</th>
 	<td>
@@ -25,7 +25,7 @@
 				'action' => 'location',
 				'id' => $widget->id)), 
 			'icon' => UI::icon('sitemap'),
-			'class' => 'btn btn-mini btn-primary',
+			'class' => 'btn btn-xs btn-primary',
 			'target' => 'blank'
 		)); ?>
 		<?php endif; ?>

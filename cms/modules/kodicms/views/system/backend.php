@@ -18,14 +18,14 @@
 		<?php Observer::notify( 'layout_backend_head_after' ); ?>
 	</head>
 	<body id="body_<?php echo $page_body_id; ?>" class="<?php echo $request->query('type'); ?>">
-		<div id="content-wrapper">
+		<div class="content-wrapper">
 			<header>
 				<nav>
 					<?php echo View::factory('system/blocks/navigation'); ?>
 				</nav>
 				<?php echo $breadcrumbs; ?>
 			</header>
-			<div class="container-fluid">
+			<div class="container">
 				<section id="content" >
 				<?php echo $content; ?>
 				</section>

@@ -1,12 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.'); ?>
 
-<ul data-level="<?php echo $level; ?>" class="unstyled">
+<ul data-level="<?php echo $level; ?>" class="list-unstyled">
 	<?php foreach($childrens as $child): ?>
 	<?php if($child instanceof Model_Page): ?>
 	<li data-id="<?php echo $child->id; ?>" <?php if($child->is_expanded) echo('class="item-expanded"'); ?>>
 		<div class="item">
-			<div class="row-fluid">
-				<div class="title span7">
+			<div class="row">
+				<div class="title col-xs-7">
 					
 					<?php if( $child->has_children ): ?>
 					<?php
@@ -35,13 +35,13 @@
 					
 					<?php echo $child->get_public_anchor(); ?>
 				</div>
-				<div class="date span2">
+				<div class="date col-xs-2">
 					<?php echo Date::format($child->published_on); ?>
 				</div>
-				<div class="status span2">
+				<div class="status col-xs-2">
 					<?php echo $child->get_status(); ?>
 				</div>
-				<div class="actions span1">
+				<div class="actions col-xs-1">
 					<?php if ( Acl::check( 'page.add')): ?>
 					<?php echo UI::button(NULL, array(
 						'href' => Route::url('backend', array(
@@ -50,7 +50,7 @@
 							'id' => $child->id
 						)), 
 						'icon' => UI::icon('plus'), 
-						'class' => 'btn btn-mini'
+						'class' => 'btn btn-xs'
 					)); ?>
 					<?php endif; ?>
 					<?php if (Acl::check( 'page.delete')): ?>
@@ -60,7 +60,7 @@
 							'action' => 'delete',
 							'id' => $child->id
 						)), 'icon' => UI::icon('remove icon-white'), 
-						'class' => 'btn btn-mini btn-confirm btn-danger'
+						'class' => 'btn btn-xs btn-confirm btn-danger'
 					)); ?>
 					<?php endif; ?>
 				</div>
@@ -71,8 +71,8 @@
 	<?php else: ?>
 	<li>
 		<div class="item">
-			<div class="row-fluid">
-				<div class="title span12">
+			<div class="row">
+				<div class="title col-xs-12">
 					<?php echo $child; ?>
 				</div>
 			</div>

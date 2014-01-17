@@ -54,7 +54,7 @@
 						<?php echo UI::button(NULL, array(
 							'href' => Route::url('backend', array('controller' => 'snippet', 'action' => 'delete', 'id' => $snippet->name)), 
 							'icon' => UI::icon('remove'),
-							'class' => 'btn btn-mini btn-confirm'
+							'class' => 'btn btn-xs btn-confirm'
 						)); ?>
 						<?php endif; ?>
 					</td>

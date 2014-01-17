@@ -3,7 +3,7 @@ echo Form::open('page/search', array(
 	'class' => 'form-search pull-right'
 ));
 echo Form::hidden('token', Security::token()); ?>
-	<div class="input-append">
+	<div class="input-group">
 		<?php echo Form::input('search', NULL, array(
 			'id' => 'pageMapSearchField', 
 			'class' => 'input-medium search-query',

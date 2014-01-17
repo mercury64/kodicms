@@ -26,7 +26,7 @@ class Bootstrap_Navbar extends Bootstrap_Helper_Elements {
 	 * or .pull-right to properly align it.
 	 * 
 	 *		<form class="navbar-form pull-left">
-	 *			<input type="text" class="span2">
+	 *			<input type="text" class="col-xs-2">
 	 *			<button type="submit" class="btn">Submit</button>
 	 *		</form>
 	 */
@@ -96,9 +96,9 @@ class Bootstrap_Navbar extends Bootstrap_Helper_Elements {
 	public static function brand( $title, $url = '#', $attributes = array() )
 	{	
 		if(isset($attributes['class']))
-			$attributes['class'] .= ' brand';
+			$attributes['class'] .= ' navbar-brand';
 		else
-			$attributes['class'] = ' brand';
+			$attributes['class'] = ' navbar-brand';
 
 		return HTML::anchor($url, $title, $attributes);
 	}
@@ -154,6 +154,10 @@ class Bootstrap_Navbar extends Bootstrap_Helper_Elements {
 		else if( $element instanceof Bootstrap_Form )
 		{
 			$element->attributes('class', 'navbar-form');
+		}
+		else if( $element instanceof Bootstrap_Nav )
+		{
+			$element->attributes('class', 'navbar-nav');
 		}
 
 		$this->_add($element, $priority);

@@ -18,7 +18,7 @@
 		<?php Observer::notify( 'layout_frontend_head_after' ); ?>
 	</head>
 	<body id="body_frontend">
-		<div id="content-wrapper">
+		<div class="content-wrapper">
 			<div class="container" id="content">
 				<section id="content">
 					<?php echo $content; ?>

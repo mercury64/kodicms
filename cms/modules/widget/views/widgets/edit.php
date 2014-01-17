@@ -30,7 +30,7 @@
 		<h4><?php echo __('Widget template'); ?></h4>
 	</div>
 	<div class="widget-content">
-		<div class="control-group">
+		<div class="form-group">
 			<label class="control-label"><?php echo __('Snippet'); ?></label>
 			<div class="controls">
 
@@ -92,7 +92,7 @@
 					->label(__('Cache enabled'))
 				));
 		?>		
-		<div id="cache_lifetime_group" class="control-group">
+		<div id="cache_lifetime_group" class="form-group">
 			<label id="bootstrap_form_element_label_QuXTwt2D" class="control-label" for="cache_lifetime">Время кеширования</label>
 			<div class="controls">
 				<input type="text" id="cache_lifetime" name="cache_lifetime" value="<?php echo $widget->cache_lifetime; ?>" class="input-medium">
@@ -125,7 +125,7 @@
 	</div>
 	<div class="widget-content spoiler roles-spoiler">
 		<?php echo Form::select('roles[]', $roles, $widget->roles, array(
-			'class' => 'span12'
+			'class' => 'col-xs-12'
 		)); ?>
 	</div>
 	<?php endif; ?>

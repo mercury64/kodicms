@@ -1,5 +1,5 @@
 <?php if( !empty($prepend) OR !empty($append)): ?>
-<div class="<?php if(!empty($prepend)) echo 'input-prepend'; ?> <?php if(!empty($append)) echo 'input-append' ?>">
+<div class="<?php if(!empty($prepend)) echo 'input-group'; ?> <?php if(!empty($append)) echo 'input-group' ?>">
 <?php endif; ?>
 	
 <?php foreach ($prepend as $string) echo $string; ?>

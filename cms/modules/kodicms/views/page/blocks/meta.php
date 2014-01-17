@@ -1,9 +1,9 @@
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label title" for="pageEditMetaTitleField"><?php echo __( 'Page title' ); ?></label>
 		<div class="controls">
 			<?php
 			echo Form::input( 'page[title]', $page->title, array(
-				'class' => 'span12 slug-generator input-title'
+				'class' => 'col-xs-12 slug-generator input-title'
 			) );
 			?>
 		</div>
@@ -11,62 +11,63 @@
 </div>
 <div class="spoiler-toggle-container widget-content-bg widget-no-border-radius">
 	<div class="spoiler-toggle text-center" data-spoiler=".spoiler-meta">
-		<?php echo UI::icon( 'chevron-down spoiler-toggle-icon' ); ?> <span class="muted"><?php echo __( 'Metadata' ); ?></span>
+		<?php echo UI::icon( 'chevron-down spoiler-toggle-icon' ); ?> <span class="text-muted"><?php echo __( 'Metadata' ); ?></span>
 	</div>
 	<div id="pageEditMetaMore" class="spoiler spoiler-meta">
 	<br />
 	<?php if ( $action == 'add' || ($action == 'edit' && isset( $page->id ) && $page->id != 1) ): ?>
-		<div class="control-group">
-			<label class="control-label" for="pageEditMetaSlugField"><?php echo __( 'Slug' ); ?></label>
-			<div class="controls">
-				<?php
-				echo Form::input( 'page[slug]', $page->slug, array(
-					'class' => 'span12 slug', 'id' => 'pageEditMetaSlugField'
-				) );
-				?>
+		<div class="form-group">
+			<label class="control-label col-sm-2" for="pageEditMetaSlugField"><?php echo __( 'Slug' ); ?></label>
+			
+			<div class="col-sm-10">
+			<?php
+			echo Form::input( 'page[slug]', $page->slug, array(
+				'class' => 'col-xs-12 slug form-control', 'id' => 'pageEditMetaSlugField'
+			) );
+			?>
 			</div>
 		</div>
 	<?php endif; ?>
 
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label" for="pageEditMetaBreadcrumbField"><?php echo __( 'Breadcrumb' ); ?></label>
 		<div class="controls">
 			<?php
 			echo Form::input( 'page[breadcrumb]', $page->breadcrumb, array(
-				'class' => 'span12', 'id' => 'pageEditMetaBreadcrumbField'
+				'class' => 'col-xs-12', 'id' => 'pageEditMetaBreadcrumbField'
 			) );
 			?>
 		</div>
 	</div>
 	
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label" for="pageEditMetaTitleField"><?php echo __( 'Meta title' ); ?></label>
 		<div class="controls">
 			<?php
 			echo Form::input( 'page[meta_title]', $page->meta_title, array(
-				'class' => 'span12', 'id' => 'pageEditMetaTitleField'
+				'class' => 'col-xs-12', 'id' => 'pageEditMetaTitleField'
 			) );
 			?>
 		</div>
 	</div>
 
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label" for="pageEditMetaKeywordsField"><?php echo __( 'Meta keywords' ); ?></label>
 		<div class="controls">
 			<?php
 			echo Form::textarea( 'page[meta_keywords]', $page->meta_keywords, array(
-				'class' => 'span12', 'id' => 'pageEditMetaKeywordsField'
+				'class' => 'col-xs-12', 'id' => 'pageEditMetaKeywordsField'
 			) );
 			?>
 		</div>
 	</div>
 
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label" for="pageEditMetaDescriptionField"><?php echo __( 'Meta description' ); ?></label>
 		<div class="controls">
 			<?php
 			echo Form::textarea( 'page[meta_description]', $page->meta_description, array(
-				'class' => 'span12', 'id' => 'pageEditMetaDescriptionField'
+				'class' => 'col-xs-12', 'id' => 'pageEditMetaDescriptionField'
 			) );
 			?>
 		</div>
@@ -74,7 +75,7 @@
 	
 	<hr />
 	
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label" for="pageEditMetaRobotsField"><?php echo __( 'Robots' ); ?></label>
 		<div class="controls">
 			<?php

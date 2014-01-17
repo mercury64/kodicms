@@ -11,7 +11,7 @@
 	<div class="error-actions">
 		<?php echo UI::button(__('Back'), array(
 			'href' => URL::site('', TRUE), 'icon' => UI::icon( 'chevron-left' ),
-			'class' => 'btn btn-large'
+			'class' => 'btn btn-lg'
 		)); ?>
 	</div>
 </div>

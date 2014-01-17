@@ -2,7 +2,7 @@
 	<h3><?php echo __('General settings'); ?></h3>
 </div>
 <div class="widget-content">
-	<div class="control-group">
+	<div class="form-group">
 		<?php echo Form::label('setting_disqus_id', __('Profile ID'), array('class' => 'control-label')); ?>
 		<div class="controls">
 			<?php echo Form::input('setting[disqus_id]', $plugin->get('disqus_id'), array(

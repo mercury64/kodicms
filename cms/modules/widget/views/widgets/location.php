@@ -28,7 +28,7 @@
 		</table>
 	</div>
 	<div class="widget-content widget-no-border-radius">
-		<div class="input-prepend input-append">
+		<div class="input-group input-group">
 			<?php echo Form::input('select_for_all', NULL, array('class' => 'inline')); ?>
 			<?php echo UI::button( __('Select for all pages'), array(
 				'icon' => UI::icon('sitemap'), 'class' => 'btn inline', 'id' => 'select_for_all'
@@ -37,7 +37,7 @@
 	</div>
 	<div class="widget-footer form-actions">
 		<?php echo UI::button( __('Save locations'), array(
-			'icon' => UI::icon( 'ok'), 'class' => 'btn btn-large'
+			'icon' => UI::icon( 'ok'), 'class' => 'btn btn-lg'
 		)); ?>
 	</div>
 	<?php echo Form::close(); ?>
@@ -70,7 +70,7 @@ function recurse_pages( $pages, $spaces = 0, $blocks = array(), $page_widgets = 
 		if(!empty($page['childs']))
 		{
 			$data .= "&nbsp;" . Form::button(NULL, UI::icon('level-down'), array(
-				'class' => 'set_to_inner_pages btn btn-mini',
+				'class' => 'set_to_inner_pages btn btn-xs',
 				'title' => __('Select to child pages')
 			) );
 		}

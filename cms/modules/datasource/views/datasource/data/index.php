@@ -12,7 +12,7 @@
 		<?php endif; ?>
 
 		<?php if(ACL::check($ds_type.$ds_id.'.document.edit')):?>
-		<div class="input-append pull-right">
+		<div class="input-group pull-right">
 			<?php echo Form::select('doc_actions', array(
 				__('Actions'), 
 				'remove' => __('Remove'), 

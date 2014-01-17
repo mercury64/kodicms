@@ -38,11 +38,11 @@
 			</thead>
 		</table>
 
-		<ul id="pageMapItems" class="map-items page-items unstyled" data-level="0">
+		<ul id="pageMapItems" class="map-items page-items list-unstyled" data-level="0">
 			<li data-id="<?php echo $page->id; ?>">
 				<div class="item">
-					<div class="row-fluid">
-						<div class="title span7">
+					<div class="row">
+						<div class="title col-xs-7">
 							<?php if( ! ACL::check('page.edit') OR ! AuthUser::hasPermission( $page->get_permissions() ) ): ?>
 							<?php echo UI::icon('lock'); ?>
 							<em title="/"><?php echo $page->title; ?></em>
@@ -55,12 +55,12 @@
 
 							<?php echo $page->get_public_anchor(); ?>
 						</div>
-						<div class="actions offset4 span1">
+						<div class="actions offset4 col-xs-1">
 							<?php if ( Acl::check( 'page.add')): ?>
 							<?php echo UI::button(NULL, array(
 								'icon' => UI::icon('plus'), 
 								'href' => Route::url('backend', array('controller' => 'page', 'action' => 'add')),
-								'class' => 'btn btn-mini')); ?>
+								'class' => 'btn btn-xs')); ?>
 							<?php endif; ?>
 						</div>
 					</div>
@@ -69,6 +69,6 @@
 				<?php echo $content_children; ?>
 			</li>
 		</ul>
-		<ul id="pageMapSearchItems" class="map-items page-items unstyled"></ul>
+		<ul id="pageMapSearchItems" class="map-items page-items list-unstyled"></ul>
 	</div>
 </div>

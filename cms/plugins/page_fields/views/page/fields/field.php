@@ -1,5 +1,5 @@
-<div class="page-field row-fluid" data-id="<?php echo $field->id; ?>">
-	<div class="span3 system-field">
+<div class="page-field row" data-id="<?php echo $field->id; ?>">
+	<div class="col-xs-3 system-field">
 		<?php if($field->loaded()): ?>
 		<?php echo FORM::input('title', $field->title, array(
 			'placeholder' => __('Field title'), 'data-slug' => '.field-slug',
@@ -14,7 +14,7 @@
 		<?php endif; ?>
 	</div>
 	
-	<div class="span2 system-field">
+	<div class="col-xs-2 system-field">
 		<?php if($field->loaded()): ?>
 		<?php echo FORM::input('key', $field->key, array(
 			'placeholder' => __('Field key'), 'disabled',
@@ -28,7 +28,7 @@
 		<?php endif; ?>
 	</div>
 
-	<div class="span6 input-append">
+	<div class="col-xs-6 input-group">
 		<?php echo FORM::input('value', $field->value, array(
 			'placeholder' => (empty($field->value) AND $field->loaded()) ? '' : __('Field value'), 
 			'class' => 'input-block-level input-filemanager'

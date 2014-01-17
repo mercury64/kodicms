@@ -11,7 +11,7 @@ class UI {
 
 	public static function icon( $name )
 	{
-		return '<i class="icon-' . HTML::chars( $name ) .'"></i>';
+		return '<i class="fa fa-' . HTML::chars( $name ) .'"></i>';
 	}
 	
 	public static function label( $text, $type = 'info' )
@@ -82,7 +82,7 @@ class UI {
 			
 		$actions = array(
 			UI::button(__('Save and Continue editing'), array(
-				'class' => 'btn btn-large btn-save', 
+				'class' => 'btn btn-lg btn-save', 
 				'icon' => UI::icon('retweet'),
 				'name' => 'continue'
 			)),

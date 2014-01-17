@@ -3,7 +3,7 @@
 </div>
 <div class="widget-content spoiler social-accounts-settings">
 	
-	<div class="control-group">
+	<div class="form-group">
 		<label class="control-label"><?php echo __( 'Enable registration' ); ?></label>
 		<div class="controls">
 			<?php
@@ -21,7 +21,7 @@
 		)); ?>)<?php endif; ?></h4>
 		<hr />
 		<?php foreach ($data as $key => $value): ?>
-		<div class="control-group">
+		<div class="form-group">
 			<label class="control-label"><?php echo strtoupper($key); ?></label>
 			<div class="controls">
 				<?php echo Form::input( 'setting[oauth][accounts]['.$provider.']['.$key.']', $value, array(

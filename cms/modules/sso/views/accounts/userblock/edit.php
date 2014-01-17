@@ -9,15 +9,15 @@
 	<h3><?php echo __('Linked social accounts'); ?></h3>
 </div>
 <div class="widget-content">
-	<div class="row-fluid social-accounts-linked">
+	<div class="row social-accounts-linked">
 	<?php foreach($socials as $social): ?>
 		<?php $linked[] = $social->provider(); ?>
-		<div class="span2 text-center">
+		<div class="col-xs-2 text-center">
 			<?php echo HTML::image($social->avatar(), array('class' => 'img-polaroid')); ?><br />
 			<strong><?php echo $social->link(); ?></strong>
 			<br />
 			<?php echo UI::button(__('Disconnect'), array(
-				'class' => 'btn btn-mini btn-warning',
+				'class' => 'btn btn-xs btn-warning',
 				'href' => Route::url('accounts-auth', array(
 					'directory' => 'oauth', 
 					'controller' => $social->provider(), 

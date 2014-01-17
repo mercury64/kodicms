@@ -6,7 +6,7 @@
 <div class="widget-content widget-no-border-radius spoiler spoiler-page-fields">
 	<?php if(empty($page->id)): ?>
 	<h4><?php echo __('Copy fields from'); ?></h4>
-	<select name="fields[from_page_id]" class="span12">
+	<select name="fields[from_page_id]" class="col-xs-12">
 		<option value="0"><?php echo __("Don't copy"); ?></option>
 		<?php foreach ($pages as $p): ?>
 		<option value="<?php echo($p['id']); ?>" <?php echo($p['id'] == $page->parent_id ? ' selected="selected"': ''); ?> ><?php echo str_repeat('- ', $p['level'] * 2).$p['title']; ?></option>
@@ -14,9 +14,9 @@
 	</select>
 	<?php else: ?>
 	<div class="well">
-		<div class="span5 select-field-container" style='display:none;'>
+		<div class="col-xs-5 select-field-container" style='display:none;'>
 			<?php echo Form::hidden('field_id', NULL, array(
-				'disabled', 'class' => 'span12', 'id' => 'select-page-field-container'
+				'disabled', 'class' => 'col-xs-12', 'id' => 'select-page-field-container'
 			)); ?>
 		</div>
 		

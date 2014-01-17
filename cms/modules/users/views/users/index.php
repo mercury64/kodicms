@@ -55,7 +55,7 @@
 									'id' => $user->id
 								)), 
 								'icon' => UI::icon('remove'),
-								'class' => 'btn btn-mini btn-confirm'
+								'class' => 'btn btn-xs btn-confirm'
 							));
 						} ?>
 					</td>

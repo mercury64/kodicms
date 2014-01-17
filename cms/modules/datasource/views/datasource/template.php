@@ -19,7 +19,7 @@
 	</head>
 	<body id="body_<?php echo $page_body_id; ?>" class="<?php echo $request->query('type'); ?>">
 
-		<div id="content-wrapper">
+		<div class="content-wrapper">
 			<header>
 				<nav>
 					<?php echo View::factory('system/blocks/navigation'); ?>
@@ -27,10 +27,10 @@
 				<?php echo $breadcrumbs; ?>
 			</header>
 
-			<div class="container-fluid">
+			<div class="container">
 				<section id="content" >
-					<div class="row-fluid">
-						<div class="span3">
+					<div class="row">
+						<div class="col-xs-3">
 							<?php echo $menu ?>
 							<?php if(isset($toolbar)): ?>
 							<hr />
@@ -42,7 +42,7 @@
 							</div>
 							<?php endif; ?>
 						</div>
-						<div class="span9">
+						<div class="col-xs-9">
 							<?php echo $content; ?>
 
 							<div class="clearfix"></div>

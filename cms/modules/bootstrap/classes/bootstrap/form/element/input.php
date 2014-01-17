@@ -9,16 +9,16 @@
 class Bootstrap_Form_Element_Input extends Bootstrap_Form_Helper_Elements {
 	
 	/**
-	 * Use relative sizing classes like .input-large 
+	 * Use relative sizing classes like .input-lg 
 	 * 
 	 * In future versions, we'll be altering the use of these relative input 
-	 * classes to match our button sizes. For example, .input-large will 
+	 * classes to match our button sizes. For example, .input-lg will 
 	 * increase the padding and font-size of an input.
 	 */
 	const MINI = 'input-mini';
-	const SMALL = 'input-small';
+	const SMALL = 'input-sm';
 	const MEDIUM = 'input-medium';
-	const LARGE = 'input-large';
+	const LARGE = 'input-lg';
 	const XLARGE = 'input-xlarge';
 	const XXLARGE = 'input-xxlarge'; 
 	
@@ -30,16 +30,16 @@ class Bootstrap_Form_Element_Input extends Bootstrap_Form_Helper_Elements {
 	const BLOCK_LEVEL = 'input-block-level';
 	
 	/**
-	 * Wrap an .add-on and an input with one of two classes to prepend or append text to an input.
+	 * Wrap an .input-group-addon and an input with one of two classes to prepend or append text to an input.
 	 * 
-	 *		<span class="add-on">.00</span>
+	 *		<span class="input-group-addon">.00</span>
 	 * 
 	 * @param string $text
 	 * @return string
 	 */
 	public static function add_on( $text )
 	{
-		return '<span'.HTML::attributes(array('class' => 'add-on')).'>' . $text . '</span>';
+		return '<span'.HTML::attributes(array('class' => 'input-group-addon')).'>' . $text . '</span>';
 	}
 	
 	/**
