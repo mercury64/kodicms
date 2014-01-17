@@ -80,64 +80,48 @@ h1, h2, h3, h4 ,h5, h6 {
 /* ===================================================
 	Navigation
  ===================================================*/
-.navbar {
-	.nav {
-		& > li {
-			& > .dropdown-menu {
-				
-				#gradient > .vertical(#fff, #f1f1f1);
-				
-				li {
-					position: relative;
-				}
+nav .navbar {
+	min-height: 0;
 
-				.counter {
-					left: -22px;
-					top: 0px;
-					background: #60a800;
-					border: 1px solid rgba(0, 0, 0, 0.2);
-					width: 20px;
-					line-height: 22px;
-					font-size: 10px;
-				}
-			}
-		}
-
-		.counter {
-			display: block;
-			width: 13px;
-			line-height: 13px;
-			font-size: 8px;
-			background: red;
-			color: #fff;
-			text-align: center;
-			right: 11px;
-			top: 0px;
-			position: absolute;
-			border: 1px solid pink;
-			border-top-width: 0px;
-		}
+	.navbar-brand {
+		padding-top: 6px;
+		padding-bottom: 6px;
 	}
 
-	[class^="icon-"],
-	[class*=" icon-"] {
-		font-size: 14px;
+	.navbar-nav > li {
+		& > a {
+			padding-top: 10px;
+			padding-bottom: 10px;
+			font-size: 12px;
+		}
 	}
+	
+	margin-bottom: 0;
 }
 
 #subnav {
-	.nav {
-		li {
-			position: relative;
-			.counter {
-				top: 2px;
-				right: 2px;
-				.border-radius(4px);
-				border: 0;
-				background: #60a800;
-			}
-		}
-	}
+	min-height: 40px;
+	padding-left: 20px;
+	padding-right: 20px;
+	background-color: #fafafa;
+	background-image: -moz-linear-gradient(top,#ffffff,#f2f2f2);
+	background-image: -webkit-gradient(linear,0 0,0 100%,from(#ffffff),to(#f2f2f2));
+	background-image: -webkit-linear-gradient(top,#ffffff,#f2f2f2);
+	background-image: -o-linear-gradient(top,#ffffff,#f2f2f2);
+	background-image: linear-gradient(to bottom,#ffffff,#f2f2f2);
+	background-repeat: repeat-x;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
+	border: 1px solid #d4d4d4;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	-webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+	-moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+	box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+	*zoom: 1;
 }
 
 .dropdown-menu {

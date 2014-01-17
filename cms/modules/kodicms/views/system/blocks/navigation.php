@@ -6,10 +6,10 @@ if($navigation !== NULL)
 		->inverse()
 		->add(
 			Bootstrap_Navbar::brand(HTML::image( ADMIN_RESOURCES . 'images/logo.png'), ADMIN_DIR_NAME )
-		);
+		)
+		->attributes('id', 'site_nav');
 
-		$menu_nav = Bootstrap_Nav::factory()
-			->attributes('id', 'site_nav');
+		$menu_nav = Bootstrap_Nav::factory();
 		
 		foreach ( $navigation->sections() as $section )
 		{

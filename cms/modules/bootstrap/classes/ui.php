@@ -82,7 +82,7 @@ class UI {
 			
 		$actions = array(
 			UI::button(__('Save and Continue editing'), array(
-				'class' => 'btn btn-lg btn-save', 
+				'class' => 'btn btn-default btn-lg btn-save', 
 				'icon' => UI::icon('retweet'),
 				'name' => 'continue'
 			)),

@@ -12,14 +12,14 @@
 	<div class="widget widget-nopad">
 		<div class="widget-title">
 			<div class="form-group">
-				<label class="control-label title" for="layoutEditNameField"><?php echo __('Layout name'); ?></label>
-				<div class="controls">
-					<div class="row">
+				<label class="control-label col-md-2" for="layoutEditNameField">
+					<?php echo __('Layout name'); ?>
+				</label>
+				<div class="col-md-10">
 					<?php echo Form::input('name', $layout->name, array(
-						'class' => 'slug focus col-xs-12 input-title', 'id' => 'layoutEditNameField',
+						'class' => 'slug focus input-lg form-control', 'id' => 'layoutEditNameField',
 						'tabindex'	=> 1
 					)); ?>
-					</div>
 				</div>
 			</div>
 		</div>
