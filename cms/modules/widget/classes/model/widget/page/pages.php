@@ -101,7 +101,7 @@ class Model_Widget_Page_Pages extends Model_Widget_Decorator_Pagination {
 	 */
 	public function get_current_page()
 	{
-		if(!$this->current_page)
+		if( ! $this->current_page)
 		{
 			$this->current_page = Model_Page_Front::findById($this->get_page_id());
 		}

@@ -124,15 +124,15 @@ class Behavior
 	 * @param array $attributes
 	 * @return string
 	 */
-	public static function dropdown_select( $name, $selected = NULL, array $attributes = NULL )
+	public static function select_choises()
 	{
-		$options = array('' => __('--- Not set ---'));
+		$options = array('' => __('none'));
 				
 		foreach ( self::findAll() as $behavior )
 		{
 			$options[$behavior] = Inflector::humanize( $behavior );
 		}
 		
-		return Form::select($name, $options, $selected, $attributes);
+		return $options;
 	}
 }
