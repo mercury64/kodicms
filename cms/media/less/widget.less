@@ -10,7 +10,6 @@
 
 	.widget-title, .widget-header {
 		border: 1px solid #D5D5D5;
-		.border-radius(@WidgetBorderRadius @WidgetBorderRadius 0 0);
 		position: relative;
 		margin: 0;
 		padding: 10px;
@@ -21,7 +20,6 @@
 
 		& + .widget-content {
 			border-top: medium none;
-			.border-radius(0);
 		}
 	}
 
@@ -34,7 +32,6 @@
 
 		& + .widget-header {
 			border-top: medium none;
-			.border-radius(0);
 		}
 	}
 
@@ -99,7 +96,6 @@
 	.widget-content {
 		background: none repeat scroll 0 0 #FFFFFF;
 		border: 1px solid #D5D5D5;
-		.border-radius(@WidgetBorderRadius);
 		padding: 15px;
 
 		&.widget-nopad {
@@ -121,19 +117,15 @@
 
 		& + .widget-header {
 			border-top: medium none;
-			.border-radius(0);
 		}
 
-		.nav-stacked a {
-			.border-radius(0);
-		}
+		.nav-stacked a {}
 	}
 
 	.widget-footer, .widget-content-bg {
 		border: 1px solid #D5D5D5;
 		border-top: 1px solid #fff;
 		background: whitesmoke;
-		.border-radius(0 0 @WidgetBorderRadius @WidgetBorderRadius);
 		padding: 10px 15px;
 		margin: 0;
 	}
@@ -150,18 +142,14 @@
 		}
 	}
 
-	.widget-no-border-radius {
-		.border-radius(0);
-	}
+	.widget-no-border-radius {}
 }
 
 .iframe {
 	.widget-title, 
 	.widget-header,
 	.widget-content, 
-	.widget-footer {
-		.border-radius(0);
-	}
+	.widget-footer {}
 
 	.widget:last-child {
 		margin-bottom: 0;

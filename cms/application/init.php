@@ -37,6 +37,7 @@ Kohana::modules( array(
 	'logs'			=> MODPATH . 'logs',
 	'auth'			=> MODPATH . 'auth',		// Basic authentication
 	'orm'			=> MODPATH . 'orm',			// Object Relationship Mapping,
+//	'mptt'			=> MODPATH . 'mptt',		// ORM MPTT 
 	'oauth'			=> MODPATH . 'oauth',
 	'sso'			=> MODPATH . 'sso',
 	'minion'		=> MODPATH . 'minion',		// Minion
@@ -62,6 +63,7 @@ Kohana::modules( array(
 	'behavior'		=> MODPATH . 'behavior',
 	'plugins'		=> MODPATH . 'plugins',
 	'datasource'	=> MODPATH . 'datasource',
+	'search'		=> MODPATH . 'search',
 ) );
 
 Kohana::$config->attach(new Config_Database);

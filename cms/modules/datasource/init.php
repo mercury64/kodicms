@@ -11,8 +11,17 @@ Route::set( 'datasources', ADMIN_DIR_NAME.'/<directory>(/<controller>(/<action>(
 
 Observer::observe('modules::afer_load', function() {
 
+	$types = Datasource_Data_Manager::types();
+	
+	if(empty($types))
+	{
+		return;
+	}
+	
 	$ds_section = Model_Navigation::get_section('Datasources');
-	foreach (Datasource_Data_Manager::get_tree() as $type => $sections)
+	$sections_list = Datasource_Data_Manager::get_tree(array_keys($types));
+
+	foreach($sections_list as $type => $sections)
 	{
 		foreach ($sections as $id => $section)
 		{
@@ -27,9 +36,8 @@ Observer::observe('modules::afer_load', function() {
 				)), 999);
 		}
 	}
-	
-	$types = Datasource_Data_Manager::types();
-	$section = Model_Navigation::get_section('Create', $ds_section);
+
+	$section = Model_Navigation::get_section(__('Create section'), $ds_section);
 
 	foreach ($types as $id => $type)
 	{
@@ -44,5 +52,19 @@ Observer::observe('modules::afer_load', function() {
 			)),
 			'permissions' => $id.'.section.create'
 		)));
+	}
+});
+
+Observer::observe('update_search_index', function() {
+	
+	$ds_ids = Datasource_Data_Manager::get_all();
+	
+	foreach ($ds_ids as $ds_id => $data)
+	{
+		$ds = Datasource_Data_Manager::load($ds_id);
+		
+		if(! $ds->loaded()) continue;
+		
+		$ds->update_index();
 	}
 });

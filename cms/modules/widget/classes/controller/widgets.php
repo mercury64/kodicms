@@ -7,6 +7,8 @@
  */
 class Controller_Widgets extends Controller_System_Backend {
 
+	public $allowed_actions = array('template');
+
 	public function before()
 	{
 		parent::before();
@@ -82,7 +84,7 @@ class Controller_Widgets extends Controller_System_Backend {
 		
 		$blocks = array();
 		
-		$default_blocks = array(-1 => '--- Remove from page ---', 'PRE' => __('Before page render'), 'POST' => __('After page render'));
+		$default_blocks = array(-1 => '--- none ---', 'PRE' => __('Before page render'), 'POST' => __('After page render'));
 		foreach ($res_blocks as $block)
 		{
 			if(empty($blocks[$block->layout_name])) 
@@ -223,8 +225,6 @@ class Controller_Widgets extends Controller_System_Backend {
 			{
 				$widget->set_cache_settings( $data );
 			}
-			
-			unset($data['caching'], $data['cache_lifetime'], $data['cache_tags']);
 
 			$widget
 				->set_values( $data );

@@ -7,10 +7,12 @@
 )); ?>
 	<?php echo Form::hidden('token', Security::token()); ?>
 	<div class="widget">
+		<?php if($user->loaded()): ?>
 		<div class="tabbable tabs-left">
 			<ul class="nav nav-tabs"></ul>
 			<div class="tab-content"></div>
 		</div>
+		<?php endif; ?>
 		<div class="widget-header">
 			<h3><?php echo __('General information'); ?></h3>
 		</div>
@@ -90,7 +92,7 @@
 			<?php Observer::notify('view_user_edit_notifications', $user->id); ?>
 		</div>
 
-		<?php if( ACL::check('users.change_password') OR $user->id == AuthUser::getId() ): ?>
+		<?php if( ACL::check('users.change_password') OR $user->id == AuthUser::getId() OR !$user->loaded() ): ?>
 		<div class="widget-header spoiler-toggle" data-spoiler=".password-spoiler">
 			<h3><?php echo __('Password'); ?></h3>
 		</div>
