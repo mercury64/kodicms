@@ -724,7 +724,7 @@ cms.ui.add('flags', function() {
 			$callback = function( e ) {
 				$self.trigger('click');
 				e.preventDefault();
-			} 
+			};
 		} else if($self.attr('href')) {
 
 			$callback = function( e ) {
@@ -734,13 +734,13 @@ cms.ui.add('flags', function() {
 				}
 				window.location = $self.attr('href');
 				e.preventDefault();
-			} 
+			};
 		} else if($self.hasClass('spoiler-toggle')) {
 			$callback = function( e ) {
 				$self.trigger('click');
 				$('body').scrollTo($self);
 				e.preventDefault();
-			} 
+			};
 		} else if($self.hasClass('nav-tabs')) {
 			$callback = function( e ) {
 				var $current_li = $self.find('li.active'),
@@ -755,7 +755,7 @@ cms.ui.add('flags', function() {
 				
 				$next_li.find('a').trigger('click');
 				e.preventDefault();
-			} 
+			};
 		} else if($self.is(':checkbox')) {
 			$callback = function( e ) {
 				if($self.prop("checked"))
@@ -763,7 +763,7 @@ cms.ui.add('flags', function() {
 				else
 					$self.check().trigger('change');
 				e.preventDefault();
-			}
+			};
 		}
 		
 		$(document).on('keydown', null, $hotkeys, $callback);
@@ -802,14 +802,14 @@ cms.ui.add('flags', function() {
 		
 		if($reload) {
 			if($reload === true)
-				$callback = function() { window.location = ''}
+				$callback = function() { window.location = ''; };
 			else
-				$callback = function() { window.location = $reload}
+				$callback = function() { window.location = $reload; };
 		}
 		
 		if( ! $method) $method = 'GET';
 		Api.request($method, $url, null, $callback);
-	})
+	});
 }).add('select_all_checkbox', function() {
 	$(document).on(' change','input[name="check_all"]', function(e) {
 		var $self = $(this),
@@ -963,9 +963,9 @@ $(function() {
 	parse_messages(MESSAGE_ERRORS, 'error');
 	parse_messages(MESSAGE_SUCCESS);
 
-	$.fn.check=function(){return this.each(function(){this.checked=true})}
-	$.fn.uncheck=function(){return this.each(function(){this.checked=false})};
-	$.fn.checked=function(){return this.prop("checked")}
+	$.fn.check=function(){return this.each(function(){this.checked=true;});};
+	$.fn.uncheck=function(){return this.each(function(){this.checked=false;});};
+	$.fn.checked=function(){return this.prop("checked");};
 
 	$.fn.tabs = function () {
 		return $('li a', this).on('click', function() {
