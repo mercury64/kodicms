@@ -34,9 +34,9 @@
 				<?php echo Bootstrap_Form_Element_Control_Group::factory(array(
 					'element' => Bootstrap_Form_Element_Select::factory(array(
 						'name' => 'install[db_driver]', 'options' => array(
-							'mysql' => __('MySQL'),
-							'mysqli' => __('MySQLi'),
-							'pdo' => __('PDO')
+							'MySQL' => __('MySQL'),
+							'MySQLi' => __('MySQLi'),
+							'PDO' => __('PDO')
 						)
 					))
 					->selected(Arr::get( $data, 'db_driver' ))

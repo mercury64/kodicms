@@ -233,7 +233,7 @@ class Controller_Install extends Controller_System_Frontend
 
 		switch ($post['db_driver'])
 		{
-			case 'mysql':
+			case 'MySQL':
 				$connection = array(
 					'hostname'	 => $post['db_server'] . ':' . $post['db_port'],
 					'database'	 => $post['db_name'],
@@ -242,7 +242,7 @@ class Controller_Install extends Controller_System_Frontend
 					'persistent' => FALSE,
 				);
 				break;
-			case 'mysqli':
+			case 'MySQLi':
 				$connection = array(
 					'hostname'	 => $post['db_server'],
 					'port'		 => $post['db_port'],
@@ -252,7 +252,7 @@ class Controller_Install extends Controller_System_Frontend
 					'persistent' => FALSE,
 				);
 				break;
-			case 'pdo':
+			case 'PDO':
 				$connection = array(
 					'dsn'        => 'mysql:host='.$post['db_server'].';port='.$post['db_port'].';dbname='.$post['db_name'],
 					'username'   => $post['db_user'],
