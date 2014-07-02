@@ -21,7 +21,7 @@ switch(DB_TYPE)
 		);
 		
 		break;
-	case 'mysqli':
+	case 'MySQLi':
 		$config = array(
 			'type'       => DB_TYPE,
 			'connection' => array(
@@ -39,7 +39,7 @@ switch(DB_TYPE)
 		);
 		
 		break;
-	case 'pdo':
+	case 'PDO':
 		$config = array(
 			'type'       => 'PDO',
 			'connection' => array(
