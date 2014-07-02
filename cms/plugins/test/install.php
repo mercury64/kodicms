@@ -17,7 +17,7 @@ if(class_exists('Widget_Manager'))
 {
 	$widgets = array(
 		array(
-			'type' => 'page_menu',
+			'type' => 'Page_Menu',
 			'data' => array (
 				'name' => 'Header menu',
 				'template' => 'header',
@@ -41,7 +41,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'page_breadcrumbs',
+			'type' => 'Page_Breadcrumbs',
 			'data' => array(
 				'name' => 'Breadcrumbs',
 				'template' => 'bradcrumbs',
@@ -61,7 +61,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'html',
+			'type' => 'HTML',
 			'data' => array (
 				'name' => 'Footer',
 				'template' => 'footer'
@@ -80,7 +80,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'html',
+			'type' => 'HTML',
 			'data' => array (
 				'name' => 'Sidebar',
 				'template' => 'sidebar'
@@ -99,7 +99,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'html',
+			'type' => 'HTML',
 			'data' => array (
 				'name' => 'Top banner',
 				'template' => 'top_banner'
@@ -109,7 +109,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		'articles_headline' => array(
-			'type' => 'page_pages',
+			'type' => 'Page_Pages',
 			'data' => array (
 				'name' => 'Articles headline',
 				'template' => 'archive-headline',
@@ -120,7 +120,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'page_pages',
+			'type' => 'Page_Pages',
 			'data' => array (
 				'name' => 'Recent entries',
 				'template' => 'recent-entries',
@@ -142,7 +142,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'page_pages',
+			'type' => 'Page_Pages',
 			'data' => array (
 				'name' => 'Recent entries index page',
 				'template' => 'recent-entries',
@@ -156,7 +156,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'page_pages',
+			'type' => 'Page_Pages',
 			'data' => array (
 				'name' => 'last entry index page',
 				'template' => 'last-entry',
@@ -171,7 +171,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'page_pages',
+			'type' => 'Page_Pages',
 			'data' => array (
 				'name' => 'Recent entries RSS',
 				'template' => 'recent-entries-rss',
@@ -185,7 +185,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'sendmail',
+			'type' => 'Sendmail',
 			'data' => array (
 				'name' => ' Send mail (sender)',
 				'template' => 'send-mail-template',
@@ -228,7 +228,7 @@ if(class_exists('Widget_Manager'))
 			)
 		),
 		array(
-			'type' => 'html',
+			'type' => 'HTML',
 			'data' => array (
 				'name' => 'Send mail (form)',
 				'template' => 'send-mail-form'
@@ -238,7 +238,7 @@ if(class_exists('Widget_Manager'))
 			),
 		),
 		array(
-			'type' => 'pagination',
+			'type' => 'Pagination',
 			'data' => array (
 				'name' => 'Постраничная навигация',
 				'template' => 'paginator',
