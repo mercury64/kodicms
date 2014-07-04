@@ -3,5 +3,5 @@
 $config = Kohana::$config->load('installer');
 $default = $config->get('default_config', array());
 
-$default['api']['key'] = ORM::factory('Api_Key')->generate('Kodicms API key');
+$default['api']['key'] = ORM::factory('API_Key')->generate('Kodicms API key');
 $config->set('default_config', $default);
