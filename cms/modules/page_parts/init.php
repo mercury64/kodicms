@@ -65,7 +65,7 @@ Observer::observe('page_edit_after_save', function($page) {
 
 Observer::observe('update_search_index', function() {
 	
-	$pages = ORM::factory('page')->find_all();
+	$pages = ORM::factory('Page')->find_all();
 	
 	foreach($pages as $page)
 	{

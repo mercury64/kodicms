@@ -50,7 +50,7 @@ abstract class KodiCMS_Search {
 		$config = $config->get($group);
 
 		// Create a new search type instance
-		$search_class = 'Search_'.ucfirst($config['driver']);
+		$search_class = 'Search_'.$config['driver'];
 		Search::$instances[$group] = new $search_class($config);
 
 		// Return the instance

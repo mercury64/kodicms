@@ -2,7 +2,7 @@
 
 return array(
 	'native' => array(
-		'driver' => 'mysql',
+		'driver' => 'MySQL',
 		'full_text_search' => TRUE
 	),
 );
