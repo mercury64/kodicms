@@ -13,7 +13,7 @@ class KodiCMS_Model_User_Profile extends ORM {
 	);
 
     protected $_has_one = array(
-		'user' => array('model' => 'user'),
+		'user' => array('model' => 'User'),
     );
 
 	public function rules()

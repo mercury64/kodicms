@@ -80,21 +80,21 @@ class KodiCMS_Model_Page extends ORM
 	
 	protected $_belongs_to = array(
 		'author' => array(
-			'model'			=> 'user',
+			'model'			=> 'User',
 			'foreign_key'	=> 'created_by_id'
 		),
 		'updator' => array(
-			'model'			=> 'user',
+			'model'			=> 'User',
 			'foreign_key'	=> 'updated_by_id'
 		),
 		'parent' => array(
-			'model'			=> 'page',
+			'model'			=> 'Page',
 			'foreign_key'	=> 'parent_id'
 		)
 	);
 
 	protected $_has_many = array (
-		'roles' => array('model' => 'role', 'through' => 'page_roles')
+		'roles' => array('model' => 'Role', 'through' => 'page_roles')
 	);
 
 	/**

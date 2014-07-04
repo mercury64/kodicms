@@ -16,13 +16,13 @@ class KodiCMS_Model_User extends Model_Auth_User {
 	protected $_roles = NULL;
 
 	protected $_has_many = array(
-		'user_tokens' => array('model' => 'user_token'),
-		'roles'       => array('model' => 'role', 'through' => 'roles_users'),
-		'socials'	  => array('model' => 'user_social')
+		'user_tokens' => array('model' => 'User_Token'),
+		'roles'       => array('model' => 'Role', 'through' => 'roles_users'),
+		'socials'	  => array('model' => 'User_Social')
 	);
 	
 	protected $_has_one = array(
-		'profile' => array('model' => 'user_profile'),
+		'profile' => array('model' => 'User_Profile'),
     );
 	
 	public function labels()
