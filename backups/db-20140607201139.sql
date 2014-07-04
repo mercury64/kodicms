@@ -100,7 +100,7 @@ INSERT INTO `datasources` VALUES ('2','hybrid','0','0','Hybrid Datasource','','2
 --
 
 CREATE TABLE `dshfields` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `ds_id` int(11) unsigned NOT NULL DEFAULT '0',
   `name` varchar(32) NOT NULL DEFAULT '',
   `family` varchar(32) NOT NULL,
@@ -189,8 +189,8 @@ INSERT INTO `dshybrid_2` VALUES ('2');
 --
 
 CREATE TABLE `email_queue_bodies` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `queue_id` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `queue_id` int(11) unsigned NOT NULL,
   `body` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `queue_id` (`queue_id`),
@@ -209,7 +209,7 @@ CREATE TABLE `email_queue_bodies` (
 --
 
 CREATE TABLE `email_queues` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `state` enum('pending','sent','failed') NOT NULL DEFAULT 'pending',
   `sender_name` varchar(128) DEFAULT NULL,
   `sender_email` varchar(320) NOT NULL,
@@ -236,7 +236,7 @@ CREATE TABLE `email_queues` (
 --
 
 CREATE TABLE `email_templates` (
-  `id` int(18) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `created_on` datetime DEFAULT NULL,
   `email_type` int(5) unsigned NOT NULL,
   `status` int(1) NOT NULL DEFAULT '1',
@@ -268,7 +268,7 @@ INSERT INTO `email_templates` VALUES ('2','2013-12-14 15:00:31','3','1','0','{em
 --
 
 CREATE TABLE `email_types` (
-  `id` int(18) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `code` varchar(255) NOT NULL DEFAULT '',
   `name` varchar(100) DEFAULT NULL,
   `data` text,
@@ -338,7 +338,7 @@ INSERT INTO `job_logs` VALUES ('6','1','2014-05-27 19:33:54','2014-05-27 19:33:5
 --
 
 CREATE TABLE `jobs` (
-  `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `job` varchar(255) NOT NULL,
   `created_on` datetime NOT NULL,
@@ -405,7 +405,7 @@ INSERT INTO `layout_blocks` VALUES ('rss','body','0');
 --
 
 CREATE TABLE `logs` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `created_on` datetime NOT NULL,
   `user_id` int(11) unsigned DEFAULT NULL,
   `level` tinytext NOT NULL,
@@ -666,7 +666,7 @@ INSERT INTO `logs` VALUES ('240','2014-06-07 20:11:08','1','0','HTTP_Exception_4
 --
 
 CREATE TABLE `media` (
-  `id` int(18) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `module` varchar(50) DEFAULT NULL,
   `size` int(18) NOT NULL,
   `content_type` varchar(255) DEFAULT 'image',
@@ -688,7 +688,7 @@ CREATE TABLE `media` (
 --
 
 CREATE TABLE `page_behavior_settings` (
-  `page_id` int(10) unsigned NOT NULL,
+  `page_id` int(11) unsigned NOT NULL,
   `behavior_id` varchar(50) NOT NULL,
   `data` text NOT NULL,
   PRIMARY KEY (`page_id`),
@@ -829,8 +829,8 @@ CREATE TABLE `page_tags` (
 --
 
 CREATE TABLE `page_widgets` (
-  `page_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `widget_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `page_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `widget_id` int(11) unsigned NOT NULL DEFAULT '0',
   `block` varchar(32) NOT NULL DEFAULT '',
   `position` int(4) NOT NULL DEFAULT '500',
   PRIMARY KEY (`page_id`,`widget_id`),
@@ -1037,7 +1037,7 @@ INSERT INTO `roles` VALUES ('4','editor','');
 --
 
 CREATE TABLE `roles_permissions` (
-  `role_id` int(5) unsigned NOT NULL,
+  `role_id` int(11) unsigned NOT NULL,
   `action` varchar(255) NOT NULL,
   UNIQUE KEY `role_id` (`role_id`,`action`),
   CONSTRAINT `roles_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -1055,8 +1055,8 @@ CREATE TABLE `roles_permissions` (
 --
 
 CREATE TABLE `roles_users` (
-  `user_id` int(10) unsigned NOT NULL,
-  `role_id` int(10) unsigned NOT NULL,
+  `user_id` int(11) unsigned NOT NULL,
+  `role_id` int(11) unsigned NOT NULL,
   PRIMARY KEY (`user_id`,`role_id`),
   KEY `fk_role_id` (`role_id`),
   CONSTRAINT `roles_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -1077,7 +1077,7 @@ INSERT INTO `roles_users` VALUES ('1','2');
 --
 
 CREATE TABLE `search_index` (
-  `id` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL,
   `module` varchar(50) NOT NULL,
   `created_on` datetime NOT NULL,
   `updated_on` datetime NOT NULL,
@@ -1137,8 +1137,8 @@ CREATE TABLE `tags` (
 --
 
 CREATE TABLE `user_profiles` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL,
   `name` varchar(255) NOT NULL,
   `locale` varchar(10) NOT NULL DEFAULT 'en-us',
   `notice` tinyint(1) NOT NULL DEFAULT '0',
@@ -1161,7 +1161,7 @@ INSERT INTO `user_profiles` VALUES ('1','1','Administrator','en-us','0','2014-05
 --
 
 CREATE TABLE `user_reflinks` (
-  `user_id` int(10) unsigned NOT NULL,
+  `user_id` int(11) unsigned NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0',
   `code` varchar(255) NOT NULL,
   `data` text,
@@ -1278,7 +1278,7 @@ INSERT INTO `users` VALUES ('1','admin@yoursite.com','demo','030d9d63ca9f845bd16
 --
 
 CREATE TABLE `widgets` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(100) NOT NULL,
   `template` varchar(100) DEFAULT NULL,
   `name` varchar(64) NOT NULL DEFAULT '',

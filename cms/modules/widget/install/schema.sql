@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__page_widgets` (
-  `page_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `widget_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `page_id` int(11) unsigned NOT NULL DEFAULT '0',
+  `widget_id` int(11) unsigned NOT NULL DEFAULT '0',
   `block` varchar(32) NOT NULL DEFAULT '',
   `position` int(4) NOT NULL DEFAULT '500',
   PRIMARY KEY (`page_id`,`widget_id`),
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__page_widgets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__widgets` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `type` varchar(100) NOT NULL,
   `template` varchar(100) DEFAULT NULL,
   `name` varchar(64) NOT NULL DEFAULT '',

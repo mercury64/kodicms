@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__jobs` (
-  `id` int(5) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `job` varchar(255) NOT NULL,
   `created_on` datetime NOT NULL,

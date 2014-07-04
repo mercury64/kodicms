@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__search_index` (
-  `id` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL,
   `module` varchar(50) NOT NULL,
   `created_on` datetime NOT NULL,
   `updated_on` datetime NOT NULL,

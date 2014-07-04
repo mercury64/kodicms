@@ -5,7 +5,7 @@ This is a simple example of a single ORM model, that has no relationships, but u
 ## SQL schema
 
 	CREATE TABLE IF NOT EXISTS `members` (
-	  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 	  `username` varchar(32) NOT NULL,
 	  `first_name` varchar(32) NOT NULL,
 	  `last_name` varchar(32) NOT NULL,

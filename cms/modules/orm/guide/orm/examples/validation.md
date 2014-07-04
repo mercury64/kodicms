@@ -5,7 +5,7 @@ This example will create user accounts and demonstrate how to handle model and c
 ## SQL schema
 
 	CREATE TABLE IF NOT EXISTS `members` (
-	  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+	  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 	  `username` varchar(32) NOT NULL,
 	  `password` varchar(100) NOT NULL,
 	  PRIMARY KEY (`id`)

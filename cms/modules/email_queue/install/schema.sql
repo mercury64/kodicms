@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__email_queues` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `state` enum('pending','sent','failed') NOT NULL DEFAULT 'pending',
   `sender_name` varchar(128) DEFAULT NULL,
   `sender_email` varchar(320) NOT NULL,
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__email_queues` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 ;
 
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__email_queue_bodies` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `queue_id` int(10) unsigned NOT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `queue_id` int(11) unsigned NOT NULL,
   `body` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `queue_id` (`queue_id`),

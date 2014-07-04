@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS `elfinder_file`;
 CREATE TABLE IF NOT EXISTS `elfinder_file` (
   `id`        int(7) unsigned NOT NULL auto_increment,
-  `parent_id` int(7) unsigned NOT NULL,
+  `parent_id` int(11) unsigned NOT NULL,
   `name`      varchar(256) NOT NULL,
   `content`   longblob NOT NULL,
   `size`      int(10) unsigned NOT NULL default '0',
