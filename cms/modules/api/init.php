@@ -5,15 +5,15 @@ Route::set('api', '(<backend>/)api(/<directory>)-<controller>(.<action>)(/<id>)'
 		'directory' => '.*'
 	))
 	->filter(function($route, $params, $request) {
-		if (strpos($params['directory'], 'Api') === FALSE)
+		if (strpos($params['directory'], 'API') === FALSE)
 		{
-			$params['directory'] = 'Api/' . $params['directory'];
+			$params['directory'] = 'API/' . $params['directory'];
 		}
 
 		return $params;
 	})
 	->defaults(array(
-		'directory' => 'api'
+		'directory' => 'API'
 	));
 
 if(ACL::check('system.api'))
