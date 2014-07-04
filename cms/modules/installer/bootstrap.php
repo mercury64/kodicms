@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
-if( ! defined('DB_TYPE') ) define('DB_TYPE', 'mysql');
+if( ! defined('DB_TYPE') ) define('DB_TYPE', 'MySQL');
 if( ! defined('DB_SERVER') ) define('DB_SERVER', '');
 if( ! defined('DB_PORT') ) define('DB_PORT', '');
 if( ! defined('DB_NAME') ) define('DB_NAME', '');

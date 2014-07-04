@@ -62,7 +62,7 @@ class Task_Install extends Minion_Task
 
 	protected function _execute(array $params)
 	{
-		$params['db_driver'] = 'mysql';
+		$params['db_driver'] = 'MySQL';
 
 		if( $params['db_name'] === NULL )
 		{

@@ -41,7 +41,7 @@ class Controller_Install extends Controller_System_Frontend
 		$this->template->title = __( ':cms_name &rsaquo; installation', array(':cms_name' => CMS_NAME ) );
 
 		$data = array(
-			'db_driver' => 'mysql',
+			'db_driver' => 'MySQL',
 			'db_server' => '127.0.0.1',
 			'db_port' => 3306,
 			'db_user' => 'root',
