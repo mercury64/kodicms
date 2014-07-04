@@ -110,7 +110,7 @@ if (isset($_SERVER['SERVER_PROTOCOL']))
  * - boolean  caching     enable or disable internal caching                 FALSE
  */
 Kohana::init( array(
-	'base_url'			=> '/',
+	'base_url'			=> '/kodicms/',
 	'index_file'		=> FALSE,
 	'cache_dir'			=> CMSPATH.'cache',
 	'caching'			=> Kohana::$environment === Kohana::PRODUCTION,
