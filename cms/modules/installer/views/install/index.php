@@ -3,6 +3,12 @@
 	'class' => Bootstrap_Form::HORIZONTAL
 )); ?>
 <div id="wizard">
+        <h1><?php echo __( 'Environment Tests' ); ?></h1>
+        <div>
+                <div class="widget">
+                        <?php echo $env_test; ?>
+                </div>
+        </div>
 	<h1><?php echo __( 'Language' ); ?></h1>
 	<div>
 		<div class="widget">
@@ -16,12 +22,6 @@
 					->label(__('Current language'))
 				)); ?>
 			</div>
-		</div>
-	</div>
-	<h1><?php echo __( 'Environment Tests' ); ?></h1>
-	<div>
-		<div class="widget">
-			<?php echo $env_test; ?>
 		</div>
 	</div>
     <h1><?php echo __( 'Database information' ); ?></h1>
