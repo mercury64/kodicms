@@ -26,7 +26,7 @@ $failed = FALSE;
 		</tr>
 		<tr>
 			<th><?php echo __('System Directory'); ?></th>
-			<?php if (is_dir(SYSPATH) AND is_file(SYSPATH.'classes/kohana'.EXT)): ?>
+			<?php if (is_dir(SYSPATH) AND is_file(SYSPATH.'classes/Kohana'.EXT)): ?>
 				<td class="pass"><?php echo SYSPATH ?></td>
 			<?php else: $failed = TRUE ?>
 				<td class="fail"><?php echo __('The configured :dir directory does not exist or does not contain required files.', array(
