@@ -92,7 +92,7 @@ class KodiCMS_Controller_System_Controller extends Controller
 		$current_params['directory'] = strtolower($this->request->directory());
 		$current_params['action'] = strtolower($this->request->action());
 		$params = $params + $current_params;
-		return Route::get(Route::name(Request::current()->route()))->uri($params, TRUE);
+		return Route::url(Route::name(Request::current()->route()), $params, TRUE);
 	}
 	
 	protected function _save_referer($event, $referer = FALSE)
@@ -120,5 +120,4 @@ class KodiCMS_Controller_System_Controller extends Controller
 
 		return FALSE;
 	}
-
 } // end Controller class

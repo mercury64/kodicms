@@ -2,17 +2,21 @@
 
 class DataSource_Hybrid_Field_Primitive_Select extends DataSource_Hybrid_Field_Primitive {
 	
+	protected $_is_indexable = FALSE;
+
 	protected $_props = array(
 		'options' => array(),
 		'custom_option' => FALSE,
 		'empty_value' => TRUE,
 	);
 	
+	public function booleans()
+	{
+		return array('custom_option', 'empty_value');
+	}
+	
 	public function set( array $data )
 	{
-		$data['custom_option'] = !empty($data['custom_option']) ? TRUE : FALSE;
-		$data['empty_value'] = !empty($data['empty_value']) ? TRUE : FALSE;	
-		
 		return parent::set( $data );
 	}
 	

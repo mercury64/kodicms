@@ -2,6 +2,8 @@
 
 class DataSource_Hybrid_Field_Primitive_Text extends DataSource_Hybrid_Field_Primitive {
 	
+	protected $_is_indexable = FALSE;
+
 	protected $_props = array(
 		'default' => NULL,
 		'allow_html' => TRUE,
@@ -10,11 +12,13 @@ class DataSource_Hybrid_Field_Primitive_Text extends DataSource_Hybrid_Field_Pri
 		'rows' => 3
 	);
 	
+	public function booleans()
+	{
+		return array('allow_html', 'filter_html');
+	}
+	
 	public function set( array $data )
-	{				
-		$data['allow_html'] = !empty($data['allow_html']) ? TRUE : FALSE;
-		$data['filter_html'] = !empty($data['filter_html']) ? TRUE : FALSE;
-		
+	{
 		return parent::set( $data );
 	}
 	

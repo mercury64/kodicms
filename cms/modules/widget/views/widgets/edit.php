@@ -23,7 +23,7 @@
 		)); ?>
 	</div>
 
-	<?php if ($widget->use_template): ?>
+	<?php if($widget->use_template): ?>
 	<?php echo View::factory('helper/snippet_select', array(
 		'header' => __('Widget template'),
 		'template' => $widget->template,
@@ -36,11 +36,10 @@
 			'id' => 'defaultTemplateButton',
 			'class' => 'popup fancybox.iframe btn'
 		)) : NULL
-	)); 
-	?>
+	)); ?>
 	<?php endif; ?>
 
-	<?php if ($widget->use_caching AND ACL::check('widgets.cache')): ?>
+	<?php if($widget->use_caching AND ACL::check('widgets.cache')): ?>
 	<div class="widget-content">
 		<?php echo Bootstrap_Form_Element_Control_Group::factory(array(
 			'element' => Bootstrap_Form_Element_Checkbox::factory(array(
@@ -92,7 +91,7 @@
 	</div>
 	<?php endif; ?>
 	
-	<?php if ($widget->use_template): ?>
+	<?php if($widget->use_template): ?>
 	<div class="widget-header spoiler-toggle" data-spoiler=".media-spoiler" data-hash="media">
 		<h4><?php echo __('Widget media'); ?></h4>
 	</div>

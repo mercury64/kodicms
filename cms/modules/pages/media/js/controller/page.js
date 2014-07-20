@@ -1,5 +1,5 @@
 cms.init.add('page_index', function () {
-	// Read cookie of expanded pages
+	// Read coockie of expanded pages
 	var matches = document.cookie.match(/expanded_rows=(.+?);/);
 	var expanded_pages = matches ? decodeURIComponent(matches[1]).split(',') : [];
 	var arr = [];
@@ -53,7 +53,7 @@ cms.init.add('page_index', function () {
 				cms.loader.hide();
 			};
 
-			cms.loader.show();
+			cms.loader.show($(this).parent());
 
 			// Sending information about page position to frog
 			$.ajax({
@@ -93,6 +93,7 @@ cms.init.add('page_index', function () {
 		}
 	});
 
+
 	// Reordering
 	$('#pageMapReorderButton').on('click', function () {
 		var self = $(this);
@@ -131,7 +132,7 @@ cms.init.add('page_index', function () {
 					var list   = e.length ? e : $(e.target);
 					Api.post('pages.sort', {'pages': list.nestable('serialize')});
 				});
-			});
+			}, self.parent());
 		}
 	});
 

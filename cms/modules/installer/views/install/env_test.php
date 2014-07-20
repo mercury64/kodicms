@@ -72,11 +72,12 @@ $failed = FALSE;
 			<?php else: $failed = TRUE ?>
 				<td class="fail">
 					<?php if(!is_writable( pathinfo(CFGFATH, PATHINFO_DIRNAME) )): ?>
-					<?php echo __('The config :dir directory must be writable.', array(
-						':dir' => pathinfo(CFGFATH, PATHINFO_DIRNAME)
+					<?php echo __('The config :dir directory must be writable or empty config file :file created with write access', array(
+						':dir' => pathinfo(CFGFATH, PATHINFO_DIRNAME),
+						':file' => pathinfo(CFGFATH, PATHINFO_FILENAME)
 					)); ?>
 					<?php else: ?>
-					<?php echo __('The config :dir directory does not exist or config file is exists.', array(
+					<?php echo __('The config :dir directory does not exist.', array(
 						':dir' => CFGFATH, ':file' => pathinfo( CFGFATH, PATHINFO_FILENAME) .'.'. pathinfo( CFGFATH, PATHINFO_EXTENSION)
 					)); ?>
 					<?php endif; ?>
@@ -170,7 +171,7 @@ $failed = FALSE;
 			<?php if (extension_loaded('http')): ?>
 				<td class="pass"><?php echo __('Pass'); ?></td>
 			<?php else: ?>
-				<td class="fail"><?php echo __('Kohana can use the :extension extension for the :class class.', array(
+				<td class="warning"><?php echo __('Kohana can use the :extension extension for the :class class.', array(
 					':extension' => '<a href="http://php.net/http" target="blank">http</a>',
 					':class' => 'Request_Client_External'
 				)); ?></td>
@@ -181,7 +182,7 @@ $failed = FALSE;
 			<?php if (extension_loaded('curl')): ?>
 				<td class="pass"><?php echo __('Pass'); ?></td>
 			<?php else: ?>
-				<td class="fail"><?php echo __('Kohana can use the :extension extension for the :class class.', array(
+				<td class="warning"><?php echo __('Kohana can use the :extension extension for the :class class.', array(
 					':extension' => '<a href="http://php.net/curl" target="blank">cURL</a>',
 					':class' => 'Request_Client_External'
 				)); ?></td>
@@ -192,7 +193,7 @@ $failed = FALSE;
 			<?php if (extension_loaded('mcrypt')): ?>
 				<td class="pass"><?php echo __('Pass'); ?></td>
 			<?php else: ?>
-				<td class="fail"><?php echo __('Kohana requires :extension for the :class class.', array(
+				<td class="warning"><?php echo __('Kohana requires :extension for the :class class.', array(
 					':extension' => '<a href="http://php.net/mcrypt" target="blank">mcrypt</a>',
 					':class' => 'Encrypt'
 				)); ?></td>
@@ -203,7 +204,7 @@ $failed = FALSE;
 			<?php if (function_exists('gd_info')): ?>
 				<td class="pass"><?php echo __('Pass'); ?></td>
 			<?php else: ?>
-				<td class="fail"><?php echo __('Kohana requires :extension for the :class class.', array(
+				<td class="warning"><?php echo __('Kohana requires :extension for the :class class.', array(
 					':extension' => '<a href="http://php.net/gd" target="blank">GD</a>',
 					':class' => 'Image'
 				)); ?></td>
@@ -214,7 +215,7 @@ $failed = FALSE;
 			<?php if (function_exists('mysql_connect')): ?>
 				<td class="pass"><?php echo __('Pass'); ?></td>
 			<?php else: ?>
-				<td class="fail"><?php echo __('Kohana can use the :extension extension for the :class class.', array(
+				<td class="warning"><?php echo __('Kohana can use the :extension extension for the :class class.', array(
 					':extension' => '<a href="http://php.net/mysql" target="blank">MySQL</a>',
 					':class' => 'MySQL'
 				)); ?></td>
@@ -225,7 +226,7 @@ $failed = FALSE;
 			<?php if (class_exists('PDO')): ?>
 				<td class="pass"><?php echo __('Pass'); ?></td>
 			<?php else: ?>
-				<td class="fail"><?php echo __('Kohana can use the :extension to support additional databases.', array(
+				<td class="warning"><?php echo __('Kohana can use the :extension to support additional databases.', array(
 					':extension' => '<a href="http://php.net/pdo" target="blank">PDO</a>',
 					':class' => 'MySQL'
 				)); ?></td>
@@ -234,4 +235,7 @@ $failed = FALSE;
 	</table>
 </div>
 
-<script>var failed = <?php echo $failed ? 'true' : 'false'; ?>;</script>
+<script>
+	var failed = <?php echo $failed ? 'true' : 'false'; ?>;
+	$('td.fail').parent().addClass('fail');
+</script>

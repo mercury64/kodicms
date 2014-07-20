@@ -175,6 +175,21 @@ class KodiCMS_Meta {
 	}
 	
 	/**
+	 * Указание favicon 
+	 * 
+	 * @param string $url
+	 * @param string $rel
+	 * @return  KodiCMS_Meta
+	 */
+	public function icon($url, $rel = 'shortcut icon')
+	{
+		return $this->group('icon', '<link rel=":rel" href=":url" type="image/x-icon" />', array(
+			':url' => HTML::chars($url), 
+			':rel' => HTML::chars($rel)
+		));
+	}
+
+	/**
 	 * Добавление произвольного HTML
 	 * 
 	 *		Meta::factory($page)->group('content-type', '<meta http-equiv="content-type" content=":content; charset=utf-8" />', 
@@ -189,6 +204,25 @@ class KodiCMS_Meta {
 	public function group($handle, $content, $params = array(), $deps = NULL)
 	{
 		Assets::group('head', $handle, strtr($content, $params), $deps);
+		return $this;
+	}
+	
+	/**
+	 * Добавление пакетов
+	 * 
+	 *		Meta::factory($page)
+	 *			->package('jquery-ui')
+	 *			->package(array('jquery-ui', 'fancybox'));
+	 * 
+	 * @param string $handle
+	 * @param string $content
+	 * @param array $params
+	 * @param string $deps
+	 * @return \KodiCMS_Meta
+	 */
+	public function package($name)
+	{
+		Assets::package($name);
 		return $this;
 	}
 

@@ -11,8 +11,6 @@ abstract class DataSource_Hybrid_Field {
 	const FAMILY_SOURCE = 'source';
 
 	const PREFFIX = 'f_';
-	
-	
 
 	/**
 	 * Список всех полех, которые есть в системе.
@@ -181,6 +179,12 @@ abstract class DataSource_Hybrid_Field {
 	 * @var boolean 
 	 */
 	protected $_is_required = TRUE;
+	
+	/**
+	 * @see is_indexable()
+	 * @var boolean 
+	 */
+	protected $_is_indexable = TRUE;
 
 	/**
 	 * 
@@ -199,7 +203,26 @@ abstract class DataSource_Hybrid_Field {
 	}
 	
 	/**
+	 * Поулучение списка параметров
 	 * 
+	 * @return array
+	 */
+	public function properties()
+	{
+		return $this->_props;
+	}
+
+	/**
+	 * Булевые параметры поля
+	 * 
+	 * @return array
+	 */
+	public function booleans()
+	{
+		return array();
+	}
+
+	/**
 	 * Правила валидации поля при его создании и редактировании.
 	 * Используется класс Validation
 	 * 
@@ -269,7 +292,13 @@ abstract class DataSource_Hybrid_Field {
 	 */
 	public function set( array $data )
 	{
-		$data['isreq'] = ! empty($data['isreq']) ? TRUE : FALSE;
+		$boleans = $this->booleans();
+		$boleans[] = 'isreq';
+
+		foreach ($boleans as $key)
+		{
+			$data[$key] = ! empty($data[$key]) ? TRUE : FALSE;
+		}
 
 		foreach ( $data as $key => $value )
 		{
@@ -361,11 +390,27 @@ abstract class DataSource_Hybrid_Field {
 	public function set_in_headline($status = FALSE)
 	{
 		$this->in_headline = (bool) $status;
-		
 		return $this;
 	}
 	
 	/**
+	 * Установка индекса для поля
+	 * 
+	 * @param string $type
+	 * @return \DataSource_Hybrid_Field
+	 */
+	public function set_index($type = DataSource_Hybrid_Field_Factory::INDEX_INDEX)
+	{
+		$this->index_type = $type;
+		return $this;
+	}
+	
+	public function is_indexed()
+	{
+		return DataSource_Hybrid_Field_Factory::is_index($this);
+	}
+
+		/**
 	 * Метод используется для присвоения старого значения для поля документа
 	 * 
 	 * @param DataSource_Hybrid_Document $document
@@ -454,7 +499,7 @@ abstract class DataSource_Hybrid_Field {
 			'type' => $this->type, 
 			'header' => $this->header,
 			'from_ds' => (int) $this->from_ds,
-			'props' => serialize($this->_props),
+			'props' => serialize( $this->_props ),
 			'position' => (int) $this->position
 		);
 
@@ -501,7 +546,7 @@ abstract class DataSource_Hybrid_Field {
 	/**
 	 * Удаление поля из БД
 	 * 
-	 * @see DataSource_Hybrid_Field_Factory::remove_fields()
+	 * @see DataSource_Hybrid_Field_Factory::remove_fields_by_key()
 	 * 
 	 * @return boolean
 	 */
@@ -571,6 +616,16 @@ abstract class DataSource_Hybrid_Field {
 	public function is_required()
 	{
 		return (bool) $this->_is_required;
+	}
+	
+	/**
+	 * Поле может иметь MySQL индекс
+	 * 
+	 * @return boolean
+	 */
+	public function is_indexable()
+	{
+		return (bool) $this->_is_indexable;
 	}
 
 	/**
@@ -724,6 +779,11 @@ abstract class DataSource_Hybrid_Field {
 		if($this->isreq === TRUE AND $this->is_required())
 		{
 			$validation->rule($this->name, 'not_empty');
+		}
+		
+		if( $this->unique === TRUE )
+		{
+			$validation->rule($this->name, array($this, 'check_unique'), array(':value', $doc));
 		}
 
 		return $validation

@@ -27,6 +27,28 @@ $(function() {
 		
 		return false;
 	});
+	
+	$('input[name^="in_headline"]').on('change', function() {
+		var id = parseInt($(this).prop('name').match(/.*\[(\d+)\]/)[1]);
+		if( ! id) return;
+		
+		if($(this).checked()) {
+			Api.post('/datasource/hybrid-field.headline', {id: id}, function(response) {});
+		} else {
+			Api.delete('/datasource/hybrid-field.headline', {id: id}, function(response) {});
+		}
+	});
+	
+	$('input[name^="index_type"]').on('change', function() {
+		var id = parseInt($(this).prop('name').match(/.*\[(\d+)\]/)[1]);
+		if( ! id) return;
+		
+		if($(this).checked()) {
+			Api.post('/datasource/hybrid-field.index_type', {id: id}, function(response) {});
+		} else {
+			Api.delete('/datasource/hybrid-field.index_type', {id: id}, function(response) {});
+		}
+	});
 });
 </script>
 
@@ -43,6 +65,7 @@ $(function() {
 			<col width="100px" />
 			<col width="200px" />
 			<col width="100px" />
+			<col width="150px" />
 			<col />
 		</colgroup>
 		<thead>
@@ -55,6 +78,7 @@ $(function() {
 				<th><?php echo __('Field header'); ?></th>
 				<th><?php echo __('Field type'); ?></th>
 				<th><?php echo __('Show in headline'); ?></th>
+				<th><?php echo __('MySQL index'); ?></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -71,6 +95,7 @@ $(function() {
 				<td>ID</td>
 				<td><?php echo UI::label('integer'); ?></td>
 				<td><?php echo Form::checkbox('', 1, TRUE, array('disabled' => 'disabled')); ?></td>
+				<td><?php echo Form::checkbox('', 1, TRUE, array('disabled' => 'disabled')); ?></td>
 			</tr>
 			<tr>
 				<?php if(Acl::check($ds->type().$ds->id().'.field.remove')): ?>
@@ -85,22 +110,22 @@ $(function() {
 				<td><?php echo __('Header'); ?></td>
 				<td><?php echo UI::label('string'); ?></td>
 				<td><?php echo Form::checkbox('', 1, TRUE, array('disabled' => 'disabled')); ?></td>
+				<td></td>
 			</tr>
 
-			<?php foreach($record->fields() as $f): ?>
-			<tr id="field-<?php echo $f->id; ?>">
+			<?php foreach($record->fields() as $field): ?>
+			<tr id="field-<?php echo $field->id; ?>">
 				<?php if(Acl::check($ds->type().$ds->id().'.field.remove')): ?>
 				<td class="f">
 					<?php 
-					$attrs = array('id' => $f->name);
-					if($f->ds_id != $ds->id()) $attrs['disabled'] = 'disabled';
-					echo Form::checkbox('field[]', $f->id, FALSE, $attrs); ?>
+					$attrs = array('id' => $field->name);
+					echo Form::checkbox('field[]', $field->id, FALSE, $attrs); ?>
 				</td>
 				<?php endif; ?>
-				<td class="position"><?php echo $f->position; ?></td>
+				<td class="position"><?php echo $field->position; ?></td>
 				<td class="sys">
-					<label for="<?php echo $f->name; ?>">
-						<?php echo substr($f->name, 2); ?>
+					<label for="<?php echo $field->name; ?>">
+						<?php echo substr($field->name, 2); ?>
 					</label>
 				</td>
 				<td>
@@ -109,21 +134,36 @@ $(function() {
 						'controller' => 'field',
 						'directory' => 'hybrid',
 						'action' => 'edit',
-						'id' => $f->id
-					)), $f->header  ); ?>
+						'id' => $field->id
+					)), $field->header  ); ?>
 					<?php else: ?>
-					<strong><?php echo $f->header; ?> </strong>
+					<strong><?php echo $field->header; ?> </strong>
 					<?php endif; ?>
 				</td>
 				<td>
-					<?php echo UI::label($f->type); ?>
+					<?php echo UI::label($field->type); ?>
 				</td>
 				<td>
 					<?php 
 					$attrs = array();
-					if(!Acl::check($ds->type().$ds->id().'.field.edit')) $attrs['disabled'] = 'disabled';
+					if ( ! Acl::check($ds->type().$ds->id().'.field.edit'))
+					{
+						$attrs['disabled'] = 'disabled';
+					}
 					
-					echo Form::checkbox('in_headline['.$f->id.']', 1, (bool) $f->in_headline, $attrs); ?>
+					echo Form::checkbox('in_headline['.$field->id.']', 1, (bool) $field->in_headline, $attrs); ?>
+				</td>
+				<td>
+				<?php if($field->is_indexable())
+				{
+					$attrs = array();
+					if ( ! Acl::check($ds->type().$ds->id().'.field.edit'))
+					{
+						$attrs['disabled'] = 'disabled';
+					}
+
+					echo Form::checkbox('index_type['.$field->id.']', 1, $field->is_indexed(), $attrs); 
+				} ?>
 				</td>
 			</tr>
 			<?php endforeach; ?>

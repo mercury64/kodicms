@@ -1,5 +1,8 @@
 <?php 
-	if(empty($doc->id)) $value = AuthUser::getId();
+if ( ! $doc->loaded() AND $field->set_current === TRUE) 
+{
+	$value = AuthUser::getId(); 
+}
 ?>
 
 <div class="control-group">
@@ -14,15 +17,11 @@
 		
 		<?php if($field->is_exists($value)): ?>
 		&nbsp;
-		<?php echo HTML::anchor(
-				Route::get('backend')->uri(array(
-					'controller' => 'users', 
-					'action' => 'edit', 
-					'id' => $value)
-				), 
-				__('Show profile'), 
-				array('class' => 'popup fancybox.iframe btn')
-		); ?>
+		<?php echo HTML::anchor(Route::get('backend')->uri(array(
+			'controller' => 'users', 
+			'action' => 'edit', 
+			'id' => $value
+		)), __('Show profile'), array('class' => 'popup fancybox.iframe btn')) ; ?>
 		<?php endif; ?>
 		
 		<?php if(isset($field->hint)): ?>

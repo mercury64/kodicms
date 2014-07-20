@@ -1,6 +1,6 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
-class KodiCMS_Controller_Update extends Controller_System_Backend {
+class Controller_Update extends Controller_System_Backend {
 	
 	public function before()
 	{
@@ -12,6 +12,11 @@ class KodiCMS_Controller_Update extends Controller_System_Backend {
 	
 	public function action_index() 
 	{
+		$this->template->content = View::factory( 'update/index');
+	}
+	
+	public function action_database() 
+	{
 		Assets::package('ace');
 		
 		$this->template->title = __('Update');
@@ -22,48 +27,38 @@ class KodiCMS_Controller_Update extends Controller_System_Backend {
 		$compare = new Database_Helper;
 		$diff = $compare->get_updates($db_sql, $file_sql, TRUE);
 		
-		$this->template->content = View::factory( 'update/index', array(
+		$this->template->content = View::factory( 'update/database', array(
 			'actions' => $diff,
-		) );
+		));
 	}
 	
-	public function action_patch()
+	public function action_patches()
 	{
 		if($this->request->method() === Request::POST)
 		{
 			return $this->_apply_patch();
 		}
 
-		$patches_list = Kohana::list_files('patches', array(DOCROOT));
-		
-		$patches = array();
-		foreach ($patches_list as $path)
-		{
-			$patches[$path] = pathinfo($path, PATHINFO_FILENAME);
-		}
-		
 		$this->template->content = View::factory( 'update/patches', array(
-			'patches' => $patches,
-		) );
+			'patches' => array_flip(Patch::find_all()),
+		));
 	}
 	
 	private function _apply_patch()
 	{
 		$patch = $this->request->post('patch');
 		
-		if(file_exists($patch))
+		try
 		{
-			try
-			{
-				include $patch;
-			} 
-			catch (Kohana_Exception $ex) 
-			{
-				Messages::errors($ex->getMessage());
-				$this->go_back();
-			}
-			
-			@unlink($patch);
+			Patch::apply($patch);
+		} 
+		catch (Validation_Exception $ex)
+		{
+			Messages::errors($ex->errors());
+		}
+		catch (Kohana_Exception $ex) 
+		{
+			Messages::errors($ex->getMessage());
 		}
 		
 		$this->go_back();

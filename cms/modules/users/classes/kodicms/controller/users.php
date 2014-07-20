@@ -20,7 +20,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 
 		parent::before();
 		$this->breadcrumbs
-			->add(__('Users'), Route::url( 'backend', array('controller' => 'users')));
+			->add(__('Users'), Route::get('backend')->uri(array('controller' => 'users')));
 	}
 	
 	public function action_index()
@@ -29,7 +29,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		$users = ORM::factory('user');
 		$pager = $users->add_pager();
 
-		$this->template->content = View::factory( 'users/index', array(
+		$this->template->content = View::factory('users/index', array(
 			'users' => $users
 				->group_by('user.id')
 				->with_roles()
@@ -40,7 +40,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 
 	public function action_add()
 	{
-		$data = Flash::get( 'users::add::data', array() );
+		$data = Flash::get('users::add::data', array() );
 
 		$user = ORM::factory('user')
 			->values($data);
@@ -53,7 +53,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		
 		$this->set_title(__('Add user'));
 
-		$this->template->content = View::factory( 'users/edit', array(
+		$this->template->content = View::factory('users/edit', array(
 			'action' => 'add',
 			'user' => $user,
 			'permissions' => array()
@@ -72,7 +72,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 			$data['notice'] = 0;
 		}
 		
-		Flash::set( 'users::add::data', $data );
+		Flash::set('users::add::data', $data );
 
 		try 
 		{
@@ -91,7 +91,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 				->values($profile)
 				->create();
 
-			Messages::success(__( 'User has been added!' ) );
+			Messages::success(__('User has been added!'));
 		}
 		catch (ORM_Validation_Exception $e)
 		{
@@ -125,7 +125,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		
 		if( ! $user->loaded() )
 		{
-			Messages::errors( __('User not found!') );
+			Messages::errors(__('User not found!'));
 			$this->go();
 		}
 		
@@ -133,7 +133,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		$this->breadcrumbs
 			->add($this->template->title);
 		
-		$this->template->content = View::factory( 'users/profile', array(
+		$this->template->content = View::factory('users/profile', array(
 			'user' => $user,
 			'permissions' => $user->permissions_list()
 		) );
@@ -148,8 +148,8 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		
 		if( ! $user->loaded() )
 		{
-			Messages::errors( __('User not found!') );
-			$this->go( 'user' );
+			Messages::errors(__('User not found!'));
+			$this->go('user');
 		}
 		
 		$this->_save_referer('account/login');
@@ -169,7 +169,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 			)))
 			->add($this->template->title);
 
-		$this->template->content = View::factory( 'users/edit', array(
+		$this->template->content = View::factory('users/edit', array(
 			'action' => 'edit',
 			'user' => $user
 		) );
@@ -203,17 +203,17 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		{
 			if ($user->update_user($data, array('email', 'username', 'password')))
 			{
-				$data['user_id'] = $user->id;
+				$profile['user_id'] = $user->id;
 				$user->profile
 					->values($profile)
 					->save();
 
-				if (Acl::check('users.change_roles') AND $user->id > 1)
+				if ( Acl::check('users.change_roles') AND $user->id > 1 )
 				{
 					// now we need to add permissions
 					$user_roles = $this->request->post('user_roles');
 
-					if ( ! empty($user_roles))
+					if( ! empty($user_roles))
 					{
 						$user->update_related_ids('roles', explode(',', $user_roles));
 					}

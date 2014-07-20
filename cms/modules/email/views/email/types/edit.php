@@ -13,7 +13,7 @@
 	</div>
 	<div class="widget-content">
 		<div class="control-group">
-			<label class="control-label title" for="name"><?php echo __( 'Email type name' ); ?></label>
+			<label class="control-label title" for="name"><?php echo __('Email type name'); ?></label>
 			<div class="controls">
 				<?php
 				echo Form::input( 'name', $type->name, array(
@@ -24,7 +24,7 @@
 		</div>
 		
 		<div class="control-group">
-			<label class="control-label" for="code"><?php echo __( 'Email type code' ); ?></label>
+			<label class="control-label" for="code"><?php echo __('Email type code'); ?></label>
 			<div class="controls">
 				<?php if($action == 'add'): ?>
 				<?php echo Form::input( 'code', $type->code, array(
@@ -65,9 +65,9 @@
 		<hr />
 		<?php endif; ?>
 		
-		<?php if ( Acl::check( 'email_template.add')): ?>
+		<?php if ( Acl::check('email_template.add')): ?>
 		<?php echo UI::button(__('Add linked template'), array(
-			'href' => Route::get( 'email_controllers')->uri(array('controller' => 'templates', 'action' => 'add')) . '?email_type='.$type->id, 'icon' => UI::icon('plus')
+			'href' => Route::get('email_controllers')->uri(array('controller' => 'templates', 'action' => 'add')) . '?email_type='.$type->id, 'icon' => UI::icon('plus')
 		)); ?>
 		<?php endif; ?>
 	</div>

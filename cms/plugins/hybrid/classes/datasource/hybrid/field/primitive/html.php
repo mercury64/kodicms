@@ -1,16 +1,22 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 class DataSource_Hybrid_Field_Primitive_HTML extends DataSource_Hybrid_Field_Primitive {
-	
+
+	protected $_is_indexable = FALSE;
+
 	protected $_props = array(
 		'default' => NULL,
 		'filter_html' => FALSE,
 		'allowed_tags' => '<b><i><u><p><ul><li><ol>'
 	);
 	
-	public function set( array $data )
+	public function booleans()
 	{
-		$data['filter_html'] = !empty($data['filter_html']) ? TRUE : FALSE;				
+		return array('filter_html');
+	}
+	
+	public function set( array $data )
+	{	
 		return parent::set( $data );
 	}
 	

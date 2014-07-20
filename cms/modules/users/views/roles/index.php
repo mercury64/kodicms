@@ -2,7 +2,7 @@
 	<div class="widget-header">
 		<?php if ( Acl::check('roles.add')): ?>
 		<?php echo UI::button(__('Add role'), array(
-			'href' => Route::get( 'backend')->uri(array('controller' => 'roles', 'action' => 'add')), 
+			'href' => Route::get('backend')->uri(array('controller' => 'roles', 'action' => 'add')), 
 			'icon' => UI::icon('plus'),
 			'hotkeys' => 'ctrl+a'
 		)); ?>

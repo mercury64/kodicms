@@ -81,19 +81,38 @@ var cms = {
 	},
 
 	loader: {
-		init: function () {
-			$('body')
-				.append('<div class="_loader_container"><div class="_loader_bg"></div><span>' + __('Loading') + '</span>\n\
-</div>');
+		counter: 0,
+		init: function (container) {
+			if(!(container instanceof jQuery)) 
+				container = $('body');
+
+			return $('<div class="_loader_container"><div class="_loader_bg"></div><span>' + __('Loading') + '</span></div>')
+				.appendTo(container)
+				.css({
+					width: container.outerWidth(true), 
+					height: container.outerHeight(true),
+					top: container.offset().top,
+					left: container.offset().left
+				})
+				.prop('id', 'loader' + ++this.counter);
 		},
-		show: function (speed) {
+		show: function (container, speed) {
 			if(!speed) {
 				speed = 500;
 			}
-			$('._loader_container').fadeTo(speed, 0.4);
+
+			var loader = this.init(container).fadeTo(speed, 0.4);
+			return this.counter;
 		},
-		hide: function () {
-			$('._loader_container').stop().fadeOut();
+		hide: function (id) {
+			if(!id)
+				cont = $('._loader_container');
+			else 
+				cont = $('#loader'+id);
+
+			cont.stop().fadeOut(400, function() {
+				$(this).remove();
+			});
 		}
 	},
 	
@@ -213,35 +232,28 @@ cms.addTranslation = function (obj) {
 
 cms.navigation = {
 	counter: {
+		total: [],
 		init: function() {
-			$('#site_nav .dropdown').each(function() {
-				var total = 0;
-
-				$('.dropdown-menu a', this).each(function() {
-					if($(this).data('counter') > 0) {
-						total += $(this).data('counter');
-						$(this).append('<span class="counter">' + $(this).data('counter') + '</span>');
-					}
-				});
-
-				if(total > 0)
-					$('.dropdown-toggle', this).append('<span class="counter">' + total + '</span>');
-			});
-			
-			$('#subnav a').each(function() {
-				if($(this).data('counter') > 0) {
-					$(this).append('<span class="counter">' + $(this).data('counter') + '</span>');
-				}
+			$('.dropdown-menu a').filter(function() { return $(this).data('counter') > 0 }).each(function() {
+				$(this)
+					.append('<span class="counter">' + $(this).data('counter') + '</span>')
+					.parents('.dropdown-menu')
+					.prev()
+					.append('<span class="counter">!</span>');
 			});
 		},
 		add: function(href, count) {
-			$('.dropdown-menu a[href*="'+href+'"]').data('counter', count);
-			$('#subnav a[href*="'+href+'"]').data('counter', count);
+			$('.dropdown-menu a[href="'+href+'"]')
+				.add('#subnav a[href="'+href+'"]')
+				.data('counter', count);
+
 			this.init();
 		},
 		remove: function(href) {
-			$('.dropdown-menu a[href*="'+href+'"]').removeData('counter');
-			$('#subnav a[href*="'+href+'"]').removeData('counter');
+			$('.dropdown-menu a[href="'+href+'"]')
+					.add('#subnav a[href="'+href+'"]')
+				.removeData('counter');
+
 			this.init();
 		}
 	}
@@ -258,6 +270,9 @@ cms.ui = {
 		return this;
     },
     init:function (module) {
+		
+		$('body').trigger('before_ui_init');
+		
         for (var i = 0; i < cms.ui.callbacks.length; i++) {
 			try {
 				if(!module)
@@ -270,6 +285,8 @@ cms.ui = {
 				}
 			} catch (e) {}
         }
+		
+		$('body').trigger('after_ui_init');
     }
 };
 
@@ -290,6 +307,8 @@ cms.init = {
 		return this;
 	},
 	run:function () {
+		$('body').trigger('before_cms_init');
+		
 		var body_id = $('body:first').attr('id');
 
 		for (var i = 0; i < cms.init.callbacks.length; i++) {
@@ -298,6 +317,8 @@ cms.init = {
 			if (body_id == rout_to_id)
 				cms.init.callbacks[i][1]();
 		}
+		
+		$('body').trigger('after_cms_init');
 	}
 };
 
@@ -584,8 +605,6 @@ cms.ui.add('flags', function() {
         dictRemoveFile: __("Remove file"),
         dictMaxFilesExceeded: __("You can only upload {{maxFiles}} files."),
 	});
-}).add('loader', function() {
-    cms.loader.init();
 }).add('fancybox', function() {
     $(".fancybox-image").fancybox();
 }).add('popup', function() {
@@ -763,8 +782,8 @@ cms.ui.add('flags', function() {
 				else
 					$self.check().trigger('change');
 				e.preventDefault();
-			};
-		}
+			}
+		};
 		
 		$(document).on('keydown', null, $hotkeys, $callback);
 	});
@@ -802,14 +821,14 @@ cms.ui.add('flags', function() {
 		
 		if($reload) {
 			if($reload === true)
-				$callback = function() { window.location = ''; };
+				$callback = function() { window.location = ''}
 			else
-				$callback = function() { window.location = $reload; };
+				$callback = function() { window.location = $reload}
 		}
 		
 		if( ! $method) $method = 'GET';
 		Api.request($method, $url, null, $callback);
-	});
+	})
 }).add('select_all_checkbox', function() {
 	$(document).on(' change','input[name="check_all"]', function(e) {
 		var $self = $(this),
@@ -824,24 +843,23 @@ cms.ui.add('flags', function() {
 
 var Api = {
 	_response: null,
-
-	get: function(uri, data, callback) {
-		this.request('GET', uri, data, callback);
+	get: function(uri, data, callback, show_loader) {
+		this.request('GET', uri, data, callback, show_loader);
 		
 		return this.response();
 	},
-	post: function(uri, data, callback) {
-		this.request('POST', uri, data, callback);
+	post: function(uri, data, callback, show_loader) {
+		this.request('POST', uri, data, callback, show_loader);
 		
 		return this.response();
 	},
-	put: function(uri, data, callback) {
-		this.request('PUT', uri, data, callback);
+	put: function(uri, data, callback, show_loader) {
+		this.request('PUT', uri, data, callback, show_loader);
 		
 		return this.response();
 	},
-	'delete': function(uri, data, callback) {
-		this.request('DELETE', uri, data, callback);
+	'delete': function(uri, data, callback, show_loader) {
+		this.request('DELETE', uri, data, callback, show_loader);
 		
 		return this.response();
 	},
@@ -852,7 +870,7 @@ var Api = {
 		{
 			uri = '-' + uri;
 		}
-		else if(uri.indexOf('-') > 0 && uri.indexOf('/') == -1)
+		else if(uri.indexOf('-') > 0 && (uri.indexOf('/') == -1 || uri.indexOf('/') > 0))
 		{
 			uri = '/' + uri;
 		}
@@ -886,6 +904,8 @@ var Api = {
 	request: function(method, uri, data, callback, show_loader) {
 		url = Api.build_url(uri);
 		
+		var obj = new Object();
+
 		if(show_loader == 'undefined')
 			show_loader = true;
 		
@@ -901,9 +921,10 @@ var Api = {
 			url: url,
 			data: data,
 			dataType: 'json',
-			beforeSend: function(){
-				if(show_loader) cms.loader.show();
-			},
+			beforeSend: $.proxy(function(){
+				if(show_loader) 
+					obj._loader_id = cms.loader.show(show_loader);					
+			}, obj),
 			success: function(response) {
 				if(response.code != 200) {
 					if(typeof(callback) == 'function') callback(response);
@@ -935,9 +956,9 @@ var Api = {
 			error: function(jqXHR, textStatus, errorThrown) {
 				if(typeof(callback) == 'function') callback(textStatus);
 			}
-		}).always(function() { 
-			cms.loader.hide();
-		});
+		}).always($.proxy(function(){
+			cms.loader.hide(obj._loader_id);
+		}, obj));
 	},
 	exception: function(response) {
 		if(response.code == 120 && typeof(response.errors) == 'object') {
@@ -956,16 +977,17 @@ var Api = {
 
 // Run
 $(function() {
-    cms.messages.init();
-    cms.ui.init();
+	cms.messages.init();
+
+	cms.ui.init();
 	cms.init.run();
-	
+
 	parse_messages(MESSAGE_ERRORS, 'error');
 	parse_messages(MESSAGE_SUCCESS);
 
-	$.fn.check=function(){return this.each(function(){this.checked=true;});};
-	$.fn.uncheck=function(){return this.each(function(){this.checked=false;});};
-	$.fn.checked=function(){return this.prop("checked");};
+	$.fn.check=function(){return this.each(function(){this.checked=true})}
+	$.fn.uncheck=function(){return this.each(function(){this.checked=false})};
+	$.fn.checked=function(){return this.prop("checked")}
 
 	$.fn.tabs = function () {
 		return $('li a', this).on('click', function() {
@@ -981,11 +1003,13 @@ $(function() {
 			return false;
 		});
 	};
-
-	$.fn.serializeObject=function(){var e={};var t=this.serializeArray();$.each(t,function(){if(e[this.name]!==undefined){if(!e[this.name].push){e[this.name]=[e[this.name]]}e[this.name].push(this.value||"")}else{e[this.name]=this.value||""}});return e}
-	
-	$.fn.scrollTo=function(e,t,n){if(typeof t=="function"&&arguments.length==2){n=t;t=e}var r=$.extend({scrollTarget:e,offsetTop:50,duration:500,easing:"swing"},t);return this.each(function(){var e=$(this);var t=typeof r.scrollTarget=="number"?r.scrollTarget:$(r.scrollTarget);var i=typeof t=="number"?t:t.offset().top+e.scrollTop()-parseInt(r.offsetTop);e.animate({scrollTop:i},parseInt(r.duration),r.easing,function(){if(typeof n=="function"){n.call(this)}})})}
 });
+
+
+
+$.fn.serializeObject=function(){var e={};var t=this.serializeArray();$.each(t,function(){if(e[this.name]!==undefined){if(!e[this.name].push){e[this.name]=[e[this.name]]}e[this.name].push(this.value||"")}else{e[this.name]=this.value||""}});return e};
+
+$.fn.scrollTo=function(e,t,n){if(typeof t=="function"&&arguments.length==2){n=t;t=e}var r=$.extend({scrollTarget:e,offsetTop:50,duration:500,easing:"swing"},t);return this.each(function(){var e=$(this);var t=typeof r.scrollTarget=="number"?r.scrollTarget:$(r.scrollTarget);var i=typeof t=="number"?t:t.offset().top+e.scrollTop()-parseInt(r.offsetTop);e.animate({scrollTop:i},parseInt(r.duration),r.easing,function(){if(typeof n=="function"){n.call(this)}})})};
 
 jQuery.browser = {};
 jQuery.browser.mozilla = /mozilla/.test(navigator.userAgent.toLowerCase()) && !/webkit/.test(navigator.userAgent.toLowerCase());

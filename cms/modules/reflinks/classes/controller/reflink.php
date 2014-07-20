@@ -17,10 +17,19 @@ class Controller_Reflink extends Controller_System_Controller {
 
 		$reflink_model = ORM::factory( 'user_reflink', $code );
 
+		if( ! $reflink_model->loaded())
+		{
+			Messages::errors(__('Reflink not found'));
+			$this->go_home();
+		}
+
+		$next_url = Arr::get($reflink_model->data, 'next_url');
+
 		try
 		{
 			Database::instance()->begin();
 			Reflink::factory($reflink_model)->confirm();
+			$reflink_model->delete();
 			Database::instance()->commit();
 		}
 		catch ( Kohana_Exception $e )
@@ -29,6 +38,11 @@ class Controller_Reflink extends Controller_System_Controller {
 			Messages::errors( $e->getMessage() );
 		}
 		
-		$this->go( Route::get('user')->uri(array( 'action' => 'login' ) ) );
+		if(Valid::url($next_url))
+		{
+			$this->go($next_url);
+		}
+		
+		$this->go_home();
 	}
 }

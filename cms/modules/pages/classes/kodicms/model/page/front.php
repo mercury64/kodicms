@@ -970,14 +970,17 @@ class KodiCMS_Model_Page_Front {
 					break;
 				}
 
-				if($param !== NULL)
+				if ($param !== NULL)
 				{
-					if( strpos( $param, 'site.') !== FALSE )
+					if (strpos( $param, 'site.') !== FALSE )
 					{
-						
 						$parts[] = Config::get('site', substr($param, 5));
 					}
-					else if(method_exists($this, $param))
+					elseif (strpos( $param, 'ctx.') !== FALSE)
+					{
+						$parts[] = Context::instance()->get(substr($param, 4));
+					}
+					elseif (method_exists($this, $param))
 					{
 						$parts[] = $this->{$param}();
 					}

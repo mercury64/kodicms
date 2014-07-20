@@ -5,32 +5,42 @@ class DataSource_Hybrid_Field_Source_User extends DataSource_Hybrid_Field_Source
 	protected $_props = array(
 		'default' => NULL,
 		'isreq' => FALSE,
-		'only_current' => FALSE
+		'only_current' => FALSE,
+		'unique' => FALSE
 	);
+	
+	protected $_use_as_document_id = TRUE;
 
+	public function booleans()
+	{
+		return array('only_current', 'unique', 'set_current');
+	}
+	
 	public function set( array $data )
 	{
-		$data['only_current'] = !empty($data['only_current']) ? TRUE : FALSE;
-		
 		return parent::set( $data );
 	}
 	
 	public function onCreateDocument(DataSource_Hybrid_Document $doc) 
 	{
-		$doc->set($this->name, AuthUser::getId());
+		return $this->onUpdateDocument($doc, $doc);
 	}
 	
 	public function onUpdateDocument(DataSource_Hybrid_Document $old = NULL, DataSource_Hybrid_Document $new)
 	{
+		$user_id = $new->get($this->name);
+
 		if($this->only_current === TRUE)
 		{
-			$new->set($this->name, AuthUser::getId());
+			$user_id = $old->get($this->name);
 		}
 		
-		if( ! $this->is_exists( $new->get($this->name) ))
+		if( ! $this->is_exists( $user_id ))
 		{
-			$new->set($this->name, $old->get($this->name));
+			$user_id = 0;
 		}
+		
+		$new->set($this->name, $user_id);
 	}
 	
 	public function get_user($id)
@@ -49,6 +59,28 @@ class DataSource_Hybrid_Field_Source_User extends DataSource_Hybrid_Field_Source
 		$users = $users + ORM::factory('user')->find_all()->as_array('id', 'username');
 		
 		return $users;
+	}
+	
+	public function fetch_headline_value( $value )
+	{
+		if(empty($value)) return parent::fetch_headline_value($value);
+
+		$user = ORM::factory('user', (int) $value);
+		
+		if( ! $user->loaded())
+		{
+			return parent::fetch_headline_value($value);
+		}
+
+		$header = DataSource_Hybrid_Field_Utils::get_document_header($this->from_ds, $value);
+		
+		return HTML::anchor(Route::get('backend')->uri(array(
+			'controller' => 'users',
+			'action' => 'profile',
+			'id' => $user->id
+		)), $user->username, array(
+			'class' => ' popup fancybox.iframe'
+		));
 	}
 
 	public static function fetch_widget_field( $widget, $field, $row, $fid )

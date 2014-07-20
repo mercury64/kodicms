@@ -64,6 +64,8 @@ Kohana::modules( array(
 	'datasource'	=> MODPATH . 'datasource',
 	'search'		=> MODPATH . 'search',
 	'sidebar'		=> MODPATH . 'sidebar',
+	'update'		=> MODPATH . 'update',
+	'captcha'		=> MODPATH . 'captcha'
 ) );
 
 Kohana::$config->attach(new Config_Database);

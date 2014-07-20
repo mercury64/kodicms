@@ -17,16 +17,8 @@ class Model_User_Reflink extends ORM {
 	protected $_belongs_to = array(
 		'user' => array(),
 	);
-
-	public function get($column) 
-	{
-		if($column == 'data')
-		{
-			return unserialize($this->_object[$column]);
-		}
-
-		return parent::get($column);
-	}
+	
+	protected $_serialize_columns = array('data');
 
 	/**
 	 * Generate new reflink code
@@ -43,12 +35,12 @@ class Model_User_Reflink extends ORM {
 			throw new Reflink_Exception(' User not loaded ');
 		}
 		
-		$data = serialize($data);
-
+		$type = URL::title($type, '_');
+		
 		$reflink = $this
 			->reset(FALSE)
 			->where('user_id', '=', $user->id)
-			->where('type', '=', (int) $type)
+			->where('type', '=', $type)
 			->where('created', '>', DB::expr('CURDATE() - INTERVAL 1 HOUR'))
 			->find();
 
@@ -57,7 +49,7 @@ class Model_User_Reflink extends ORM {
 			$values = array(
 				'user_id'	=> (int) $user->id,
 				'code'		=> uniqid(TRUE) . sha1(microtime()),
-				'type'		=> (int) $type,
+				'type'		=> $type,
 				'data'		=> $data
 			);
 

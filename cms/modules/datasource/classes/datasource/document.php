@@ -32,14 +32,6 @@ class Datasource_Document {
 	protected $_changed_fields = array();
 	
 	/**
-	 * Список значений полей по умолчанию
-	 * @var array 
-	 */
-	protected $_default_values = array(
-		'published' => 1
-	);
-	
-	/**
 	 * Объект раздела
 	 * @var DataSource_Hybrid_Section 
 	 */
@@ -74,6 +66,17 @@ class Datasource_Document {
 		$this->ds_id = $section->id();
 		
 		$this->reset();
+	}
+	
+	/**
+	 * Список значений полей по умолчанию
+	 * @return array
+	 */
+	public function defaults()
+	{
+		return array(
+			'published' => 1
+		);
 	}
 
 	/**
@@ -207,7 +210,7 @@ class Datasource_Document {
 		{
 			if( ! $this->loaded() AND empty($this->_system_fields[$field]))
 			{
-				return Arr::get($this->_default_values, $field, $default);
+				return Arr::get($this->defaults(), $field, $default);
 			}
 
 			return $this->_system_fields[$field];
@@ -418,13 +421,24 @@ class Datasource_Document {
 	 * @return \DataSource_Document
 	 */
 	public function load( $id )
+	{		
+		return $this->load_by('id', (int) $id);
+	}
+	
+	/**
+	 * Загрузка документа по названию поля значению
+	 * 
+	 * @param string $field
+	 * @param string $value
+	 * @return \DataSource_Document
+	 */
+	public function load_by( $field, $value )
 	{
-		$ds_id = $this->section()->id();
-
 		$result = DB::select()
 			->select_array( array_keys( $this->_system_fields ))
 			->from($this->section()->table())
-			->where('id', '=', (int) $id)
+			->where('ds_id', '=', (int) $this->section()->id())
+			->where($field, '=', $value)
 			->limit(1)
 			->execute()
 			->current();
@@ -511,6 +525,7 @@ class Datasource_Document {
 
 		DB::update($this->section()->table())
 			->set($values)
+			->where('ds_id', '=', (int) $this->section()->id())
 			->where('id', '=', $this->id)
 			->execute();
 		
@@ -532,6 +547,7 @@ class Datasource_Document {
 		if( ! $this->loaded() ) return FALSE;
 		
 		DB::delete($this->section()->table())
+			->where('ds_id', '=', (int) $this->section()->id())
 			->where('id', '=', $this->id)
 			->execute();
 		
