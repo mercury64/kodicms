@@ -211,7 +211,7 @@ var cms = {
 	filemanager: {
 		open: function(object, type) {
 			return $.fancybox.open({
-				href : BASE_URL + ADMIN_DIR_NAME + '/elfinder/',
+				href : BASE_URL + '/elfinder/',
 				type: 'iframe'
 			}, {
 				autoSize: false,
@@ -743,7 +743,7 @@ cms.ui.add('flags', function() {
 			$callback = function( e ) {
 				$self.trigger('click');
 				e.preventDefault();
-			};
+			} 
 		} else if($self.attr('href')) {
 
 			$callback = function( e ) {
@@ -753,13 +753,13 @@ cms.ui.add('flags', function() {
 				}
 				window.location = $self.attr('href');
 				e.preventDefault();
-			};
+			} 
 		} else if($self.hasClass('spoiler-toggle')) {
 			$callback = function( e ) {
 				$self.trigger('click');
 				$('body').scrollTo($self);
 				e.preventDefault();
-			};
+			} 
 		} else if($self.hasClass('nav-tabs')) {
 			$callback = function( e ) {
 				var $current_li = $self.find('li.active'),
@@ -774,7 +774,7 @@ cms.ui.add('flags', function() {
 				
 				$next_li.find('a').trigger('click');
 				e.preventDefault();
-			};
+			} 
 		} else if($self.is(':checkbox')) {
 			$callback = function( e ) {
 				if($self.prop("checked"))
@@ -783,7 +783,7 @@ cms.ui.add('flags', function() {
 					$self.check().trigger('change');
 				e.preventDefault();
 			}
-		};
+		}
 		
 		$(document).on('keydown', null, $hotkeys, $callback);
 	});
@@ -804,7 +804,7 @@ cms.ui.add('flags', function() {
 		e.preventDefault();
 	});
 	
-	$(document).on('keydown', null, 'shift+l', function(e) {
+	$(document).on('keydown', null, 'ctrl+shift+l', function(e) {
 		window.location = '/backend/logout';
 		e.preventDefault();
 	});
@@ -864,8 +864,8 @@ var Api = {
 		return this.response();
 	},
 	build_url: function(uri) {
-	    uri = uri.replace(BASE_URL, '');
-
+		uri = uri.replace(BASE_URL, '');
+	    
 		if(uri.indexOf('-') == -1)
 		{
 			uri = '-' + uri;

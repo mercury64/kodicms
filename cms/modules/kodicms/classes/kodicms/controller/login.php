@@ -61,7 +61,9 @@ class KodiCMS_Controller_Login extends Controller_System_Frontend {
 		// Get the remember login option
 		$remember = isset( $array['remember'] );
 
-		if ( $array->check() )
+		Observer::notify( 'admin_login_validation', $array );
+
+		if ($array->check())
 		{
 			Observer::notify( 'admin_login_before', $array );
 
@@ -83,7 +85,8 @@ class KodiCMS_Controller_Login extends Controller_System_Frontend {
 			}
 			else
 			{
-				Observer::notify( 'admin_login_failed', $array['username'] );
+				Observer::notify( 'admin_login_failed', $array );
+
 				Messages::errors( __('Login failed. Please check your login data and try again.') );
 				$array->error( $fieldname, 'incorrect' );
 				

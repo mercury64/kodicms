@@ -67,7 +67,6 @@ Kohana::modules( array(
 	'captcha'		=> MODPATH . 'captcha'
 ) );
 
-Kohana::$config->attach(new Config_Database);
 Kohana::$log->attach(new Log_Database('logs'));
 
 Observer::notify('modules::after_load');

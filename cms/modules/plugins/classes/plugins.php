@@ -48,7 +48,7 @@ class Plugins {
 	 * 
 	 * @param string $plugin_id
 	 */
-	public static function activate( Plugin_Decorator $plugin )
+	public static function activate( Plugin $plugin )
 	{
 		self::$_activated[$plugin->id()] = TRUE;
 	}
@@ -57,7 +57,11 @@ class Plugins {
 	 * 
 	 * @param string $plugin_id
 	 */
+<<<<<<< HEAD
 	public static function deactivate( Plugin_Decorator $plugin )
+=======
+	public static function deactivate( Plugin $plugin )
+>>>>>>> upstream/dev
 	{
 		if ( isset( self::$_activated[$plugin->id()] ) )
 		{
@@ -83,7 +87,11 @@ class Plugins {
 	 */
 	public static function is_activated( $plugin_id )
 	{
+<<<<<<< HEAD
 		if($plugin_id instanceof Plugin_Decorator)
+=======
+		if($plugin_id instanceof Plugin)
+>>>>>>> upstream/dev
 		{
 			$plugin_id = $plugin_id->id();
 		}
@@ -130,7 +138,7 @@ class Plugins {
 	 * @param Plugins_Item $plugin
 	 * @return boolean
 	 */
-	public static function register( Plugin_Decorator $plugin )
+	public static function register( Plugin $plugin )
 	{
 		self::$_registered[$plugin->id()] = $plugin;
 		return TRUE;
@@ -162,8 +170,8 @@ class Plugins {
 	protected static function _load_from_db()
 	{
 		return DB::select('id')
-			->from(Plugin_Decorator::TABLE_NAME)
-			->cache_key(Plugin_Decorator::CACHE_KEY . '::list')
+			->from(Plugin::TABLE_NAME)
+			->cache_key(Plugin::CACHE_KEY . '::list')
 			->cached(Date::DAY)
 			->execute()
 			->as_array('id', 'id');
