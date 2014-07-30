@@ -110,7 +110,7 @@ if (isset($_SERVER['SERVER_PROTOCOL']))
  * - boolean  caching     enable or disable internal caching                 FALSE
  */
 Kohana::init( array(
-	'base_url'			=> '/kodicms/',
+	'base_url'			=> '/kodicms',
 	'index_file'		=> FALSE,
 	'cache_dir'			=> CMSPATH.'cache',
 	'caching'			=> Kohana::$environment === Kohana::PRODUCTION,
@@ -133,10 +133,10 @@ if(PHP_SAPI != 'cli')
 	define('SITE_HOST',		str_replace('www.', '', $_SERVER['HTTP_HOST']));
 }
 
-if( ! defined( 'BASE_URL' ) ) define('BASE_URL', '/kodicms/');
+if( ! defined( 'BASE_URL' ) ) define('BASE_URL', '/kodicms');
 if( ! defined( 'SITE_HOST' ) ) define('SITE_HOST', 'test');
 
-define('ADMIN_RESOURCES',	BASE_URL . 'cms/media/');
+define('ADMIN_RESOURCES', 'cms/media/');
 
 /**
  * Attach the file write to logging. Multiple writers are supported.
