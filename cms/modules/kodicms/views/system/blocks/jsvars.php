@@ -1,5 +1,5 @@
 var CURRENT_URL			= '<?php echo Request::current()->url(TRUE) . URL::query() ; ?>',
-	BASE_URL			= '<?php echo URL::backend(ADMIN_DIR_NAME, TRUE); ?>',
+	BASE_URL			= '<?php echo URL::base(); ?>',
 	SITE_URL			= '<?php echo URL::base(TRUE); ?>',
 	ADMIN_DIR_NAME		= '<?php echo ADMIN_DIR_NAME; ?>',
 	ADMIN_RESOURCES		= '<?php echo ADMIN_RESOURCES; ?>',
