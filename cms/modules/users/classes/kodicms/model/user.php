@@ -257,15 +257,9 @@ class KodiCMS_Model_User extends Model_Auth_User {
 		return serialize($data);
 	}
 
-<<<<<<< HEAD
-	/**
-	 * Events
-	 */
-=======
 	/**************************************************************************
 	 * Events
 	 **************************************************************************/
->>>>>>> upstream/dev
 	public function before_create()
 	{
 		Observer::notify( 'user_before_add', $this );

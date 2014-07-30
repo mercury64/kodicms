@@ -57,11 +57,7 @@ class Plugins {
 	 * 
 	 * @param string $plugin_id
 	 */
-<<<<<<< HEAD
-	public static function deactivate( Plugin_Decorator $plugin )
-=======
 	public static function deactivate( Plugin $plugin )
->>>>>>> upstream/dev
 	{
 		if ( isset( self::$_activated[$plugin->id()] ) )
 		{
@@ -87,11 +83,7 @@ class Plugins {
 	 */
 	public static function is_activated( $plugin_id )
 	{
-<<<<<<< HEAD
-		if($plugin_id instanceof Plugin_Decorator)
-=======
 		if($plugin_id instanceof Plugin)
->>>>>>> upstream/dev
 		{
 			$plugin_id = $plugin_id->id();
 		}
