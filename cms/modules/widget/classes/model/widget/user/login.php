@@ -133,7 +133,7 @@ class Model_Widget_User_Login extends Model_Widget_Decorator {
 		Request::current()->headers( 'Content-type', 'application/json' );		
 		$this->_ctx->response()->body(json_encode($json));
 	}
-****
+
 	protected function _login(Validation $validation, $login_fieldname, $remember)
 	{
 		if ( $validation->check() )
@@ -147,9 +147,6 @@ class Model_Widget_User_Login extends Model_Widget_Decorator {
 			}
 			else
 			{
-				Messages::errors( __('Login failed. Please check your login data and try again.') );
-			}
-		}
 				Observer::notify( 'login_failed', $validation );
 				Messages::errors( __('Login failed. Please check your login data and try again.') );
 			}
