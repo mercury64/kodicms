@@ -211,7 +211,7 @@ var cms = {
 	filemanager: {
 		open: function(object, type) {
 			return $.fancybox.open({
-				href : BASE_URL + '/elfinder/',
+				href : BASE_URL + ADMIN_DIR_NAME + '/elfinder/',
 				type: 'iframe'
 			}, {
 				autoSize: false,
@@ -864,15 +864,15 @@ var Api = {
 		return this.response();
 	},
 	build_url: function(uri) {
-		uri = uri.replace('/' + ADMIN_DIR_NAME, '');
-		
+	    uri = uri.replace(BASE_URL, '');
+
 		if(uri.indexOf('-') == -1)
 		{
 			uri = '-' + uri;
 		}
 		else if(uri.indexOf('-') > 0 && (uri.indexOf('/') == -1 || uri.indexOf('/') > 0))
 		{
-			uri = '/' + uri;
+			//uri = '/' + uri;
 		}
 		
 		if(uri.indexOf('/api') == -1)
@@ -893,10 +893,10 @@ var Api = {
 			}	
 		}
 		
-		if(uri.indexOf(SITE_URL) == -1)
+		if(uri.indexOf(BASE_URL) == -1)
 		{
-			// Add SITE_URL.
-			uri = SITE_URL + uri;
+			// Add BASE_URL.
+			uri = BASE_URL + uri;
 		}
 		
 		return uri;
