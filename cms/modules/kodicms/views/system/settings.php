@@ -1,6 +1,6 @@
 <?php echo Form::open(Route::get('api')->uri(array(
 		'controller' => 'settings', 
-		'backend' => ADMIN_DIR_NAME,
+	  'backend' => ADMIN_DIR_NAME,
 		'action' => 'save'
 	)), array(
 	'id' => 'settingForm', 'class' => 'form-horizontal form-ajax'
