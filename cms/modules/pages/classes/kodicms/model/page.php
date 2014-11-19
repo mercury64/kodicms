@@ -1,9 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package		KodiCMS
+ * @package		KodiCMS/Pages
  * @category	Model
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Model_Page extends ORM
 {
@@ -41,17 +44,6 @@ class KodiCMS_Model_Page extends ORM
 			'NOINDEX, FOLLOW'	=> 'NOINDEX, FOLLOW',
 			'NOINDEX, NOFOLLOW' => 'NOINDEX, NOFOLLOW'
 		);
-	}
-	
-	/**
-	 * Список пользователей
-	 * @return array
-	 */
-	public static function authors()
-	{
-		return ORM::factory('user')
-			->find_all()
-			->as_array('id', 'username');
 	}
 
 	/**
@@ -94,7 +86,10 @@ class KodiCMS_Model_Page extends ORM
 	);
 
 	protected $_has_many = array (
-		'roles' => array('model' => 'role', 'through' => 'page_roles')
+		'roles' => array(
+			'model' => 'role', 
+			'through' => 'page_roles'
+		)
 	);
 
 	/**
@@ -137,7 +132,9 @@ class KodiCMS_Model_Page extends ORM
 			'published_on'		=> __('Published date'),
 			'needs_login'		=> __('Needs login'),
 			'page_permissions'	=> __('Page permissions'),
-			'created_by_id'		=> __('Author')
+			'created_by_id'		=> __('Author'),
+			'use_redirect'		=> __('Use redirect'),
+			'redirect_url'		=> __('Redirect URL')
 		);
 	}
 
@@ -179,7 +176,7 @@ class KodiCMS_Model_Page extends ORM
 	{
 		return array(
 			'slug' => array(
-				array('URL::title'),
+				array(array($this, 'clean_slug')),
 				array('strtolower')
 			),
 			'parent_id' => array(
@@ -220,6 +217,12 @@ class KodiCMS_Model_Page extends ORM
 				array('trim'),
 				array('strip_tags')
 			),
+			'use_redirect' => array(
+				array('intval')
+			),
+			'redirect_url' => array(
+				array('trim')
+			),
 		);		
 	}
 	
@@ -254,7 +257,7 @@ class KodiCMS_Model_Page extends ORM
 			),
 			'parent_id' => array(
 				'type' => 'select',
-				'choices' => array($this, '_get_sitemap')
+				'choices' => array($this, 'get_sitemap')
 			),
 			'status_id' => array(
 				'type' => 'select',
@@ -262,7 +265,7 @@ class KodiCMS_Model_Page extends ORM
 			),
 			'layout_file' => array(
 				'type' => 'select',
-				'choices' => array($this, '_get_layouts_list')
+				'choices' => array($this, 'get_layouts_list')
 			),
 			'behavior_id' => array(
 				'type' => 'select',
@@ -274,24 +277,33 @@ class KodiCMS_Model_Page extends ORM
 			),
 			'created_by_id' => array(
 				'type' => 'select',
-				'choices' => 'Model_Page::authors'
+				'choices' => function() {
+					 return ORM::factory('user')
+						->find_all()
+						->as_array('id', 'username');
+				}
 			),
 		);
 	}
 
 	public function before_create()
 	{
-		$this->created_by_id = AuthUser::getId();
+		$this->created_by_id = Auth::get_id();
 		$this->updated_by_id = $this->created_by_id;
-		
-		if( empty($this->status_id) )
+
+		if (empty($this->status_id))
 		{
-			$this->status_id = Config::get('site', 'default_status_id' );
+			$this->status_id = Config::get('site', 'default_status_id');
 		}
 
 		if ($this->status_id == Model_Page::STATUS_PUBLISHED)
 		{
 			$this->published_on = date('Y-m-d H:i:s');
+		}
+
+		if (empty($this->use_redirect))
+		{
+			$this->redirect_url = NULL;
 		}
 
 		if ($this->position == 0)
@@ -304,8 +316,8 @@ class KodiCMS_Model_Page extends ORM
 
 			$this->position = ((int) $last_position) + 1;
 		}
-		
-		Observer::notify( 'page_add_before_save', $this );
+
+		Observer::notify('page_add_before_save', $this);
 
 		return TRUE;
 	}
@@ -330,43 +342,48 @@ class KodiCMS_Model_Page extends ORM
 			':id' => $this->id
 		))->write();
 		
-		Observer::notify( 'page_add_after_save', $this );
+		Observer::notify('page_add_after_save', $this);
 
 		return TRUE;
 	}
 
 	public function before_update()
 	{	
-		if( empty($this->published_on) AND $this->status_id == Model_Page::STATUS_PUBLISHED)
+		if (empty($this->published_on) AND $this->status_id == Model_Page::STATUS_PUBLISHED)
 		{
 			$this->published_on = date('Y-m-d H:i:s');
 		}
-		
+
+		if (empty($this->use_redirect))
+		{
+			$this->redirect_url = NULL;
+		}
+
 		// Если запрещены теги в Заголовке, удаляем их
-		if ( Config::get('site', 'allow_html_title' ) == Config::NO )
+		if (Config::get('site', 'allow_html_title') == Config::NO)
 		{
 			$this->title = strip_tags( trim( $this->title ) );
 		}
 
-		$this->updated_by_id = AuthUser::getId();
+		$this->updated_by_id = Auth::get_id();
 		
-		Observer::notify( 'page_edit_before_save', $this );
+		Observer::notify('page_edit_before_save', $this);
 
 		return TRUE;
 	}
 
 	public function after_update()
 	{
-		if(Kohana::$caching === TRUE)
+		if (Kohana::$caching === TRUE)
 		{
 			Cache::instance()->delete_tag('pages');
 		}
-		
+
 		Kohana::$log->add(Log::INFO, 'Page :id edited by :user', array(
 			':id' => $this->id
 		))->write();
 
-		Observer::notify( 'page_edit_after_save', $this );
+		Observer::notify('page_edit_after_save', $this);
 
 		return $this->after_create();
 	}
@@ -401,22 +418,37 @@ class KodiCMS_Model_Page extends ORM
 	 */
 	public function get_status()
 	{
+		$status = __('None');
+		$label = 'default';
+
 		switch ($this->status_id)
 		{
-			case self::STATUS_DRAFT: 
-				return UI::label(__('Draft'), 'info');
-			case self::STATUS_PASSWORD_PROTECTED: 
-				return UI::label(__('Password protected'), 'warning');
-			case self::STATUS_HIDDEN:   
-				return UI::label(__('Hidden'), 'default');
+			case self::STATUS_DRAFT:
+				$status = __('Draft');
+				$label = 'info';
+				break;
+			case self::STATUS_PASSWORD_PROTECTED:
+				$status = __('Password protected');
+				$label = 'warning';
+				break;
+			case self::STATUS_HIDDEN:
+				$status = __('Hidden');
+				break;
 			case self::STATUS_PUBLISHED:
-				if( strtotime($this->published_on) > time() )
-					return UI::label(__('Pending'), 'success');
+				if (strtotime($this->published_on) > time())
+				{
+					$status = __('Pending');
+				}
 				else
-					return UI::label(__('Published'), 'success');
+				{
+					$status = __('Published');
+				}
+				
+				$label = 'success';
+				break;
 		}
 
-		return UI::label(__('None'), 'default');
+		return UI::label($status, $label . ' editable-status', array('data-value' => $this->status_id));
 	}
 
 	/**
@@ -426,7 +458,7 @@ class KodiCMS_Model_Page extends ORM
 	 */
 	public function get_public_anchor()
 	{
-		return HTML::anchor($this->get_frontend_url(), UI::label(UI::icon( 'globe icon-white' ) . ' ' . __('View page')), array(
+		return HTML::anchor($this->get_frontend_url(), UI::label(UI::icon( 'globe' ) . ' ' . __('View page')), array(
 			'class' => 'item-preview', 'target' => '_blank'
 		));
 	}
@@ -494,13 +526,11 @@ class KodiCMS_Model_Page extends ORM
 	{
 		return $this
 			->where_open()
-			->or_where(DB::expr('LOWER(title)'), 'like', '%:query%')
-			->or_where('slug', 'like', '%:query%')
-			->or_where('breadcrumb', 'like', '%:query%')
-			->or_where('meta_title', 'like', '%:query%')
-			->or_where('meta_keywords', 'like', '%:query%')
-			->or_where('published_on', 'like', '%:query%')
-			->or_where('created_on', 'like', '%:query%')
+				->or_where(DB::expr('LOWER(title)'), 'like', '%:query%')
+				->or_where('slug', 'like', '%:query%')
+				->or_where('breadcrumb', 'like', '%:query%')
+				->or_where('meta_title', 'like', '%:query%')
+				->or_where('meta_keywords', 'like', '%:query%')
 			->where_close()
 			->param(':query', DB::expr($keyword));
 	}
@@ -602,11 +632,31 @@ class KodiCMS_Model_Page extends ORM
 	}
 	
 	/**
+	 * 
+	 * @param string $slug
+	 * @return string
+	 */
+	public function clean_slug($slug)
+	{
+		$ext = pathinfo($slug, PATHINFO_EXTENSION);
+		$slug = pathinfo($slug, PATHINFO_FILENAME);
+
+		$slug = URL::title($slug);
+
+		if (!empty($ext) AND File::mime_by_ext($ext) !== FALSE AND URL_SUFFIX != '.' . $ext)
+		{
+			$slug .= '.' . $ext;
+		}
+
+		return $slug;
+	}
+
+	/**
 	 * Получение списка страниц за исключением текущей
 	 * 
 	 * @return array
 	 */
-	protected function _get_sitemap()
+	public function get_sitemap()
 	{
 		$sitemap = Model_Page_Sitemap::get(TRUE);
 		if($this->loaded())
@@ -622,7 +672,7 @@ class KodiCMS_Model_Page extends ORM
 	 * 
 	 * @return array
 	 */
-	protected function _get_layouts_list()
+	public function get_layouts_list()
 	{
 		$options = array();
 		

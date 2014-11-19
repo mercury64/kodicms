@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__user_profiles` (
   `user_id` int(11) unsigned NOT NULL,
   `name` varchar(255) NOT NULL,
   `locale` varchar(10) NOT NULL DEFAULT 'en-us',
-  `notice` tinyint(1) NOT NULL DEFAULT '0',
   `created_on` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`),
@@ -51,6 +50,17 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__user_tokens` (
   KEY `fk_user_id` (`user_id`),
   KEY `expires` (`expires`),
   CONSTRAINT `__TABLE_PREFIX__user_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `__TABLE_PREFIX__users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__user_meta` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned DEFAULT NULL,
+  `key` varchar(255) DEFAULT NULL,
+  `value` longtext,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `key` (`key`),
+  CONSTRAINT `__TABLE_PREFIX__user_meta_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `__TABLE_PREFIX__users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__roles_users` (

@@ -2,12 +2,22 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Page
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Model_Widget_Page_Pages extends Model_Widget_Decorator_Pagination {
 	
 	public $cache_tags = array('pages', 'page_parts', 'page_tags');
+	
+	public function set_values(array $data)
+	{		
+		$data['include_users_object'] = (bool) Arr::get($data, 'include_users_object');
+		
+		return parent::set_values($data);
+	}
 	
 	public function on_page_load()
 	{
@@ -58,24 +68,28 @@ class Model_Widget_Page_Pages extends Model_Widget_Decorator_Pagination {
 		return NULL;
 	}
 	
+	/**
+	 * 
+	 * @return array [$pages]
+	 */
 	public function fetch_data()
 	{
 		$page = $this->get_current_page();
-		
+
 		$pages = array();
 
-		if($page instanceof Model_Page_Front)
+		if ($page instanceof Model_Page_Front)
 		{
 			$clause = array(
 				'order_by' => array(array('page.created_on', 'desc'))
 			);
 
-			if($this->list_offset > 0)
+			if ($this->list_offset > 0)
 			{
 				$clause['offset'] = $this->list_offset;
 			}
 
-			if($this->list_size > 0)
+			if ($this->list_size > 0)
 			{
 				$clause['limit'] = $this->list_size;
 			}
@@ -83,11 +97,43 @@ class Model_Widget_Page_Pages extends Model_Widget_Decorator_Pagination {
 			$pages = $page->children($clause);
 		}
 
+		if ($this->include_users_object)
+		{
+			$user_ids = array();
+			$users = array();
+
+			foreach ($pages as $page)
+			{
+				if (!empty($page->created_by_id))
+				{
+					$user_ids[] = $page->created_by_id;
+				}
+
+				if (!empty($page->updated_by_id))
+				{
+					$user_ids[] = $page->updated_by_id;
+				}
+			}
+
+			$user_ids = array_unique($user_ids);
+
+			if (!empty($user_ids))
+			{
+				$users = ORM::factory('user')->where('id', 'in', $user_ids)->find_all()->as_array('id');
+			}
+
+			foreach ($pages as $page)
+			{
+				$page->author = Arr::get($users, $page->created_by_id);
+				$page->updator = Arr::get($users, $page->updated_by_id);
+			}
+		}
+
 		return array(
 			'pages' => $pages
 		);
 	}
-	
+
 	/**
 	 * 
 	 * @return integer

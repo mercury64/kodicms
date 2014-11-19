@@ -1,5 +1,12 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
+/**
+ * @package		KodiCMS/Assets
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright  (c) 2012-2014 butschster
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Assets_Package implements Iterator {
 	
 	protected static $_list = array();
@@ -35,6 +42,16 @@ class Assets_Package implements Iterator {
 	public static function get_all()
 	{
 		return Assets_Package::$_list;
+	}
+	
+	/**
+	 * 
+	 * @return array
+	 */
+	public static function select_choises()
+	{
+		$options = array_keys(Assets_Package::$_list);
+		return array_combine($options, $options);
 	}
 
 	/**
@@ -121,7 +138,22 @@ class Assets_Package implements Iterator {
 
 	public function __toString()
 	{
-		return (string) $this->_name;
+		$string = '';
+
+		foreach ($this->_data as $item)
+		{
+			switch($item['type'])
+			{
+				case 'css':
+					$string .= HTML::style($item['src'], $item['attrs']);
+					break;
+				case 'js':
+					$string .= HTML::script($item['src']);
+					break;
+			}
+		}
+		
+		return $string;
 	}
 	
 	function rewind()

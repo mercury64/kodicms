@@ -1,5 +1,5 @@
 <?php if($breadcrumbs->count() > 1):?>
-<ul class="breadcrumb">
+<ul class="breadcrumb breadcrumb-page">
 <?php $i = 1; foreach($breadcrumbs as $breadcrumb): ?>
 	<li>
 		<?php if( ! empty($breadcrumb->url) AND $i < $breadcrumbs->count()): ?>
@@ -7,9 +7,6 @@
 		<?php else: ?>
 		<span><?php echo $breadcrumb->name; ?></span>
 		<?php endif; ?>
-		<?php /*if($i < $breadcrumbs->count()): ?>
-		<span class="divider">></span>
-		<?php endif;*/ ?>
 	</li>
 	<?php $i++; ?>
 	<?php endforeach; ?>

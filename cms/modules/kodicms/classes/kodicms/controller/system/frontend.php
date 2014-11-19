@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS
  * @category	System Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Controller_System_Frontend extends Controller_System_Template
 {
@@ -11,16 +14,11 @@ class KodiCMS_Controller_System_Frontend extends Controller_System_Template
 	{
 		parent::before();
 
-		if($this->auto_render === TRUE)
+		if ($this->auto_render === TRUE)
 		{
 			Assets::js('jquery', ADMIN_RESOURCES . 'libs/jquery.min.js');
-			
-			Assets::package(array('jquery-ui', 'backbone', 'notify'));
 
-			Assets::js('bootstrap', ADMIN_RESOURCES . 'libs/bootstrap/js/bootstrap.min.js', 'jquery');
-			
-			Assets::css('global', ADMIN_RESOURCES . 'css/common.css');
-			Assets::js('global', ADMIN_RESOURCES . 'js/backend.js', 'backbone');
+			Assets::package(array('jquery-ui', 'backbone', 'notify', 'underscore', 'select2', 'core', 'bootstrap'));
 		}
 	}
 }

@@ -2,7 +2,10 @@
 
 /**
  * @package		KodiCMS/Users
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_ACL {
 
@@ -47,6 +50,37 @@ class KodiCMS_ACL {
 		
 		return $permissions;
 	}
+	
+	/**
+	 * 
+	 * @param Model_User $user
+	 * @return boolean
+	 */
+	public static function is_admin($user = NULL)
+	{
+		if ($user === NULL)
+		{
+			$user = Auth::instance()->get_user();
+		}
+	
+		if ($user instanceof Model_User)
+		{
+			$user_id = $user->id;
+			$roles = $user->roles();
+		}
+		else
+		{
+			$user_id = (int) $user;
+			$roles = array('login');
+		}
+
+		if ($user_id == self::ADMIN_USER OR in_array(self::ADMIN_ROLE, $roles))
+		{
+			return TRUE;
+		}
+
+		return FALSE;
+	}
 
 	/**
 	 * Проверка прав на доступ
@@ -55,33 +89,33 @@ class KodiCMS_ACL {
 	 * @param Model_User $user
 	 * @return boolean
 	 */
-	public static function check( $action, Model_User $user = NULL)
+	public static function check($action, Model_User $user = NULL)
 	{
-		if($user === NULL)
+		if ($user === NULL)
 		{
 			$user = Auth::instance()->get_user();
 		}
-		
-		if( ! ( $user instanceof Model_User ) )
+
+		if (!( $user instanceof Model_User ))
 		{
 			return self::DENY;
 		}
-		
-		if( empty($action) )
+
+		if (empty($action))
 		{
 			return self::ALLOW;
 		}
-		
-		if($user->id == self::ADMIN_USER OR in_array( self::ADMIN_ROLE, $user->roles() ))
+
+		if (self::is_admin($user))
 		{
 			return self::ALLOW;
 		}
-		
-		if( $action instanceof Request)
+
+		if ($action instanceof Request)
 		{
 			$params = array();
 			$directory = $action->directory();
-			if( !empty($directory) AND $directory != ADMIN_DIR_NAME )
+			if (!empty($directory) AND $directory != ADMIN_DIR_NAME)
 			{
 				$params[] = $action->directory();
 			}
@@ -90,17 +124,17 @@ class KodiCMS_ACL {
 			$params[] = $action->action();
 			$action = $params;
 		}
-		
-		if( is_array( $action ))
+
+		if (is_array($action))
 		{
 			$action = strtolower(implode('.', $action));
 		}
 
-		if( ! isset( self::$_permissions[$user->id] ))
+		if (!isset(self::$_permissions[$user->id]))
 		{
 			self::_set_permissions($user);
 		}
-		
+
 		return isset(self::$_permissions[$user->id][$action]);
 	}
 	

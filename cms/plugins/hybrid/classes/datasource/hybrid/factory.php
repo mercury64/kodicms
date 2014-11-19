@@ -1,8 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package Datasource
- * @category Hybrid
+ * @package		KodiCMS/Hybrid
+ * @category	Helper
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class DataSource_Hybrid_Factory {
 
@@ -26,13 +30,13 @@ class DataSource_Hybrid_Factory {
 	 * @param integer $parent
 	 * @return null|\DataSource_Hybrid_Section
 	 */
-	public static function create( DataSource_Section_Hybrid $ds ) 
+	public static function create(DataSource_Section_Hybrid $ds)
 	{
-		if(self::create_table($ds->id())) 
+		if (self::create_table($ds->id()))
 		{
-			if(self::create_folder($ds->id())) 
+			if (self::create_folder($ds->id()))
 			{
-				$ds->save();
+				$ds->update();
 
 				return $ds;
 			}
@@ -44,7 +48,7 @@ class DataSource_Hybrid_Factory {
 
 		return NULL;
 	}
-	
+
 	/**
 	 * Удалении таблицы раздела и директории
 	 * 
@@ -69,18 +73,18 @@ class DataSource_Hybrid_Factory {
 	 * @param array|string $doc_ids array(1,2,..) OR "1,2,3,.."
 	 * @return null|boolean
 	 */
-	public static function remove_documents( $doc_ids = NULL ) 
+	public static function remove_documents($doc_ids)
 	{
-		if( !is_array( $doc_ids ) AND strpos(',', $doc_ids ) !== FALSE)
+		if (!is_array($doc_ids) AND strpos(',', $doc_ids) !== FALSE)
 		{
 			$doc_ids = explode(',', $doc_ids);
 		}
-		else if(!is_array( $doc_ids ))
+		else if (!is_array($doc_ids))
 		{
 			$doc_ids = array($doc_ids);
 		}
-		
-		if( empty($doc_ids) )
+
+		if (empty($doc_ids))
 		{
 			return NULL;
 		}
@@ -90,32 +94,33 @@ class DataSource_Hybrid_Factory {
 			->where('id', 'in', $doc_ids)
 			->order_by('ds_id', 'desc')
 			->execute();
-		
+
 		$documents = array();
-		
+
 		foreach ($query as $row)
 		{
 			$documents[$row['ds_id']][] = $row['id'];
 		}
-		
+
+
 		foreach ($documents as $ds_id => $ids)
 		{
-			$ds = Datasource_Data_Manager::load( $ds_id );
-			$ds->remove_documents( $ids );
+			$ds = Datasource_Data_Manager::load($ds_id);
+			$ds->remove_documents($ids);
 		}
-		
+
 		unset($ds, $documents, $query);
-		
+
 		return TRUE;
 	}
-	
+
 	/**
 	 * Опубликовать документы раздела по ID
 	 * 
 	 * @param array $ids
 	 * @return \DataSource_Hybrid_Factory
 	 */
-	public function publish_documents( array $ids) 
+	public function publish_documents(array $ids)
 	{
 		return $this->set_published($ids, TRUE);
 	}
@@ -126,11 +131,11 @@ class DataSource_Hybrid_Factory {
 	 * @param array $ids
 	 * @return \DataSource_Hybrid_Factory
 	 */
-	public function unpublish_documents( array $ids) 
+	public function unpublish_documents(array $ids)
 	{
 		return $this->set_published($ids, FALSE);
 	}
-	
+
 	/**
 	 * Опубликовать или снять с публикации документы раздела по ID
 	 * 
@@ -138,7 +143,7 @@ class DataSource_Hybrid_Factory {
 	 * @param boolean $value
 	 * @return \DataSource_Hybrid_Factory
 	 */
-	public function set_published( array $ids, $value) 
+	public function set_published(array $ids, $value)
 	{
 		if( empty($ids) ) return $this;
 
@@ -201,13 +206,15 @@ class DataSource_Hybrid_Factory {
 	 */
 	public static function create_table($id) 
 	{
+		$db = Database::instance();
+
 		DB::query(NULL, '
-			CREATE TABLE IF NOT EXISTS `:name` (
+			CREATE TABLE IF NOT EXISTS :name (
 			 `id` int(11) unsigned NOT NULL default "0",
 			 PRIMARY KEY (`id`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8
 		')
-			->param(':name', DB::expr( TABLE_PREFIX . self::PREFIX . $id ))
+			->param(':name', DB::expr($db->quote_table(self::PREFIX . $id)))
 			->execute();
 		
 		return TRUE;
@@ -251,8 +258,10 @@ class DataSource_Hybrid_Factory {
 	 */
 	public static function remove_table($id) 
 	{
-		DB::query(NULL, 'DROP TABLE `:name`')
-			->param(':name', DB::expr( TABLE_PREFIX .  self::PREFIX . $id ))
+		$db = Database::instance();
+		
+		DB::query(NULL, 'DROP TABLE :name')
+			->param(':name', DB::expr($db->quote_table(self::PREFIX . $id)))
 			->execute();
 		
 		return TRUE;

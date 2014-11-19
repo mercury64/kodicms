@@ -1,7 +1,8 @@
-<div class="widget">
-	<?php echo View::factory('helper/tabbable'); ?>
-	<div class="widget-header"><h3><?php echo __( 'General information' ); ?></h3></div>
-	<div class="widget-content">
+<div class="panel tabbable">
+	<div class="panel-heading">
+		<span class="panel-title"><?php echo __('General information'); ?></span>
+	</div>
+	<div class="panel-body">
 		<table class="table table-striped">
 			<colgroup>
 				<col width="200px" />
@@ -14,7 +15,9 @@
 				</tr>
 				<tr>
 					<th><?php echo __('CMS Version') ?></th>
-					<td><?php echo CMS_VERSION; ?></td>
+					<td><?php echo CMS_VERSION; ?>&nbsp;&nbsp;&nbsp;<?php echo HTML::anchor(Route::get('backend')->uri(array(
+						'controller' => 'update'
+					)), __('Check updates'), array('class' => 'btn btn-xs btn-info'));?></td>
 				</tr>
 				<tr>
 					<th><?php echo __('PHP Version') ?></th>
@@ -48,9 +51,11 @@
 		</table>
 	</div>
 	
-	<?php if(Acl::check('system.phpinfo')): ?>
-	<div class="widget-header"><h3><?php echo __( 'PHP info' ); ?></h3></div>
-	<div class="widget-content">
+	<?php if(Acl::check('system.phpinfo') AND function_exists('phpinfo')): ?>
+	<div class="panel-heading">
+		<span class="panel-title"><?php echo __('PHP info'); ?></span>
+	</div>
+	<div class="panel-body">
 		<iframe src="<?php echo URL::site(Route::get('backend')->uri(array(
 			'controller' => 'system',
 			'action' => 'phpinfo'
@@ -58,5 +63,5 @@
 	</div>
 	<?php endif; ?>
 
-	<?php Observer::notify( 'view_system_information' ); ?>
+	<?php Observer::notify('view_system_information'); ?>
 </div>

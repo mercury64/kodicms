@@ -489,7 +489,7 @@ window.elFinder = function(node, opts) {
 	 *
 	 * @type String
 	 **/
-	this.cssClass = 'ui-helper-reset ui-helper-clearfix ui-widget ui-widget-content  elfinder elfinder-'+(this.direction == 'rtl' ? 'rtl' : 'ltr')+' '+this.options.cssClass;
+	this.cssClass = 'ui-widget ui-panel-body  elfinder panel elfinder-'+(this.direction == 'rtl' ? 'rtl' : 'ltr')+' '+this.options.cssClass;
 
 	/**
 	 * Method to store/fetch data
@@ -1697,7 +1697,7 @@ window.elFinder = function(node, opts) {
 			title     : '&nbsp;',
 			width     : 280
 		}),
-		statusbar : $('<div class="ui-widget-header ui-helper-clearfix ui-corner-bottom elfinder-statusbar"/>').hide().appendTo(node)
+		statusbar : $('<div class="panel-footer elfinder-statusbar"/>').hide().appendTo(node)
 	}
 	
 	// load required ui
@@ -3873,7 +3873,7 @@ elFinder.prototype.resources = {
 	'class' : {
 		hover       : 'ui-state-hover',
 		active      : 'ui-state-active',
-		disabled    : 'ui-state-disabled',
+		disabled    : 'disabled',
 		draggable   : 'ui-draggable',
 		droppable   : 'ui-droppable',
 		adroppable  : 'elfinder-droppable-active',
@@ -4036,7 +4036,7 @@ $.fn.dialogelfinder = function(opts) {
 
 		
 		var doc     = $(document),
-			toolbar = $('<div class="ui-widget-header dialogelfinder-drag ui-corner-top">'+(opts.title || 'Files')+'</div>'),
+			toolbar = $('<div class=" dialogelfinder-drag">'+(opts.title || 'Files')+'</div>'),
 			button  = $('<a href="#" class="dialogelfinder-drag-close "><span class="ui-icon ui-icon-closethick"/></a>')
 				.appendTo(toolbar)
 				.click(function(e) {
@@ -4057,7 +4057,7 @@ $.fn.dialogelfinder = function(opts) {
 		
 		node.width(parseInt(node.width()) || 840) // fix width if set to "auto"
 			.data(destroy, !!opts.destroyOnClose)
-			.find('.elfinder-toolbar').removeClass('ui-corner-top');
+			.find('.elfinder-toolbar').removeClass('');
 		
 		opts.position && node.data(position, opts.position);
 		
@@ -4221,7 +4221,7 @@ if (elFinder && elFinder.prototype && typeof(elFinder.prototype.i18) == 'object'
 			'cmdinfo'      : 'Get info',
 			'cmdmkdir'     : 'New folder',
 			'cmdmkfile'    : 'New text file',
-			'cmdopen'      : 'Open',
+//			'cmdopen'      : 'Open',
 			'cmdpaste'     : 'Paste',
 			'cmdquicklook' : 'Preview',
 			'cmdreload'    : 'Reload',
@@ -4464,7 +4464,7 @@ if (elFinder && elFinder.prototype && typeof(elFinder.prototype.i18) == 'object'
  **/
 $.fn.elfinderbutton = function(cmd) {
 	return this.each(function() {
-		
+//		
 		var c        = 'class',
 			fm       = cmd.fm,
 			disabled = fm.res(c, 'disabled'),
@@ -4473,7 +4473,7 @@ $.fn.elfinderbutton = function(cmd) {
 			item     = 'elfinder-button-menu-item',
 			selected = 'elfinder-button-menu-item-selected',
 			menu,
-			button   = $(this).addClass('ui-state-default elfinder-button')
+			button   = $(this).addClass('btn')
 				.attr('title', cmd.title)
 				.append('<span class="elfinder-button-icon elfinder-button-icon-'+cmd.name+'"/>')
 				.hover(function(e) { !button.is('.'+disabled) && button[e.type == 'mouseleave' ? 'removeClass' : 'addClass'](hover) /**button.toggleClass(hover);*/ })
@@ -4499,7 +4499,7 @@ $.fn.elfinderbutton = function(cmd) {
 		if ($.isArray(cmd.variants)) {
 			button.addClass('elfinder-menubutton');
 			
-			menu = $('<div class="ui-widget ui-widget-content elfinder-button-menu "/>')
+			menu = $('<div class="ui-widget ui-panel-body elfinder-button-menu "/>')
 				.hide()
 				.appendTo(button)
 				.zIndex(12+button.zIndex())
@@ -5794,7 +5794,7 @@ $.fn.elfinderdialog = function(opts) {
 	opts = $.extend({}, $.fn.elfinderdialog.defaults, opts);
 
 	this.filter(':not(.ui-dialog-content)').each(function() {
-		var self       = $(this).addClass('ui-dialog-content widget-content'),
+		var self       = $(this).addClass('ui-dialog-content panel-body'),
 			parent     = self.parent(),
 			clactive   = 'elfinder-dialog-active',
 			cldialog   = 'elfinder-dialog',
@@ -5803,14 +5803,14 @@ $.fn.elfinderdialog = function(opts) {
 			id         = parseInt(Math.random()*1000000),
 			overlay    = parent.children('.elfinder-overlay'),
 			buttonset  = $('<div />'),
-			buttonpane = $('<div class="widget-footer"/>')
+			buttonpane = $('<div class="panel-footer"/>')
 				.append(buttonset),
 			
-			dialog = $('<div class="ui-dialog widget outline_inner widget-nopad ui-draggable std42-dialog '+cldialog+' '+opts.cssClass+'"/>')
+			dialog = $('<div class="ui-dialog panel ui-draggable std42-dialog '+cldialog+' '+opts.cssClass+'"/>')
 				.hide()
 				.append(self)
 				.appendTo(parent)
-				.draggable({ handle : '.widget-header',
+				.draggable({ handle : '.panel-heading',
 					     containment : 'document' })
 				.css({
 					width  : opts.width,
@@ -5920,8 +5920,8 @@ $.fn.elfinderdialog = function(opts) {
 			})
 		}
 		dialog.prepend(
-			$('<div class="widget-header">'+opts.title+'</div>')
-				.prepend($('<i class="icon-remove pull-right"></i>')
+			$('<div class="panel-heading">'+opts.title+'</div>')
+				.prepend($('<i class="fa fa-times pull-right"></i>')
 					.css('cursor', 'pointer')
 					.mousedown(function(e) {
 						e.preventDefault();
@@ -5931,7 +5931,7 @@ $.fn.elfinderdialog = function(opts) {
 		);
 			
 		$.each(opts.buttons, function(name, cb) {
-			var button = $('<button type="button" class="btn">'+name+'</button>')
+			var button = $('<button type="button" class="btn btn-default">'+name+'</button>')
 				.click($.proxy(cb, self[0]))
 				.keydown(function(e) { 
 					var next;
@@ -6455,8 +6455,8 @@ $.fn.elfindersearchbutton = function(cmd) {
 		var result = false,
 			button = $(this)
 				.hide()
-				.addClass('form-search '+cmd.fm.res('class', 'searchbtn')+''),
-			form = $('<div class="input-prepend input-append" />').appendTo(button),
+				.addClass('pane-heading-controls hidden-sm hidden-xs form-inline col-sm-auto '+cmd.fm.res('class', 'searchbtn')+''),
+			form = $('<div class="input-group input-group-sm" />').appendTo(button),
 			search = function() {
 				var val = $.trim(input.val());
 				if (val) {
@@ -6476,7 +6476,7 @@ $.fn.elfindersearchbutton = function(cmd) {
 					cmd.fm.trigger('searchend');
 				}
 			},
-			input  = $('<input type="text" class="search-query" />')
+			input  = $('<input type="text" class="form-control no-margin-b" placeholder="Search..." />')
 				.appendTo(form)
 				// to avoid fm shortcuts on arrows
 				.keypress(function(e) {
@@ -6493,13 +6493,13 @@ $.fn.elfindersearchbutton = function(cmd) {
 					}
 				});
 		
-		$('<button class="btn" title="'+cmd.title+'"><i class="icon-search" /></button>')
-			.prependTo(form)
+		$('<span class="input-group-btn"><button class="btn" title="'+cmd.title+'"><i class="fa fa-search" /></button></span>')
+			.appendTo(form)
 			.click(search);
 		
-		$('<button class="btn"><i class="icon-remove" /></button>')
-			.appendTo(form)
-			.click(abort)
+//		$('<span class="input-group-btn"><button class="btn"><i class="fa fa-times" /></button></span>')
+//			.appendTo(form)
+//			.click(abort)
 		
 		// wait when button will be added to DOM
 		setTimeout(function() {
@@ -6559,7 +6559,7 @@ $.fn.elfindersortbutton = function(cmd) {
 						menu.slideToggle(100);
 					}
 				}),
-			menu = $('<div class="ui-widget ui-widget-content elfinder-button-menu "/>')
+			menu = $('<div class="ui-widget ui-panel-body elfinder-button-menu "/>')
 				.hide()
 				.appendTo(button)
 				.zIndex(12+button.zIndex())
@@ -6696,7 +6696,7 @@ $.fn.elfinderstat = function(fm) {
 $.fn.elfindertoolbar = function(fm, opts) {
 	this.not('.elfinder-toolbar').each(function() {
 		var commands = fm._commands,
-			self     = $(this).addClass('ui-helper-clearfix ui-widget-header ui-corner-top elfinder-toolbar'),
+			self     = $(this).addClass('elfinder-toolbar panel-heading'),
 			panels   = opts || [],
 			l        = panels.length,
 			i, cmd, panel, button;
@@ -6705,7 +6705,7 @@ $.fn.elfindertoolbar = function(fm, opts) {
 
 		while (l--) {
 			if (panels[l]) {
-				panel = $('<div class="ui-widget-content  elfinder-buttonset"/>');
+				panel = $('<div class="btn-group" style="margin-right: 5px;"/>');
 				i = panels[l].length;
 				while (i--) {
 					if ((cmd = commands[panels[l][i]])) {
@@ -6715,7 +6715,6 @@ $.fn.elfindertoolbar = function(fm, opts) {
 				}
 				
 				panel.children().length && self.prepend(panel);
-				panel.children(':gt(0)').before('<span class="ui-widget-content elfinder-toolbar-button-separator"/>');
 
 			}
 		}
@@ -7729,7 +7728,6 @@ elFinder.prototype.commands.edit = function() {
 				save = function() {
 					ta.editor && ta.editor.save(ta[0], ta.editor.instance);
 					dfrd.resolve(ta.getContent());
-					ta.elfinderdialog('close');
 				},
 				cancel = function() {
 					dfrd.reject();
@@ -7807,10 +7805,10 @@ elFinder.prototype.commands.edit = function() {
 				}
 				
 				opts.buttons[fm.i18n('Save')]   = save;
-				opts.buttons[fm.i18n('Cancel')] = cancel
+				opts.buttons[fm.i18n('Close')] = cancel
 				
 				fm.dialog(ta, opts).attr('id', id).parent().on('resize', function(e, ui) {
-					cms.filters.exec(id+'-ta', 'changeHeight', $(this).find('.widget-content').height());
+					cms.filters.exec(id+'-ta', 'changeHeight', $(this).find('.panel-body').height());
 				});
 				return dfrd.promise();
 		},
@@ -8238,15 +8236,15 @@ elFinder.prototype.commands.help = function() {
 		prim    = 'ui-priority-primary',
 		sec     = 'ui-priority-secondary',
 		lic     = 'elfinder-help-license',
-		tab     = '<li class="ui-state-default ui-corner-top"><a href="#{id}">{title}</a></li>',
-		html    = ['<div class="ui-tabs ui-widget ui-widget-content  elfinder-help">', 
-				'<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ">'],
+		tab     = '<li class="ui-state-default"><a href="#{id}">{title}</a></li>',
+		html    = ['<div class="ui-tabs ui-widget ui-panel-body  elfinder-help">', 
+				'<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix  ">'],
 		stpl    = '<div class="elfinder-help-shortcut"><div class="elfinder-help-shortcut-pattern">{pattern}</div> {descrip}</div>',
 		sep     = '<div class="elfinder-help-separator"/>',
 		
 		
 		about = function() {
-			html.push('<div id="about" class="ui-tabs-panel ui-widget-content ui-corner-bottom"><div class="elfinder-help-logo"/>')
+			html.push('<div id="about" class="ui-tabs-panel ui-panel-body"><div class="elfinder-help-logo"/>')
 			html.push('<h3>elFinder</h3>');
 			html.push('<div class="'+prim+'">'+fm.i18n('webfm')+'</div>');
 			html.push('<div class="'+sec+'">'+fm.i18n('ver')+': '+fm.version+', '+fm.i18n('protocolver')+': <span id="apiver"></span></div>');
@@ -8282,10 +8280,10 @@ elFinder.prototype.commands.help = function() {
 		shortcuts = function() {
 			var sh = fm.shortcuts();
 			// shortcuts tab
-			html.push('<div id="shortcuts" class="ui-tabs-panel ui-widget-content ui-corner-bottom">');
+			html.push('<div id="shortcuts" class="ui-tabs-panel ui-panel-body">');
 			
 			if (sh.length) {
-				html.push('<div class="ui-widget-content elfinder-help-shortcuts">');
+				html.push('<div class="ui-panel-body elfinder-help-shortcuts">');
 				$.each(sh, function(i, s) {
 					html.push(stpl.replace(/\{pattern\}/, s[0]).replace(/\{descrip\}/, s[1]));
 				});
@@ -8301,7 +8299,7 @@ elFinder.prototype.commands.help = function() {
 		},
 		help = function() {
 			// help tab
-			html.push('<div id="help" class="ui-tabs-panel ui-widget-content ui-corner-bottom">');
+			html.push('<div id="help" class="ui-tabs-panel ui-panel-body">');
 			html.push('<a href="http://elfinder.org/forum/" target="_blank" class="elfinder-dont-panic"><span>DON\'T PANIC</span></a>');
 			html.push('</div>');
 			// end help
@@ -9304,7 +9302,7 @@ elFinder.prototype.commands.quicklook = function() {
 				navbar.attr('style', '').draggable(full ? 'destroy' : {});
 				win.toggleClass(fullscreen);
 				$(this).toggleClass(navicon+'-fullscreen-off');
-				$.fn.resizable && parent.add(win).resizable(full ? 'enable' : 'disable').removeClass('ui-state-disabled');
+				$.fn.resizable && parent.add(win).resizable(full ? 'enable' : 'disable').removeClass('disabled');
 			}),
 			
 		navbar  = $('<div class="elfinder-quicklook-navbar"/>')
@@ -10105,9 +10103,9 @@ elFinder.prototype.commands.resize = function() {
 					rhandlec = $('<div class="elfinder-resize-handle"/>'),
 					uiresize = $('<div class="elfinder-resize-uiresize"/>'),
 					uicrop   = $('<div class="elfinder-resize-uicrop"/>'),
-					uibuttonset = '<div class="ui-widget-content  elfinder-buttonset"/>',
-					uibutton    = '<div class="ui-state-default elfinder-button"/>',
-					uiseparator = '<span class="ui-widget-content elfinder-toolbar-button-separator"/>',
+					uibuttonset = '<div class="ui-panel-body btn-group"/>',
+					uibutton    = '<div class="btn"/>',
+					uiseparator = '',
 					uirotate    = $('<div class="elfinder-resize-rotate"/>'),
 					uideg270    = $(uibutton).attr('title',fm.i18n('rotate-cw')).append($('<span class="elfinder-button-icon elfinder-button-icon-rotate-l"/>')
 						.click(function(){

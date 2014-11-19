@@ -1,5 +1,13 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct script access.' );
 
+/**
+ * @package		KodiCMS/User_Messages
+ * @category	API
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Controller_API_User_Messages extends Controller_System_Api {
 
 	public function get_get()
@@ -9,7 +17,18 @@ class Controller_API_User_Messages extends Controller_System_Api {
 		$messages = Model_API::factory('api_message')
 			->get_all($user_id, $parent_id, $this->fields);
 
-		$this->response($messages);
+		$use_template = $this->param('use_template', FALSE);
+		
+		if($use_template)
+		{
+			$this->response((string) View::factory('messages/messages', array(
+				'messages' => array_map(function($a) { return (object) $a; }, $messages)
+			)));
+		}
+		else
+		{
+			$this->response($messages);
+		}
 	}
 	
 	public function get_list()
@@ -25,7 +44,7 @@ class Controller_API_User_Messages extends Controller_System_Api {
 			if($msg->is_read == Model_API_Message::STATUS_NEW)
 			{
 				Api::post('user-messages.mark_read', array(
-					'id' => $msg->id, 'uid' => AuthUser::getId()
+					'id' => $msg->id, 'uid' => Auth::get_id()
 				));
 			}
 	
@@ -67,6 +86,18 @@ class Controller_API_User_Messages extends Controller_System_Api {
 		
 		$this->response($message);
 	}
+	
+	public function post_starred()
+	{
+		$id = $this->param('id', NULL, TRUE);
+		$user_id = $this->param('uid', NULL, TRUE);
+		$status = (int) $this->param('status', Model_API_Message::NOT_STARRED);
+		
+		$message = Model_API::factory('api_message')
+			->starred($id, $user_id, $status);
+		
+		$this->response($message);
+	}
 
 	public function rest_put()
 	{
@@ -86,7 +117,7 @@ class Controller_API_User_Messages extends Controller_System_Api {
 		else
 		{
 			$title = $this->param('title', NULL, TRUE);
-			$to_user_id = (int) $this->param('to_user_id', NULL, TRUE);
+			$to_user_id = (array) $this->param('to_user_id', array(), TRUE);
 		}
 		
 		$message = Model_API::factory('api_message')

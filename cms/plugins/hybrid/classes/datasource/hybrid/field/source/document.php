@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Hybrid
+ * @category	Field
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class DataSource_Hybrid_Field_Source_Document extends DataSource_Hybrid_Field_Source_OneToOne {
 
 	protected $_props = array(
@@ -17,7 +25,7 @@ class DataSource_Hybrid_Field_Source_Document extends DataSource_Hybrid_Field_So
 	{		
 		if ( ! empty($data['from_ds']))
 		{
-			$section = Datasource_Section::load($data['from_ds']);
+			$section = Datasource_Data_Manager::load($data['from_ds']);
 			
 			if ($section !== NULL)
 			{
@@ -72,7 +80,7 @@ class DataSource_Hybrid_Field_Source_Document extends DataSource_Hybrid_Field_So
 	 * @param string $fid
 	 * @return mixed
 	 */
-	public static function fetch_widget_field( $widget, $field, $row, $fid, $recurse )
+	public static function fetch_widget_field($widget, $field, $row, $fid, $recurse)
 	{
 		$related_widget = NULL;
 
@@ -83,12 +91,12 @@ class DataSource_Hybrid_Field_Source_Document extends DataSource_Hybrid_Field_So
 
 		return ($related_widget !== NULL) 
 			? $related_widget 
-			: $row[$fid];
+			: (int) $row[$fid];
 	}
 	
-	public function fetch_headline_value( $value )
+	public function fetch_headline_value( $value, $document_id )
 	{
-		if(empty($value)) return parent::fetch_headline_value($value);
+		if(empty($value)) return parent::fetch_headline_value($value, $document_id);
 
 		$header = DataSource_Hybrid_Field_Utils::get_document_header($this->from_ds, $value);
 		
@@ -106,12 +114,14 @@ class DataSource_Hybrid_Field_Source_Document extends DataSource_Hybrid_Field_So
 			);
 		}
 		
-		return parent::fetch_headline_value($value);
+		return parent::fetch_headline_value($value, $document_id);
 	}
 	
 	public function get_query_props(\Database_Query $query, DataSource_Hybrid_Agent $agent)
 	{
-		return $query->join(array('ds' . $this->ds_type, 'dss' . $this->id), 'left')
+		parent::get_query_props($query, $agent);
+
+		$query->join(array('ds' . $this->ds_type, 'dss' . $this->id), 'left')
 			->on(DataSource_Hybrid_Field::PREFFIX . $this->key, '=', 'dss' . $this->id . '.id')
 			->on('dss' . $this->id . '.published', '=', DB::expr( 1 ))
 			->select(array('dss'.$this->id.'.header', $this->id . 'header'));

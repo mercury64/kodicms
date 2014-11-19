@@ -3,20 +3,20 @@
 /**
  * @package		KodiCMS
  * @category	Helper
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Text extends Kohana_Text 
 {
-	/**
-	 * 
-	 * @param string $haystack
-	 * @param string $needle
-	 * @return boolean
-	 */
-	public static function starts_with( $haystack, $needle )
+	public static function translit($string)
 	{
-		$length = strlen( $needle );
-		return (substr( $haystack, 0, $length ) === $needle);
+		$rus = array('А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я');
+
+		$lat = array('A', 'B', 'V', 'G', 'D', 'E', 'E', 'Gh', 'Z', 'I', 'Y', 'K', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T', 'U', 'F', 'H', 'C', 'Ch', 'Sh', 'Sch', 'Y', 'Y', 'Y', 'E', 'Yu', 'Ya', 'a', 'b', 'v', 'g', 'd', 'e', 'e', 'gh', 'z', 'i', 'y', 'k', 'l', 'm', 'n', 'o', 'p', 'r', 's', 't', 'u', 'f', 'h', 'c', 'ch', 'sh', 'sch', 'y', 'y', 'y', 'e', 'yu', 'ya');
+
+		return str_replace($rus, $lat, $string);
 	}
 
 	/**
@@ -25,17 +25,29 @@ class KodiCMS_Text extends Kohana_Text
 	 * @param string $needle
 	 * @return boolean
 	 */
-	public static function ends_with( $haystack, $needle )
+	public static function starts_with($haystack, $needle)
 	{
-		$length = strlen( $needle );
-		if ( $length == 0 )
+		$length = strlen($needle);
+		return (substr($haystack, 0, $length) === $needle);
+	}
+
+	/**
+	 * 
+	 * @param string $haystack
+	 * @param string $needle
+	 * @return boolean
+	 */
+	public static function ends_with($haystack, $needle)
+	{
+		$length = strlen($needle);
+		if ($length == 0)
 		{
 			return true;
 		}
 
-		return (substr( $haystack, -$length ) === $needle);
+		return (substr($haystack, -$length) === $needle);
 	}
-	
+
 	/**
 	 * 
 	 * @param string $word
@@ -106,5 +118,3 @@ class KodiCMS_Text extends Kohana_Text
 	}
 
 }
-
-// End text

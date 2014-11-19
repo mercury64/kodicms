@@ -2,7 +2,10 @@
 
 /**
  * @package		KodiCMS/Behavior
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright  (c) 2012-2014 butschster
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Behavior_Route {
 	
@@ -93,7 +96,7 @@ class Behavior_Route {
 	{
 		$method = $this->_match_route($uri);
 		
-		Context::instance()->behavior_router( $this );
+		Context::instance()->behavior_router($this);
 
 		return $method;
 	}
@@ -117,7 +120,7 @@ class Behavior_Route {
 
 		foreach ($this->routes() as $_uri => $params)
 		{
-			if( ! isset($params['method']))
+			if (!isset($params['method']))
 			{
 				$params['method'] = $default_method;
 			}

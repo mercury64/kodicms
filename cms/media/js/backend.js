@@ -3,90 +3,152 @@ var cms = {
 	views: {},
 	collections: {},
 	routes: {},
+	settings: {},
 	popup_target: null,
-	
-	// Error
-	error: function (msg, e) {
-		this.message(msg, 'error');
-	},
-		
-	message: function(msg, type) {
-		if(!type) type = 'success';
-		
-		var title = type.charAt(0).toUpperCase() + type.slice(1);
-		window.top.$.pnotify({
-			title: __(title),
-			text: msg,
-			sticker: false,
-			type: type,
-			history: false
-		});
-	},
-	error_field: function(name, message) {
-		name = name.indexOf('.') !== -1 ? '['+name.replace(/\./g, '][') + ']' : name;
-		var gpoups = $('.control-group:not(.error)');
-		
-		input = $(':input[name*="' + name + '"]', gpoups)
-			.after('<span class="help-inline error-message">' + message + '</span>')
-			.parentsUntil( '.control-group' )
-			.parent()
-			.addClass('error');
-	
-		var $tab_pane = input.parentsUntil('tab-pane');
-		if($tab_pane.length) {
-			$tab_id = $tab_pane.attr('id');
-			$tab_pane.parent().parent().find('.nav-tabs li a[href="#'+$tab_id+'"]').addClass('tab-error');
+
+	messages: {
+		init: function() {
+			this.parse(MESSAGE_ERRORS, 'error');
+			this.parse(MESSAGE_SUCCESS);
+		},
+		parse: function($messages, $type) {
+			for(text in $messages) {
+				if(text == '_external') {
+					this.parse($messages[text], $type);
+					continue;
+				}
+
+				if($type == 'error'){
+					cms.error_field(text, $messages[text]);
+				}
+
+				this.show($messages[text], $type);
+			}
+		},
+		show: function(msg, type) {
+			if(!type) type = 'success';
+
+			var title = type.charAt(0).toUpperCase() + type.slice(1);
+			window.top.$.pnotify({
+				title: __(title),
+				text: msg,
+				sticker: false,
+				nonblock: true,
+				delay: 4000,
+				type: type,
+				history: false
+			});
+		},
+		error: function (message) {
+			this.show(message, 'error');
 		}
 	},
-	clear_error: function() {
-		$('.control-group')
-			.removeClass('error')
-			.find('.error-message')
-			.remove();
 	
-		$('.nav-tabs li a').removeClass('tab-error');
-	},
-	// Convert slug
-	convert_dict: {
-		'ą':'a', 'ä':'a', 'č':'c', 'ę':'e', 'ė':'e', 'i':'i', 'į':'i', 'š':'s', 'ū':'u', 'ų':'u', 'ü':'u', 'ž':'z', 'ö':'o',
-		'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z','и':'i','й':'j','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'c','ч':'ch','ш':'sh','щ':'shh','ы':'y','э':'e','ю':'yu','я':'ya','ь':'','ъ':'','і':'i','ї':'yi','А':'A','Б':'B','В':'V','Г':'G','Д':'D','Е':'E','Ё':'YO','Ж':'ZH','З':'Z','И':'I','Й':'J','К':'K','Л':'L','М':'M','Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U','Ф':'F','Х':'H','Ц':'C','Ч':'CH','Ш':'SH','Щ':'SHH','Ы':'Y','Э':'E','Ю':'YU','Я':'YA','І':'I','Ї':'YI','Є':'E','Ь':'','Ъ':'',
-		'Ą':'A','Č':'C','Ę':'E','Ė':'E','Į':'I','Š':'S','Ū':'U','Ų':'U','Ž':'Z','ą':'a','č':'c','ę':'e','ė':'e','i':'i','į':'i','š':'s','ū':'u','ų':'u','ž':'z'
-	},
-	convertSlug: function (str, separator) {
-		var default_separator = '-';
-		if(!separator) {
-			separator = default_separator;
+	notifications: {
+		_init: false,
+		_list: [],
+		counter: 0,
+		container: '#notifications-container',
+		add: function(text, created_on, title, type, icon, counter) {
+			this._list.push([text, moment(created_on), title, type, icon, counter]);
+		},
+		update_counter: function() {
+			this.counter++;
+		},
+		init: function() {
+			this._build();
+
+			$('.notifications-list', this.container).slimScroll({ height: 250 });
+			this._init = true;
+		},
+		_build_row:function(row) {
+			var text = row[0],
+				created_on = row[1].fromNow(), 
+				title = row[2], 
+				type = row[3], 
+				icon = row[4];
+
+			var $notification = $('<div class="notification" />');
+			if(!type) var type = '';
+
+			if(title)
+				$('<div class="notification-title '+type+'" />').text(__(title).toUpperCase()).prependTo($notification);
+
+			if(text)
+				$('<div class="notification-description" />').html(text).appendTo($notification);
+
+			if(created_on)
+				$('<div class="notification-ago margin-xs-vr" />').html(created_on).appendTo($notification);
+
+			if(icon)
+				$('<div class="notification-icon fa fa-'+icon+'" />').appendTo($notification);
+			
+			return $notification;
+		},
+		_build: function() {
+			var $cont = $('.notifications-list', this.container);
+			
+			this._list = _.sortBy(this._list, function(row) {
+				return !row[1].unix();
+			});
+
+			for(i in this._list) {
+				$notification = this._build_row(this._list[i]);
+				$notification.prependTo($cont);
+				
+				if(this._list[i][5] !== false)
+					this.update_counter();
+
+				delete(this._list[i]);
+			}
+			
+			$('.counter', this.container).text(parseInt(this.counter));
 		}
-		return str
-			.toString()
-			.toLowerCase()
-			.replace(/[àâ]/g, 'a')
-			.replace(/[éèêë]/g, 'e')
-			.replace(/[îï]/g, 'i')
-			.replace(/[ô]/g, 'o')
-			.replace(/[ùû]/g, 'u')
-			.replace(/[ñ]/g, 'n')
-			.replace(/[äæ]/g, 'ae')
-			.replace(/[öø]/g, 'oe')
-			.replace(/[ü]/g, 'ue')
-			.replace(/[ß]/g, 'ss')
-			.replace(/[å]/g, 'aa')
-			.replace(/(.)/g, function (c) {
-				return (cms.convert_dict[c] != undefined ? cms.convert_dict[c] : c);
-			})
-			.replace(/[^a-zа-яіїє0-9\.\_]/g, separator)
-			.replace(/ /g, separator)
-			.replace(/\-+/g, separator)
-			.replace(/^-/, '');
 	},
 
+	error_field: function(name, message) {
+		var gpoups = $('.form-group:not(.has-error)');
+		
+		if(typeof name == 'object')
+			var input = name;
+		else {
+			name = name.indexOf('.') !== -1 ? '['+name.replace(/\./g, '][') + ']' : name;
+			var input = $(':input[name*="' + name + '"]', gpoups);
+		}
+
+		input
+			.after('<span class="help-block error-message">' + message + '</span>')
+			.closest('.form-group')
+			.addClass('has-error');
+	
+		var $tab_id = input.closest('.tab-pane').prop('id');
+		if($tab_id) {
+			var $tab = $('.nav-tabs a[href="#'+$tab_id+'"]').addClass('tab-error');
+			
+			$tab.closest('.tabdrop').find('.dropdown-toggle').addClass('tab-error');
+		}
+		
+		
+	},
+	clear_error: function($container, $clear_tabs_error) {
+		var $group = $('.form-group');
+		if(typeof $container == 'object')
+			$group = $('.form-group', $container);
+
+		$group
+			.removeClass('has-error')
+			.find('.error-message')
+			.remove();
+
+		if($clear_tabs_error !== false)
+			$('.nav-tabs li a').removeClass('tab-error');
+	},
 	loader: {
 		counter: 0,
 		init: function (container) {
-			if(!(container instanceof jQuery)) 
-				container = $('body');
+			container = $('body');
 
-			return $('<div class="_loader_container"><div class="_loader_bg"></div><span>' + __('Loading') + '</span></div>')
+			return $('<div class="_loader_container"><span>' + __('Loading') + '</span></div>')
 				.appendTo(container)
 				.css({
 					width: container.outerWidth(true), 
@@ -124,13 +186,13 @@ var cms = {
 		if(this.content_height != null) 
 			return this.content_height;
 
-		var contentCont = $('#content'),
-			headerCont = $('header'),
+		var contentCont = $('#content-wrapper'),
+			headerCont = $('#main-navbar'),
 			footerCont = $('footer'),
 			windowCont = $(window);
 
 		var contentContHeight = windowCont.outerHeight() - headerCont.outerHeight(),
-			contentContPadding = contentCont.outerHeight(!$('body').hasClass('iframe')) - contentCont.innerHeight() + ($('body').hasClass('iframe')) ? 0 : 85;
+			contentContPadding = contentCont.outerHeight(!$('body').hasClass('iframe')) - contentCont.innerHeight() + ($('body').hasClass('iframe')) ? 0 : 140;
 
 		this.content_height = contentContHeight - contentContPadding;
 
@@ -141,21 +203,14 @@ var cms = {
 	
 	// Plugins
 	plugins: {},
-	
-	// Messages
-	messages: {
-		init: function () {
-			$('.message')
-				.animate({top:0}, 1000);
-		}
-	},
+
 	filters: {
 		filters: [],
 		switchedOn: {},
 		editors: {},
 		add: function (name, switchOn_handler, switchOff_handler, exec_handler) {
 			if (switchOn_handler == undefined || switchOff_handler == undefined) {
-				cms.error('System try to add filter without required callbacks.', name, switchOn_handler, switchOff_handler);
+				cms.messages.error('System try to add filter without required callbacks.', name, switchOn_handler, switchOff_handler);
 				return;
 			}
 			this.filters.push([ name, switchOn_handler, switchOff_handler, exec_handler ]);
@@ -230,35 +285,6 @@ cms.addTranslation = function (obj) {
     }
 };
 
-cms.navigation = {
-	counter: {
-		total: [],
-		init: function() {
-			$('.dropdown-menu a').filter(function() { return $(this).data('counter') > 0 }).each(function() {
-				$(this)
-					.append('<span class="counter">' + $(this).data('counter') + '</span>')
-					.parents('.dropdown-menu')
-					.prev()
-					.append('<span class="counter">!</span>');
-			});
-		},
-		add: function(href, count) {
-			$('.dropdown-menu a[href="'+href+'"]')
-				.add('#subnav a[href="'+href+'"]')
-				.data('counter', count);
-
-			this.init();
-		},
-		remove: function(href) {
-			$('.dropdown-menu a[href="'+href+'"]')
-					.add('#subnav a[href="'+href+'"]')
-				.removeData('counter');
-
-			this.init();
-		}
-	}
-};
-
 cms.ui = {
     callbacks:[],
     add:function (module, callback) {
@@ -270,9 +296,7 @@ cms.ui = {
 		return this;
     },
     init:function (module) {
-		
 		$('body').trigger('before_ui_init');
-		
         for (var i = 0; i < cms.ui.callbacks.length; i++) {
 			try {
 				if(!module)
@@ -283,9 +307,10 @@ cms.ui = {
 				else if (module == cms.ui.callbacks[i][0]) {
 					cms.ui.callbacks[i][1]();
 				}
-			} catch (e) {}
+			} catch (e) {
+				console.log(cms.ui.callbacks[i][0], e);
+			}
         }
-		
 		$('body').trigger('after_ui_init');
     }
 };
@@ -326,6 +351,7 @@ cms.ui.add('flags', function() {
 	$('body').on('click', '.flags .label', function(e) {
 		var $src = $(this).parent().data('target');
 		if( ! $src ) $src = $(this).parent().prevAll(':input');
+		else $src = $($src);
 		
 		var $container = $(this).parent();
 		var $append = $container.data('append') == true;
@@ -333,23 +359,30 @@ cms.ui.add('flags', function() {
 		var $value = $(this).data('value');
 		
 		if($array) $value = $value.split(',');
-		
-		$('.label', $container).removeClass('label-success');
-		$(this).addClass('label-success');
 
 		if($append) {
-			var $old_value = '';
 			if($src.is(':input')) {
-				$old_value += $src.val();
-				$value = $old_value.length > 0 ? $old_value + ', ' + $value: $value;
-				$src.val($value);
+				var $values = $src.val().split(', ');
+				$values.push($value);
+				$values = _.uniq(_.compact($values));
+				$src.val($values.join(', '));
 			}
 			else {
-				$old_value += $src.val();
-				$value = $old_value.length > 0 ? $old_value + ', ' : $value;
-				$src.text($value);
+				var $values = $src.text().split(', ');
+				$values.push($value);
+				$values = _.uniq(_.compact($values));
+				$src.text($values.join(', '));
 			}
+			
+			$('.label', $container).removeClass('label-success');
+			for(i in $values) {
+				$('.label[data-value="'+$values[i]+'"]').addClass('label-success');
+			}
+			
 		} else {
+			$('.label', $container).removeClass('label-success');
+			$(this).addClass('label-success');
+
 			if($src.hasClass('select2-offscreen'))
 			{
 				$src.select2("val", $value);
@@ -366,72 +399,10 @@ cms.ui.add('flags', function() {
 		e.preventDefault();
 	});
 }).add('btn-confirm', function() {
-	$('body').on('click', '.btn-confirm', function () {
-		if (confirm(__('Are you sure?')))
-			return true;
-
-		return false;
+	$('body').on('click', '.btn-confirm', function (e) {
+		if (!confirm(__('Are you sure?')))
+			e.preventDefault();
 	});
-}).add('nav-counter', function() {
-
-	$('.dropdown-submenu .caret').remove();
-	cms.navigation.counter.init();
-
-}).add('outline', function() {
-	$('.widget')
-		.addClass('outline_inner')
-		.wrap('<div class="outline"></div>');
-}).add('tabable', function() {
-	if($('.tabbable').length > 0) {
-		$('#content .widget-header').each(function(i) {
-			if($(this).hasClass('widget-section')) {
-				$('<li class="nav-section"><h5><i class="icon-arrow-down"></i> ' + $(this).text() + '</h5></li>').appendTo($('.tabbable .nav'));
-			} else {
-				var text = $(this).text();
-				
-				if($(this).data('icon')) {
-					text = '<i class="icon-'+$(this).data('icon')+'"></i> ' + text;
-				}
-				
-				$('<li class="tab-item"><a href="#tab' + i + '" data-toggle="tab">' + text + '</a></li>')
-					.appendTo($('.tabbable .nav'));
-				
-				if($(this).hasClass('widget-header-onlytab'))
-					$('<div class="tab-pane" id="tab' + i + '">' + $(this).next().html() + '</div>').appendTo($('.tabbable .tab-content'));
-				else 
-					$('<div class="tab-pane" id="tab' + i + '"><h2>'+$(this).text()+'</h2><hr />' + $(this).next().html() + '</div>').appendTo($('.tabbable .tab-content'));
-
-				$(this).next().remove();
-			}
-			
-			$(this).remove();
-			
-			
-		});
-		$('.tabbable .nav li a').on('click', function() {
-			window.location.hash = $(this).attr('href');
-		});
-
-		if(window.location.hash.length > 0 && $('.tabbable .nav li a[href='+window.location.hash+']').length > 0) {
-			$('.tabbable .nav li a[href='+window.location.hash+']').parent().addClass('active');
-			$('.tabbable ' + window.location.hash).addClass('active');
-		} else {
-			$('.tabbable .nav li:first-child').addClass('active');
-			$('.tabbable .tab-pane:first-child').addClass('active');
-		}
-
-		$('.tabbable .tab-pane').css({
-			'min-height': cms.calculateContentHeight() - 130
-		});
-		
-		$(window).resize(function() {
-			$('.tabbable .tab-pane').css({
-				'min-height': cms.calculateContentHeight() - 130
-			});
-		});
-	}
-	
-	$(window).trigger('tabbable');
 }).add('calculate_height', function() {
 	cms.calculateContentHeight();
 
@@ -439,62 +410,26 @@ cms.ui.add('flags', function() {
 		cms.content_height = null;
 		cms.calculateContentHeight();
 	});
-}).add('navbar', function() {
-	
-	var user_nav = $('#user_nav');
-	var brand = $('.brand');
+}).add('panel-toggler', function() {
+	var icon_open = 'fa-chevron-up',
+		icon_close = 'fa-chevron-down';
 
-	var sw = $('#site_nav').outerWidth();
-	var uw = user_nav.outerWidth();
-	var bw = brand.outerWidth(true);
-
-	$(window).resize(function() {
-		calcNav();
-	});
-	
-	function calcNav() {
-		var nw = $('.navbar-inner').width();
-		var w = nw - sw - uw - bw - 20;
-		var wh = false;
-		
-		if(w <= 0) {
-			$('.text, .divider-vertical', user_nav).hide();
-			wh = true;
-		} else {
-			wh = false;
-			$('.text, .divider-vertical', user_nav).show();
-		}
-		
-		if(wh) {
-			var unw = $(user_nav).outerWidth();
-			var nw = w + uw - unw;
-			
-			if(w <= 0 && nw < 0) brand.hide();
-			else brand.fadeIn();
-				
-		} else brand.fadeIn();
-	};
-	
-	calcNav();
-}).add('spoiler', function() {
-	var icon_open = 'icon-chevron-up',
-		icon_close = 'icon-chevron-down';
-
-	$('.spoiler-toggle')
+	$('.panel-toggler')
 		.click(function () {
 			var $self = $(this);
-			var $spoiler_cont = $('.spoiler');
-			
-			if($(this).data('spoiler')) {
-				$spoiler_cont = $($(this).data('spoiler'));
+	
+			if($self.data('target-')) {
+				$_cont = $($self.data('target-'));
+			} else {
+				var $_cont = $self.next('.panel-spoiler');
 			}
 		
-			$spoiler_cont.slideToggle('fast', function() {
-				var $icon = $self.find('.spoiler-toggle-icon');
+			$_cont.slideToggle('fast', function() {
+				var $icon = $self.find('.panel-toggler-icon');
 				if($(this).is(':hidden')) {
-					$icon.removeClass(icon_open).addClass(icon_close);
+					$icon.removeClass(icon_open).addClass(icon_close).addClass('fa');
 				} else {
-					$icon.addClass(icon_open).removeClass(icon_close);
+					$icon.addClass(icon_open).removeClass(icon_close).addClass('fa');
 				}
 			});
 			
@@ -505,33 +440,82 @@ cms.ui.add('flags', function() {
 				$(this).click();
 				$('html,body').animate({scrollTop: $(this).offset().top}, 'slow');
 			}
-			
 		})
-		.find('h3, h4')
-		.append(' <i class="spoiler-toggle-icon '+icon_close+'"></i>');
+		.append('<div class="panel-heading-controls"><span class="text-sm"><i class="panel-toggler-icon fa '+icon_close+'" />&nbsp;&nbsp;&nbsp;'+__('Toggle')+'</span></div>');
+
 }).add('datepicker', function() {
-	$('.datetimepicker').datetimepicker({
-		format:'Y-m-d H:i:00',
+
+	var options = {
+		format: 'Y-m-d H:i:00',
 		lang: LOCALE,
-		dayOfWeekStart:1
+		dayOfWeekStart: 1
+	};
+	
+	$('.datetimepicker').each(function() {
+		var local_options = $.extend({}, options);
+		var $self = $(this);
+		
+		if($self.data('range-max-input')) {
+			local_options['onShow'] = function(ct) {
+				var $input = $($self.data('range-max-input'));
+				this.setOptions({
+					maxDate: $input.val() ? $input.val() : false
+				});
+			}
+		}
+		
+		if($self.data('range-min-input')) {
+			local_options['onShow'] = function(ct) {
+				var $input = $($self.data('range-min-input'));
+				this.setOptions({
+					minDate: $input.val() ? $input.val() : false
+				});
+			}
+		}
+		
+		$self.datetimepicker(local_options);
 	});
 	
-	$('.datepicker').datetimepicker({
-		timepicker: false,
-		format: 'Y-m-d',
-		lang: LOCALE,
-		dayOfWeekStart:1
+	$('.datepicker').each(function() {
+		var local_options = $.extend(options, {
+			timepicker: false,
+			format: 'Y-m-d'
+		});
+		
+		var $self = $(this);
+		
+		if($self.data('range-max-input')) {
+			local_options['onShow'] = function( ct ){
+				var $input = $($self.data('range-max-input'));
+				this.setOptions({
+					maxDate: $input.val() ? $input.val() : false
+				});
+			}
+		} else if($self.data('range-min-input')) {
+			local_options['onShow'] = function( ct ){
+				var $input = $($self.data('range-min-input'));
+				this.setOptions({
+					minDate: $input.val() ? $input.val() : false
+				});
+			}
+		}
+
+		$self.datetimepicker(local_options);
 	});
 	
-	$('.timepicker').datetimepicker({
-		timepicker: true,
-		datepicker: false,
-		format: 'H:i:s',
-		lang: LOCALE,
-		dayOfWeekStart:1
+	$('.timepicker').each(function() {
+		var local_options = $.extend(options, {
+			timepicker: true,
+			datepicker: false,
+			format: 'H:i:s'
+		});
+		
+		var $self = $(this);
+		
+		$self.datetimepicker(local_options);
 	});
 }).add('slug', function() {
-	// Slug & metadata
+
     var slugs = {};
     $('body').on('keyup', '.slug-generator', function () {
 		var $slug_cont = $('.slug');
@@ -545,13 +529,22 @@ cms.ui.add('flags', function() {
 			$separator = $(this).data('separator');
 		}
 		
-        if ($slug_cont.val() == '')
+        if ($slug_cont.is(':input') && $slug_cont.val() == '')
             slugs[$slug_cont] = true;
+		
+		$slug_cont.on('keyup', function() {
+			slugs[$slug_cont] = false;
+		});
 
         if (slugs[$slug_cont]) {
-            var new_slug = cms.convertSlug($(this).val(), $separator);
-
-            $slug_cont.val(new_slug);
+			var slug = getSlug($(this).val(), {
+				separator: $separator
+			});
+			
+			if($slug_cont.is(':input'))
+				$slug_cont.val(slug);
+			else
+				$slug_cont.text(slug);
         }
     });
 
@@ -566,24 +559,27 @@ cms.ui.add('flags', function() {
 			$separator = $(this).data('separator');
 		}
 		
-		$(this).val(cms.convertSlug($(this).val(), $separator));
+		var slug = getSlug($(this).val(), {
+			separator: $separator
+		});
+		
+		$(this).val(slug);
 		slugs[$(this)] = false;
 
 		if ($(this).val() == '')
 			slugs[$(this)] = true;
 	});
-}).add('focus', function() {
-	$('.focus').focus();
+
 }).add('dropzone', function() {
 	cms.uploader = new Dropzone('.dropzone', {
 		success: function(file, r) {
 			var response = $.parseJSON(r);
 			var self = this;
 			if(response.code != 200) {
-				cms.message(response.message, 'error');
+				cms.messages.error(response.message);
 				
 			} else if(response.message) {
-				cms.message(response.message);
+				cms.messages.show(response.message);
 			}
 			
 			$(file.previewElement).fadeOut(500, function() {
@@ -591,7 +587,7 @@ cms.ui.add('flags', function() {
 			});
 		},
 		error: function(file, message) {
-			cms.message(message, 'error');
+			cms.messages.error(message);
 			this.removeFile(file);
 		},
         dictDefaultMessage: __("Drop files here to upload"),
@@ -616,8 +612,10 @@ cms.ui.add('flags', function() {
 		openEffect	: 'none',
 		closeEffect	: 'none',
 		beforeLoad: function() {
-			this.href = updateQueryStringParameter(this.href, 'type', 'iframe');
+			var url = this.href.split("?")[0];
+			var query_string = $.query.load(this.href).set('type', 'iframe').toString();
 			
+			this.href = url + query_string;
 			var title = this.element.data('title');
 			if(title !== false) {
 				this.title = title ? title : this.element.html();
@@ -627,7 +625,8 @@ cms.ui.add('flags', function() {
 		},
 		helpers : {
     		title : {
-    			type : 'inside'
+    			type : 'inside',
+				position: 'top'
     		}
     	}
 	});
@@ -660,6 +659,8 @@ cms.ui.add('flags', function() {
 		e.preventDefault();
 	});
 }).add('select2', function() {
+	if(!TAG_SEPARATOR) var TAG_SEPARATOR = ',';
+
 	$('select').not('.no-script').select2();
 	$('.tags').select2({
 		tags: [],
@@ -702,11 +703,14 @@ cms.ui.add('flags', function() {
 	});
 }).add('ajax_form', function() {
 	$('body').on('submit', 'form.form-ajax', function() {
-		var $self = $(this);
-		var $buttons = $('button', $self)
-			.attr('disabled', 'disabled');
+		var $self = $(this),
+			$buttons = $('button', $self).attr('disabled', 'disabled'),
+			$action = $self.attr('action');
 
-		Api.post($self.attr('action'), $self.serialize(), function(response) {
+		if($self.data('ajax-action'))
+			$action = $self.data('ajax-action');
+
+		Api.post($action, $self.serialize(), function(response) {
 			setTimeout(function() {
 				$buttons.removeAttr('disabled');
 			}, 5000);
@@ -715,14 +719,23 @@ cms.ui.add('flags', function() {
 		return false;
 	});
 }).add('filemanager', function() {
-	var input = $('input.input-filemanager:not(.init)')
-		.addClass('init');
+	var $input = $(':input[data-filemanager]');
 	
-	$('<button class="btn" type="button"><i class="icon-folder-open"></i></button>')
-		.insertAfter(input)
-		.on('click', function() {
-			cms.filemanager.open($(this).prev());
+	$input.each(function() {
+		var $self = $(this);
+		var $btn = $('<button class="btn" type="button"><i class="fa fa-folder-open"></i></button>');
+		if($self.next().hasClass('input-group-btn')) {
+			$btn.prependTo($self.next());
+		} else {
+			$btn.insertAfter($self);
+		}
+
+		$btn.on('click', function() {
+			cms.filemanager.open($self);
 		});
+		
+		$self.removeAttr('data-filemanager');
+	})
 		
 	$('body').on('click', '.btn-filemanager', function() {
 		var el = $(this).data('el');
@@ -734,9 +747,9 @@ cms.ui.add('flags', function() {
 		return false;
 	});
 }).add('hotkeys', function(){
-	$('*[hotkeys]').each(function() {
+	$('*[data-hotkeys]').each(function() {
 		var $self = $(this),
-			$hotkeys = $self.attr('hotkeys'),
+			$hotkeys = $self.data('hotkeys'),
 			$callback = function(e){ e.preventDefault(); };
 			
 		if($self.is(':submit') || $self.hasClass('popup')) {
@@ -754,7 +767,7 @@ cms.ui.add('flags', function() {
 				window.location = $self.attr('href');
 				e.preventDefault();
 			} 
-		} else if($self.hasClass('spoiler-toggle')) {
+		} else if($self.hasClass('panel-toggler')) {
 			$callback = function( e ) {
 				$self.trigger('click');
 				$('body').scrollTo($self);
@@ -790,7 +803,7 @@ cms.ui.add('flags', function() {
 	
 	// GLOBAL HOTKEYS
 	$(document).on('keydown', null, 'shift+f1', function(e) {
-		Api.get('cache.clear');
+		Api.delete('cache');
 		e.preventDefault();
 	});
 	
@@ -809,15 +822,22 @@ cms.ui.add('flags', function() {
 		e.preventDefault();
 	});
 }).add('api_buttons', function(){
-	$('.btn-api').on('click', function(e) {
+	$('.btn[data-api-url]').on('click', function(e) {
 		e.preventDefault();
+		var $self = $(this);
 		
 		var $callback = function(response) {};
-		var $url = $(this).data('url');
+		var $url = $self.data('api-url');
 		if( ! $url) return;
 		
-		var $method = $(this).data('method');
-		var $reload = $(this).data('reload');
+		var $callback = $self.data('callback');
+		if($callback) 
+			$callback = window[$callback];
+		else
+			$callback = function(response) {};
+		
+		var $method = $self.data('method');
+		var $reload = $self.data('reload');
 		
 		if($reload) {
 			if($reload === true)
@@ -830,7 +850,7 @@ cms.ui.add('flags', function() {
 		Api.request($method, $url, null, $callback);
 	})
 }).add('select_all_checkbox', function() {
-	$(document).on(' change','input[name="check_all"]', function(e) {
+	$(document).on('change', 'input[name="check_all"]', function(e) {
 		var $self = $(this),
 			$target = $self.data('target');
 		
@@ -839,33 +859,140 @@ cms.ui.add('flags', function() {
 		$($target).prop("checked" , this.checked).trigger('change');
 		e.preventDefault();
     });
+}).add('icon', function() {
+	$('*[data-icon]').add('*[data-icon-prepend]').each(function() {
+		$(this).html('<i class="fa fa-' + $(this).data('icon') + '"></i> ' + $(this).html());
+		$(this).removeAttr('data-icon-prepend').removeAttr('data-icon');
+	});
+	
+	$('*[data-icon-append]').each(function() {
+		$(this).html($(this).html() + '&nbsp&nbsp<i class="fa fa-' + $(this).data('icon-append') + '"></i>');
+		$(this).removeAttr('data-icon-append');
+	});
+}).add('tabbable', function() {
+	$('.tabbable').each(function(i) {
+		var $self = $(this);
+		
+		if($('> .panel-heading', $self).size() > 0) {
+			var $tabs_content = $('<div class="tab-content no-padding-t" />').prependTo($self);
+			var $tabs_ul = $('<ul class="nav nav-tabs tabs-generated" style="position:relative; margin-top: 10px;" />').insertBefore($self);
+			$('> .panel-heading', $self).each(function(j) {
+				var $li = $('<li></li>').appendTo($tabs_ul);
+				var $content = $(this).nextUntil('.panel-heading').not('.panel-footer').removeClass('panel-spoiler');
+
+				$(this).find('.panel-title').removeClass('panel-title');
+				$(this).find('.panel-heading-controls').remove();
+				var $content_container = $('<div class="tab-pane" id="panel-tab-' + i + '' +  '' + j+ '" />').append($content).appendTo($tabs_content);
+				$('<a href="#panel-tab-' + i + '' +  '' + j+ '" data-toggle="tab"></a>').html($(this).html()).appendTo($li);
+
+				$(this).remove();
+			});
+
+			$('li a', $tabs_ul).on('click', function() {
+				window.location.hash = $(this).attr('href');
+			});
+		}
+	});
+	
+	if(window.location.hash.length > 0 && $('.tabs-generated li a[href='+window.location.hash+']').length > 0) {
+		$('li a[href='+window.location.hash+']').parent().addClass('active');
+		$('.tabbable .tab-pane' + window.location.hash).addClass('active');
+	} else {
+		$('.tabs-generated li:first-child').addClass('active');
+		$('.tabbable .tab-pane:first-child').addClass('active');
+	}
+	
+	$('.tabs-generated').tabdrop();
 });
 
 var Api = {
 	_response: null,
-	get: function(uri, data, callback, show_loader) {
-		this.request('GET', uri, data, callback, show_loader);
+	get: function(uri, data, callback, async) {
+		var request = this.request('GET', uri, data, callback, async);
 		
+		if(async === false)
+			this._response = request.responseJSON;
+
 		return this.response();
 	},
-	post: function(uri, data, callback, show_loader) {
-		this.request('POST', uri, data, callback, show_loader);
+	post: function(uri, data, callback, async) {
+		var request = this.request('POST', uri, data, callback, async);
 		
+		if(async === false)
+			this._response = request.responseJSON;
+
 		return this.response();
 	},
-	put: function(uri, data, callback, show_loader) {
-		this.request('PUT', uri, data, callback, show_loader);
+	put: function(uri, data, callback, async) {
+		var request = this.request('PUT', uri, data, callback, async);
 		
+		if(async === false)
+			this._response = request.responseJSON;
+
 		return this.response();
 	},
-	'delete': function(uri, data, callback, show_loader) {
-		this.request('DELETE', uri, data, callback, show_loader);
-		
+	'delete': function(uri, data, callback, async) {
+		var request = this.request('DELETE', uri, data, callback, async);
+	
+		if(async === false)
+			this._response = request.responseJSON;
+
 		return this.response();
+	},
+	request: function(method, uri, data, callback, async) {
+		url = Api.build_url(uri);
+		
+		var obj = new Object();
+
+		$.ajaxSetup({
+			contentType : 'application/json'
+		});
+
+		if(typeof(data) == 'object' && method != 'GET') 
+			data = JSON.stringify(data);
+
+		return $.ajax({
+			type: method,
+			url: url,
+			data: data,
+			dataType: 'json',
+			async: async !== false,
+			success: function(response) {
+				if(response.code != 200) {
+					if(typeof(callback) == 'function') callback(response);
+					return Api.exception(response);
+				}
+
+				if (response.message) {
+					cms.clear_error();
+
+					if(response.message instanceof Object) {
+						cms.messages.parse(response.message);
+					} else {
+						cms.messages.show(response.message);
+					}
+				}
+	
+				if(response.redirect) {
+					$.get(window.top.CURRENT_URL, function(resp){
+						window.location = response.redirect + '?type=iframe';
+					});
+				}
+				this._response = response;
+				
+				var $event = method + url.replace(SITE_URL, ":").replace(/\//g, ':');
+				window.top.$('body').trigger($event.toLowerCase(), [this._response.response]);
+
+				if(typeof(callback) == 'function') callback(this._response);
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				if(typeof(callback) == 'function') callback(textStatus);
+			}
+		});
 	},
 	build_url: function(uri) {
-		uri = uri.replace(BASE_URL, '');
-	    
+		uri = uri.replace('/' + ADMIN_DIR_NAME, '');
+		
 		if(uri.indexOf('-') == -1)
 		{
 			uri = '-' + uri;
@@ -893,81 +1020,24 @@ var Api = {
 			}	
 		}
 		
-		if(uri.indexOf(BASE_URL) == -1)
+		if(uri.indexOf(SITE_URL) == -1)
 		{
-			// Add BASE_URL.
-			uri = BASE_URL + uri;
+			// Add SITE_URL.
+			uri = SITE_URL + uri;
 		}
 		
 		return uri;
 	},
-	request: function(method, uri, data, callback, show_loader) {
-		url = Api.build_url(uri);
-		
-		var obj = new Object();
-
-		if(show_loader == 'undefined')
-			show_loader = true;
-		
-		$.ajaxSetup({
-			contentType : 'application/json'
-		});
-
-		if(typeof(data) == 'object' && method != 'GET') 
-			data = JSON.stringify(data);
-
-		$.ajax({
-			type: method,
-			url: url,
-			data: data,
-			dataType: 'json',
-			beforeSend: $.proxy(function(){
-				if(show_loader) 
-					obj._loader_id = cms.loader.show(show_loader);					
-			}, obj),
-			success: function(response) {
-				if(response.code != 200) {
-					if(typeof(callback) == 'function') callback(response);
-					return Api.exception(response);
-				}
-				
-				if (response.message) {
-					cms.clear_error();
-
-					if(response.message instanceof Object) {
-						parse_messages(response.message);
-					} else {
-						cms.message(response.message);
-					}
-				}
-	
-				if(response.redirect) {
-					$.get(window.top.CURRENT_URL, function(resp){
-						window.location = response.redirect + '?type=iframe';
-					});
-				}
-				this._response = response;
-				
-				var $event = method + url.replace(SITE_URL, ":").replace(/\//g, ':');
-				window.top.$('body').trigger($event.toLowerCase(), [this._response.response]);
-
-				if(typeof(callback) == 'function') callback(this._response);
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				if(typeof(callback) == 'function') callback(textStatus);
-			}
-		}).always($.proxy(function(){
-			cms.loader.hide(obj._loader_id);
-		}, obj));
-	},
 	exception: function(response) {
 		if(response.code == 120 && typeof(response.errors) == 'object') {
+			cms.clear_error();
 			for(i in response.errors) {
-				cms.message(response.errors[i], 'error');
+				cms.messages.error(response.errors[i], 'error');
 				cms.error_field(i, response.errors[i]);
 			}
 		} else if (response.message) {
-			cms.message(response.message, 'error');
+			cms.clear_error();
+			cms.messages.error(response.message, 'error');
 		}
 	},
 	response: function() {
@@ -977,95 +1047,13 @@ var Api = {
 
 // Run
 $(function() {
-	cms.messages.init();
-
 	cms.ui.init();
+	KodiCMS.start(null, cms.settings);
+	
 	cms.init.run();
-
-	parse_messages(MESSAGE_ERRORS, 'error');
-	parse_messages(MESSAGE_SUCCESS);
-
-	$.fn.check=function(){return this.each(function(){this.checked=true})}
-	$.fn.uncheck=function(){return this.each(function(){this.checked=false})};
-	$.fn.checked=function(){return this.prop("checked")}
-
-	$.fn.tabs = function () {
-		return $('li a', this).on('click', function() {
-			$(this)
-				.parent()
-				.addClass('active')
-				.siblings()
-				.removeClass('active');
-
-			$('div.tab-pane').removeClass('active');
-			$($(this).attr('href')).addClass('active');
-
-			return false;
-		});
-	};
+	
+	setTimeout(function() {
+		cms.notifications.init();
+	}, 1500);
+	cms.messages.init();
 });
-
-
-
-$.fn.serializeObject=function(){var e={};var t=this.serializeArray();$.each(t,function(){if(e[this.name]!==undefined){if(!e[this.name].push){e[this.name]=[e[this.name]]}e[this.name].push(this.value||"")}else{e[this.name]=this.value||""}});return e};
-
-$.fn.scrollTo=function(e,t,n){if(typeof t=="function"&&arguments.length==2){n=t;t=e}var r=$.extend({scrollTarget:e,offsetTop:50,duration:500,easing:"swing"},t);return this.each(function(){var e=$(this);var t=typeof r.scrollTarget=="number"?r.scrollTarget:$(r.scrollTarget);var i=typeof t=="number"?t:t.offset().top+e.scrollTop()-parseInt(r.offsetTop);e.animate({scrollTop:i},parseInt(r.duration),r.easing,function(){if(typeof n=="function"){n.call(this)}})})};
-
-jQuery.browser = {};
-jQuery.browser.mozilla = /mozilla/.test(navigator.userAgent.toLowerCase()) && !/webkit/.test(navigator.userAgent.toLowerCase());
-jQuery.browser.webkit = /webkit/.test(navigator.userAgent.toLowerCase());
-jQuery.browser.opera = /opera/.test(navigator.userAgent.toLowerCase());
-jQuery.browser.msie = /msie/.test(navigator.userAgent.toLowerCase());
-
-function readImage(input, target) {
-	if ( input.files && input.files[0] && target ) {
-		var FR = new FileReader();
-		FR.onload = function(e) {
-			var img = new Image();
-				img.src = e.target.result;
-			
-			var ratio = img.width / img.height;
-
-			var canvas = document.createElement("canvas");
-				canvas.width = 100 * ratio;
-				canvas.height = 100;
-
-			var ctx = canvas.getContext("2d");
-				ctx.drawImage(img, 0, 0, canvas.width, canvas.height );
-			target.attr( "src", canvas.toDataURL("image/jpeg", 1) );
-		};       
-		FR.readAsDataURL( input.files[0] );
-	}
-}
-
-function updateQueryStringParameter(uri, key, value) {
-	var re = new RegExp("([?|&])" + key + "=.*?(&|$)", "i");
-	separator = uri.indexOf('?') !== -1 ? "&" : "?";
-	if (uri.match(re)) {
-		return uri.replace(re, '$1' + key + "=" + value + '$2');
-	}
-	else {
-		return uri + separator + key + "=" + value;
-	}
-}
-
-function parse_messages($messages, $type) {
-	for(text in $messages) {
-		if(text == '_external') {
-			parse_messages($messages[text], $type);
-			continue;
-		}
-		
-		if($type == 'error'){
-			cms.error_field(text, $messages[text]);
-		}
-
-		cms.message($messages[text], $type);
-	}
-}
-
-function strtr(e,t,n){if(typeof t==="object"){var r="";for(var i=0;i<e.length;i++){r+="0"}var s=0;var o=-1;var u="";for(fr in t){s=0;while((o=e.indexOf(fr,s))!=-1){if(parseInt(r.substr(o,fr.length))!=0){s=o+1;continue}for(var a=0;a<t[fr].length;a++){u+="1"}r=r.substr(0,o)+u+r.substr(o+fr.length,r.length-(o+fr.length));e=e.substr(0,o)+t[fr]+e.substr(o+fr.length,e.length-(o+fr.length));s=o+t[fr].length+1;u=""}}return e}for(var f=0;f<t.length;f++){e=e.replace(new RegExp(t.charAt(f),"g"),n.charAt(f))}return e}
-
-function __(e,t){if(cms.translations[e]!==undefined){var e=cms.translations[e]}return t==undefined?e:strtr(e,t)}
-
-(function(e){function t(t){if(typeof t.data==="string"){t.data={keys:t.data}}if(!t.data||!t.data.keys||typeof t.data.keys!=="string"){return}var n=t.handler,r=t.data.keys.toLowerCase().split(" "),i=["text","password","number","email","url","range","date","month","week","time","datetime","datetime-local","search","color","tel"];t.handler=function(t){if(this!==t.target&&(/textarea|select/i.test(t.target.nodeName)||e.inArray(t.target.type,i)>-1)){return}var s=e.hotkeys.specialKeys[t.keyCode],o=String.fromCharCode(t.which).toLowerCase(),u="",a={};e.each(["alt","ctrl","meta","shift"],function(e,n){if(t[n+"Key"]&&s!==n){u+=n+"+"}});u=u.replace("alt+ctrl+meta+shift","hyper");if(s){a[u+s]=true}if(o){a[u+o]=true;a[u+e.hotkeys.shiftNums[o]]=true;if(u==="shift+"){a[e.hotkeys.shiftNums[o]]=true}}for(var f=0,l=r.length;f<l;f++){if(a[r[f]]){return n.apply(this,arguments)}}}}e.hotkeys={version:"0.8",specialKeys:{8:"backspace",9:"tab",10:"return",13:"return",16:"shift",17:"ctrl",18:"alt",19:"pause",20:"capslock",27:"esc",32:"space",33:"pageup",34:"pagedown",35:"end",36:"home",37:"left",38:"up",39:"right",40:"down",45:"insert",46:"del",59:";",61:"=",96:"0",97:"1",98:"2",99:"3",100:"4",101:"5",102:"6",103:"7",104:"8",105:"9",106:"*",107:"+",109:"-",110:".",111:"/",112:"f1",113:"f2",114:"f3",115:"f4",116:"f5",117:"f6",118:"f7",119:"f8",120:"f9",121:"f10",122:"f11",123:"f12",144:"numlock",145:"scroll",173:"-",186:";",187:"=",188:",",189:"-",190:".",191:"/",192:"`",219:"[",220:"\\",221:"]",222:"'"},shiftNums:{"`":"~",1:"!",2:"@",3:"#",4:"$",5:"%",6:"^",7:"&",8:"*",9:"(",0:")","-":"_","=":"+",";":": ","'":'"',",":"<",".":">","/":"?","\\":"|"}};e.each(["keydown","keyup","keypress"],function(){e.event.special[this]={add:t}})})(this.jQuery)

@@ -29,6 +29,8 @@ return array(
 	'Include hidden pages' => 'Показывать скрытые страницы',
 	'Exclude pages' => 'Исключить страницы',
 	'Select to child pages' => 'Установить для дочерних страниц',
+	'Select page level' => 'Уровень страниц',
+	'Include users object' => 'Загружать объект пользователя',
 	'--- Do not copy ---' => '--- Не копировать ---',
 	'Page password form' => 'Форма ввода пароля для закрытой страницы',
 	'Widget :name' => 'Виджет :name',
@@ -42,14 +44,15 @@ return array(
 	'Block: :block_name' => 'Блок: :block_name',
 	'Position: :position' => 'Позиция: :position',
 	'All widgets set to page' => 'Все виджеты установлены на страницу',
-	
+	'Widget variables' => 'Переменные виджета',
 	'Other' => 'Другое',
 	'Menu' => 'Меню',
 	'Pages with parts' => 'Страницы с контентом',
 	'Breadcrumbs' => 'Хлебные крошки',
 	'Authentication' => 'Авторизация',
 	'Authentication destroy' => 'Выход',
-	
+	'Widget inject key' => 'Ключ для инъекции',
+	'Handler' => 'Обработчик',
 	'Send mail' => 'Отправка писем',
 	'Message subject' => 'Заголовок письма',
 	'Message from' => 'От',
@@ -68,9 +71,16 @@ return array(
 	'Validator' => 'Валидация',
 	'Field error message' => 'Текст ошибки',
 	'Field error' => 'Ошибки',
+	'Caching' => 'Кеширование',
+	'Day' => 'День',
+	'Week' => 'Неделя',
+	'Media packages' => 'Media пакеты',
+	'Equal' => 'Равно',
+	'POST array' => 'POST массив',
+	'GET array' => 'GET массив',
 	
 	'Copy widgets from' => 'Скопировать виджеты у страницы',
-	'Cache time' => 'Время кеширования',
+	'Cache time' => 'Кеширование',
 	'--- Remove from page ---' => '--- Убрать со страницы ---',
 	'--- Hide ---' => '--- Скрыть ---',
 	'Pagination' => 'Постраничная навигация',
@@ -89,6 +99,8 @@ return array(
 	'Default template' => 'Шаблон по умолчанию',
 	
 	'Widget permissions' => 'Права на видимость',
+	'To use handler send your data to URL :href or use route :route' => 
+		'Для использования обработчика отправляйте ваши данные на URL :href или используйте роут :route',
 	//============Permissions============//
 	'View widgets' => 'Видеть раздел',
 	'Edit widget' => 'Редактировать виджет',

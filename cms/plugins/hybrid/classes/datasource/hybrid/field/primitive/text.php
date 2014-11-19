@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Hybrid
+ * @category	Field
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class DataSource_Hybrid_Field_Primitive_Text extends DataSource_Hybrid_Field_Primitive {
 	
 	protected $_is_indexable = FALSE;
@@ -15,11 +23,6 @@ class DataSource_Hybrid_Field_Primitive_Text extends DataSource_Hybrid_Field_Pri
 	public function booleans()
 	{
 		return array('allow_html', 'filter_html');
-	}
-	
-	public function set( array $data )
-	{
-		return parent::set( $data );
 	}
 	
 	public function set_rows( $rows )
@@ -49,7 +52,7 @@ class DataSource_Hybrid_Field_Primitive_Text extends DataSource_Hybrid_Field_Pri
 		return 'TEXT NOT NULL';
 	}
 	
-	public function fetch_headline_value( $value )
+	public function fetch_headline_value( $value, $document_id )
 	{
 		if(empty($value)) return '';
 

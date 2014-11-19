@@ -1,14 +1,20 @@
 <?php echo $form; ?>
-<div class="widget widget-sidebar">
-	<div class="widget-content">
-		<?php foreach ($fields as $field): ?>
-		<?php echo $field; ?>
-		<?php endforeach; ?>
-		<div class="form-actions" style="margin-bottom: 0; padding: 10px 10px;">
-			<button type="submit" class="btn btn-primary"><?php echo UI::icon('search'); ?> <?php echo __('Search'); ?></button>
-			<?php echo HTML::anchor($form->action(), __('Cancel'), array('class' => 'btn btn-link')); ?>
-		</div>
+<div class="panel-sidebar">
+	<div class="panel-heading panel-toggler">
+		<span class="panel-title"><?php echo __('Filter'); ?></span>
 	</div>
-	
+	<div class="panel-body panel-spoiler">
+		<?php foreach ($fields as $field): ?>
+			<div class="col-sm-4">
+				<?php echo $field; ?>
+			</div>
+		<?php endforeach; ?>
+		
+		<hr class="panel-wide visible-xs" />
+		
+		<button type="submit" class="btn btn-primary" data-icon="search"><?php echo __('Search'); ?></button>
+		&nbsp;&nbsp;&nbsp;
+		<?php echo HTML::anchor($form->action(), __('Cancel'), array('class' => 'btn btn-xs btn-outline btn-rounded', 'data-icon' => 'ban')); ?>
+	</div>
 </div> 
 <?php echo Form::close(); ?>

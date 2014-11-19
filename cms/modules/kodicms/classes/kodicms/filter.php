@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS
  * @category	Helper
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Filter implements ArrayAccess {
 	
@@ -13,7 +16,7 @@ class KodiCMS_Filter implements ArrayAccess {
 	 * @param   array   $array  array to use for filter
 	 * @return  Filter
 	 */
-	public static function factory(array $array, array $rules = NULL)
+	public static function factory(array $array = NULL, array $rules = NULL)
 	{
 		return new Filter($array, $rules);
 	}
@@ -32,13 +35,16 @@ class KodiCMS_Filter implements ArrayAccess {
 	 * @param array $rules rules [field => array(..., rules, ...)]
 	 * @return  void
 	 */
-	public function __construct(array $array, array $rules = NULL)
+	public function __construct(array $array = NULL, array $rules = NULL)
 	{
 		$this->_data = $array;
-		
-		foreach ($rules as $field => $data)
+
+		if (!empty($rules))
 		{
-			$this->rules($field, $data);
+			foreach ($rules as $field => $data)
+			{
+				$this->rules($field, $data);
+			}
 		}
 	}
 
@@ -60,7 +66,7 @@ class KodiCMS_Filter implements ArrayAccess {
 	 */
 	public function rule($field, $rule, $default = NULL)
 	{
-		if( ! is_bool($rule) AND ! is_null($rule) )
+		if (!is_bool($rule) AND ! is_null($rule))
 		{
 			// Store the rule and params for this rule
 			$this->_rules[$field]['rules'][] = $rule;
@@ -70,7 +76,7 @@ class KodiCMS_Filter implements ArrayAccess {
 
 		return $this;
 	}
-	
+
 	/**
 	 * Add rules using an array.
 	 *
@@ -80,14 +86,17 @@ class KodiCMS_Filter implements ArrayAccess {
 	 */
 	public function rules($field, array $rules = NULL)
 	{
-		foreach ($rules as $rule)
+		if (!empty($rules))
 		{
-			$this->rule($field, $rule[0], Arr::get($rule, 1));
+			foreach ($rules as $rule)
+			{
+				$this->rule($field, $rule[0], Arr::get($rule, 1));
+			}
 		}
 
 		return $this;
 	}
-	
+
 	/**
 	 * Filters a values
 	 */
@@ -95,28 +104,31 @@ class KodiCMS_Filter implements ArrayAccess {
 	{
 		$rules = $this->_rules;
 
+		// Get the filters for this column
+		$wildcards = empty($rules[TRUE]) ? array() : $rules[TRUE];
+		
 		foreach ($rules as $field => $data)
 		{
 			$data['rules'] = empty($data['rules']) ? $wildcards : array_merge($wildcards, $data['rules']);
-	
-			if($this->offsetExists($field))
+
+			if ($this->offsetExists($field))
 			{
 				$value = $this->offsetGet($field);
 			}
-			elseif(!$this->offsetExists($field) AND !empty($data['default']))
+			elseif (!$this->offsetExists($field) AND ! empty($data['default']))
 			{
 				Arr::set_path($this->_data, $field, $data['default']);
 				continue;
 			}
-		
+
 			$value = $this->field($field, $value, $data['rules']);
 
 			Arr::set_path($this->_data, $field, $value);
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * 
 	 * @param string $field
@@ -126,19 +138,19 @@ class KodiCMS_Filter implements ArrayAccess {
 	 */
 	public function field($field, $value, array $rules = NULL)
 	{
-		if(Kohana::$profiling === TRUE)
+		if (Kohana::$profiling === TRUE)
 		{
 			$benchmark = Profiler::start('Filter field', $field);
 		}
-		
-		if(empty($rules))
+
+		if (empty($rules))
 		{
 			$rules = Arr::path($this->_rules, $field . '.rules', array());
 		}
 
 		// Bind the field name and model so they can be used in the filter method
 		$_bound = array
-		(
+			(
 			':field' => $field,
 			':filter' => $this,
 		);
@@ -159,40 +171,17 @@ class KodiCMS_Filter implements ArrayAccess {
 				}
 			}
 
-			if (is_array($filter) OR ! is_string($filter))
-			{
-				// This is either a callback as an array or a lambda
-				$value = call_user_func_array($filter, $params);
-			}
-			elseif (strpos($filter, '::') === FALSE)
-			{
-				// Use a function call
-				$function = new ReflectionFunction($filter);
-
-				// Call $function($this[$field], $param, ...) with Reflection
-				$value = $function->invokeArgs($params);
-			}
-			else
-			{
-				// Split the class and method of the rule
-				list($class, $method) = explode('::', $filter, 2);
-
-				// Use a static method call
-				$method = new ReflectionMethod($class, $method);
-
-				// Call $Class::$method($this[$field], $param, ...) with Reflection
-				$value = $method->invokeArgs(NULL, $params);
-			}
+			$value = Callback::invoke($filter, $params);
 		}
 
-		if(isset($benchmark))
+		if (isset($benchmark))
 		{
 			Profiler::stop($benchmark);
 		}
-		
+
 		return $value;
 	}
-	
+
 	/**
 	 * Throws an exception because Filter is read-only.
 	 * Implements ArrayAccess method.

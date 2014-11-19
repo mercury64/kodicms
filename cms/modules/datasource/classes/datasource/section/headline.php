@@ -1,7 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package		Datasource
+ * @package		KodiCMS/Datasource
+ * @category	Headline
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 abstract class Datasource_Section_Headline {
 	
@@ -45,6 +50,12 @@ abstract class Datasource_Section_Headline {
 	 * @var integer 
 	 */
 	protected $_offset = 0;
+	
+	/**
+	 * Текущая страница
+	 * @var integer 
+	 */
+	protected $_page = NULL;
 
 	/**
 	 * 
@@ -65,12 +76,15 @@ abstract class Datasource_Section_Headline {
 		return array(
 			'id' => array(
 				'name' => 'ID',
-				'width' => 50
+				'width' => 50,
+				'class' => 'text-right text-muted',
+				'visible' => TRUE
 			),
 			'header' => array(
 				'name' => 'Header',
 				'width' => NULL,
-				'type' => 'link'
+				'type' => 'link',
+				'visible' => TRUE
 			)
 		);
 	}
@@ -87,12 +101,17 @@ abstract class Datasource_Section_Headline {
 		{
 			$template = 'datasource/' . $this->_section->type() . '/headline';
 		}
+		
+		if(Kohana::find_file('views', $template) === FALSE)
+		{
+			$template = 'datasource/section/headline';
+		}
 
 		return View::factory($template, array(
 			'fields' => $this->fields(),
 			'data' => $this->get(),
 			'pagination' => $this->pagination(),
-			'section' => $this->_section
+			'datasource' => $this->_section
 		));
 	}
 	
@@ -138,25 +157,51 @@ abstract class Datasource_Section_Headline {
 	}
 	
 	/**
+	 * 
+	 * @param integer $num
+	 */
+	public function set_page($num)
+	{
+		$this->_page = (int) $num;
+		
+		return $this;
+	}
+	
+	public function set_query_params()
+	{
+		$_GET['ds_id'] = $this->_section->id();
+	}
+
+	/**
 	 * Формирование данных для постраничной навигации
 	 * 
 	 * @param array $ids
 	 * @param string $search_word
 	 * @return Pagination
 	 */
-	public function pagination( array $ids = NULL )
+	public function pagination(array $ids = NULL)
 	{
-		$this->_pagination->setup(array(
+		$this->set_query_params();
+
+		$options = array(
 			'items_per_page' => $this->limit(),
 			'total_items' => $this->count_total($ids),
 			'current_page' => array(
 				'source' => 'query_string',
-				'key' => 'page'
+				'key' => 'page',
+				'uri' => Route::get('datasources')->uri()
 			)
-		));
+		);
+
+		if (!empty($this->_page))
+		{
+			$options['current_page']['page'] = $this->_page;
+		}
+
+		$this->_pagination->setup($options);
 
 		$this->_offset = (int) $this->_pagination->offset;
-		
+
 		return $this->_pagination;
 	}
 
@@ -234,7 +279,7 @@ abstract class Datasource_Section_Headline {
 		$this->_sorting = $orders;
 		return $this;
 	}
-	
+
 	/**
 	 * 
 	 * @return array
@@ -252,7 +297,12 @@ abstract class Datasource_Section_Headline {
 	protected function _serialize()
 	{
 		$vars = get_object_vars($this);
-		unset($vars['_section'], $vars['_pagination']);
+		unset(
+			$vars['_section'], 
+			$vars['_pagination'],
+			$vars['_page'],
+			$vars['_offset']
+		);
 		
 		return $vars;
 	}

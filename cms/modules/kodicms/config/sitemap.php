@@ -2,14 +2,21 @@
 
 return array(
 	array(
+		'name' => 'Content',
+		'icon' => 'pencil-square-o',
+		'priority' => 200,
+	),
+	array(
 		'name' => 'System',
+		'icon' => 'cog',
+		'priority' => 8000,
 		'children' => array(
 			array(
 				'name' => 'Information',
 				'url' => Route::get('backend')->uri(array('controller' => 'system', 'action' => 'information')),
 				'permissions' => 'system.information',
 				'priority' => 90,
-				'icon' => 'info-sign',
+				'icon' => 'info-circle',
 			),
 			array(
 				'name' => 'Settings',
@@ -23,6 +30,8 @@ return array(
 	),
 	array(
 		'name' => 'Design',
+		'icon' => 'desktop',
+		'priority' => 7000,
 		'children' => array(
 			array(
 				'name' => 'Layouts', 

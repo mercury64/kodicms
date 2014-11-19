@@ -1,5 +1,13 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Update
+ * @category	Controller
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Controller_Update extends Controller_System_Backend {
 	
 	public function before()
@@ -12,6 +20,7 @@ class Controller_Update extends Controller_System_Backend {
 	
 	public function action_index() 
 	{
+		$this->set_title(__('Update'));
 		$this->template->content = View::factory( 'update/index');
 	}
 	
@@ -19,16 +28,10 @@ class Controller_Update extends Controller_System_Backend {
 	{
 		Assets::package('ace');
 		
-		$this->template->title = __('Update');
-		
-		$db_sql = Database_Helper::schema();
-		$file_sql = Database_Helper::install_schema();
-
-		$compare = new Database_Helper;
-		$diff = $compare->get_updates($db_sql, $file_sql, TRUE);
+		$this->set_title(__('Database'));
 		
 		$this->template->content = View::factory( 'update/database', array(
-			'actions' => $diff,
+			'actions' => Update::check_database(FALSE),
 		));
 	}
 	
@@ -38,6 +41,8 @@ class Controller_Update extends Controller_System_Backend {
 		{
 			return $this->_apply_patch();
 		}
+		
+		$this->set_title(__('Patches'));
 
 		$this->template->content = View::factory( 'update/patches', array(
 			'patches' => array_flip(Patch::find_all()),

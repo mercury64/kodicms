@@ -1,6 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 return array(
+	'Datasource' => 'Раздел',
 	'Datasources' => 'Datasources',
 	'Create Document' => 'Создать документ',
 	'Apply' => 'Применить',
@@ -30,5 +31,23 @@ return array(
 	'Datasource section not loaded' => 'Раздел не загружен',
 	'Document saved' => 'Документ сохранен',
 	'Document ID :id not found' => 'Документ c ID :id не найден',
-	
+	'Check all' => 'Выбрать все',
+	'Uncheck all' => 'Отменить выбор',
+	'Create document' => 'Создать документ',
+	'Section is empty' => 'Раздел пустой',
+	'Create folder' => 'Создать папку',
+	'New folder' => 'Новая папка',
+	'Folder name' => 'Название',
+	'Datasource Author' => 'Автор',
+	'Datasource properties' => 'Настройки',
+	'Datasource :name' => 'Раздел :name',
+	'View section' => 'Просмотр раздела',
+	'Edit section' => 'Редактировать раздел',
+	'Remove section' => 'Удалить раздел',
+	'View documents' => 'Просмотре документов',
+	'Create documents' => 'Создание документов',
+	'Edit documents' => 'Редактирование документов',
+	'Remove documents' => 'Удаление документов',
+	'Datasource icon' => 'Иконка раздела',
+	'Show datasource in root menu' => 'Отображать раздел в корне меню'
 );

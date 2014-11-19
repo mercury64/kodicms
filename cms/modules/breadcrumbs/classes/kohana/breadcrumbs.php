@@ -2,7 +2,14 @@
 
 /**
  * @package		KodiCMS/Breadcrumbs
+<<<<<<< HEAD
  * @author		ButscHSter
+=======
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright  (c) 2012-2014 butschster
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+>>>>>>> upstream/dev
  */
 abstract class Kohana_Breadcrumbs implements Countable, Iterator {
 
@@ -89,8 +96,11 @@ abstract class Kohana_Breadcrumbs implements Countable, Iterator {
 		{
 			$position = $this->_get_next_positon($position);
 			$this->_items[$position] = $item;
+<<<<<<< HEAD
 
 			$this->delete($item->name);
+=======
+>>>>>>> upstream/dev
 		}
 
 		return $this;
@@ -133,6 +143,7 @@ abstract class Kohana_Breadcrumbs implements Countable, Iterator {
 	protected function _get_next_positon($position = NULL)
 	{
 		$position = (int) $position;
+<<<<<<< HEAD
 		if(empty($position) OR !isset($this->_items[$position]))
 		{
 			$position = $this->count() + 1;
@@ -143,10 +154,24 @@ abstract class Kohana_Breadcrumbs implements Countable, Iterator {
 			{
 				$position++;
 			}
+=======
+		while(isset($this->_items[$position]))
+		{
+			$position++;
+>>>>>>> upstream/dev
 		}
 
 		return $position;
 	}
+<<<<<<< HEAD
+=======
+	
+	protected function _sort()
+	{
+		ksort($this->_items);
+		return $this;
+	}
+>>>>>>> upstream/dev
 
 	/**
 	 * 
@@ -271,6 +296,11 @@ abstract class Kohana_Breadcrumbs implements Countable, Iterator {
 	 */
 	public function render()
 	{
+<<<<<<< HEAD
+=======
+		$this->_sort();
+
+>>>>>>> upstream/dev
 		return View::factory($this->options['view'], array(
 			'breadcrumbs' => $this,
 			'active_class' => $this->options['active_class'],
@@ -282,4 +312,8 @@ abstract class Kohana_Breadcrumbs implements Countable, Iterator {
 	{
 		return (string) $this->render();
 	}
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> upstream/dev

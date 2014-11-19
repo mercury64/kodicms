@@ -2,6 +2,5 @@
 
 Plugin::factory('maintenance', array(
 	'title' => 'Maintenance mode',
-	'description' => 'Enables the site to be put into maintenance mode.',
-	'version' => '1.0.0'
+	'author' => 'ButscH',
 ))->register();

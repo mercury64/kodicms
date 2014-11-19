@@ -1,11 +1,7 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 return array(
-	'Scheduler' => 'Планировщик',
-	'Today' => 'Сегодня',
-	'Month' => 'Месяц',
-	'Week' => 'Неделя',
-	'Day' => 'День',
+	'Calendar' => 'Календарь',
 	
 	//============Jobs============//
 	'Jobs' => 'Задачи',
@@ -27,7 +23,7 @@ return array(
 	'Job is currently running' => 'В процессе',
 	'Job is complete' => 'Выполнена',
 	'Job run time' => 'Время запуска',
-	'Job history' => 'История запука',
+	'Job history' => 'История запуcка',
 	'Job settings' => 'Настройка задач',
 	'Job agent' => 'Агент',
 	'When using cron you need to add the following line to the crontab file:' => 
@@ -37,8 +33,25 @@ return array(
 	'Delete job' => 'Удалять задачи',
 	'At least :num characters. Must be unique.' => 'Не менее :num символов. Должен быть уникальным.',
 	
+	'Day of week (0 - 6) (0 to 6 are Sunday to Saturday, or use names; 7 is Sunday, the same as 0)' => 'День недели (0 - 7) (Воскресенье 0 или 7)',
+	'Month (1 - 12)' => 'Месяц (1 - 12)',
+	'Day of month (1 - 31)' => 'День (1 - 31)',
+	'Hour (0 - 23)' => 'Час (0 - 23)',
+	'Min (0 - 59)' => 'Минута (0 - 59)',
+	
+	'New event' => 'Новое событие',
+	'Event Title' => 'Тема',
+	'Event start' => 'Дата начала',
+	'Event end' => 'Дата окончания',
+	'Select Event Color' => 'Выберите цвет',
+	'Only for me' => 'Только для меня',
+	'Add Event' => 'Добавить',
+	
+	'Mini calendar' => 'Мини календарь',
+	'Calendar' => 'Календарь',
+	
 	//============Permissions============//
-	'View scheduler' => 'Видеть раздел',
+	'View calendar' => 'Видеть раздел',
 		
 	/* Validation */
 	'Not true format.' => 'Не верный формат.',

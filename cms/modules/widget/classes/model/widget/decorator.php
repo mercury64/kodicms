@@ -2,26 +2,22 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Decorator
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 abstract class Model_Widget_Decorator {
 	
 	const ORDER_ASC = 'ASC';
 	const ORDER_DESC = 'DESC';
 
-
 	/**
 	 * Идентификатор виджета
 	 * @var integer
 	 */
 	public $id;
-
-	/**
-	 * Тип виджета
-	 * @var string 
-	 */
-	public $type;
 	
 	/**
 	 * Название виджета
@@ -58,14 +54,6 @@ abstract class Model_Widget_Decorator {
 	 * @var string 
 	 */
 	public $frontend_template = NULL;
-
-
-	/**
-	 * Виджет использует шаблон
-	 * @var boolean 
-	 */
-	public $use_template = TRUE;
-
 	
 	/**
 	 * Параметры передаваемые в шаблон
@@ -90,12 +78,6 @@ abstract class Model_Widget_Decorator {
 	 * @var boolean 
 	 */
 	public $crumbs = FALSE;
-	
-	/**
-	 * Виджет можно кешировать
-	 * @var boolean 
-	 */
-	public $use_caching = TRUE;
 
 	/**
 	 * Включение / Отключение кеширования
@@ -131,19 +113,56 @@ abstract class Model_Widget_Decorator {
 	 * @var array 
 	 */
 	public $media = array();
+	
+	/**
+	 * Подключаемые медиа пакеты для текущего виджета
+	 * Для подключения пакетов в шаблон используется класс Assets
+	 * 
+	 * @var array 
+	 */
+	public $media_packages = array();
 
 	/**
-	 * 
+	 * Генерировать ошибку 404
 	 * @var bool 
 	 */
 	public $throw_404 = FALSE;
 	
+	/**
+	 * 
+	 * @var string 
+	 */
+	public $frontend_template_preffix = 'frontend';
+
 	/**
 	 *
 	 * @var Context 
 	 */
 	protected $_ctx = NULL;
 
+	/**
+	 * Тип виджета
+	 * @var string 
+	 */
+	protected $_type;
+	
+	/**
+	 * Виджет явялется обработчиком
+	 * @var bool 
+	 */
+	protected $_is_handler = FALSE;
+
+	/**
+	 * Виджет использует шаблон
+	 * @var boolean 
+	 */
+	protected $_use_template = TRUE;
+	
+	/**
+	 * Виджет можно кешировать
+	 * @var boolean 
+	 */
+	protected $_use_caching = TRUE;
 
 	/**
 	 * Дополнительные параметры виджета
@@ -156,6 +175,29 @@ abstract class Model_Widget_Decorator {
 		$this->_ctx = Context::instance();
 		$this->_set_type();
 	}
+	
+	/**
+	 * 
+	 * @return string
+	 */
+	public function type($as_key = TRUE)
+	{
+		if($as_key === TRUE)
+		{
+			return $this->_type;
+		}
+		
+		$widget_types = Widget_Manager::map();
+		
+		$type = $this->_type;
+
+		foreach($widget_types as $group => $types)
+		{
+			if(isset($types[$type])) $type = $types[$type];
+		}
+		
+		return $type;
+	}
 
 	/**
 	 * Сеттер доплнительных параметров
@@ -164,19 +206,20 @@ abstract class Model_Widget_Decorator {
 	 * @param mixed $value
 	 * @return \Model_Widget_Decorator
 	 */
-	public function set( $name, $value )
+	public function set($name, $value)
 	{
 		$this->_data[$name] = $value;
+		
 		return $this;
 	}
-	
+
 	/**
 	 * 
 	 * @param string $name
 	 * @param mixed $value
 	 * @return \Model_Widget_Decorator
 	 */
-	public function bind( $name, & $value )
+	public function bind($name, & $value)
 	{
 		$this->_data[$name] = & $value;
 		return $this;
@@ -189,14 +232,14 @@ abstract class Model_Widget_Decorator {
 	 * @param mixed $default
 	 * @return mided
 	 */
-	public function & get( $name, $default = NULL)
+	public function & get($name, $default = NULL)
 	{
 		$result = $default;
 		if (array_key_exists($name, $this->_data))
 		{
 			$result = $this->_data[$name];
 		}
-		
+
 		return $result;
 	}
 
@@ -205,19 +248,46 @@ abstract class Model_Widget_Decorator {
 	 * @param string $name
 	 * @param mixed $value
 	 */
-	public function __set( $name, $value )
+	public function __set($name, $value)
 	{
 		$this->set($name, $value);
 	}
-	
+
 	/**
 	 * 
 	 * @param string $name
 	 * @return mixed
 	 */
-	public function & __get( $name )
+	public function & __get($name)
 	{
-		return $this->get( $name );
+		return $this->get($name);
+	}
+
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public function is_handler()
+	{
+		return $this->_is_handler;
+	}
+	
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public function use_template()
+	{
+		return $this->_use_template;
+	}
+	
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public function use_caching()
+	{
+		return $this->_use_caching;
 	}
 
 	/**
@@ -231,7 +301,7 @@ abstract class Model_Widget_Decorator {
 	{
 		if($this->backend_template === NULL)
 		{
-			$this->backend_template = $this->type;
+			$this->backend_template = $this->type();
 		}
 		
 		return $this->backend_template;
@@ -248,7 +318,7 @@ abstract class Model_Widget_Decorator {
 	{
 		if($this->frontend_template === NULL)
 		{
-			$this->frontend_template = $this->type;
+			$this->frontend_template = $this->type();
 		}
 		
 		return $this->frontend_template;
@@ -261,64 +331,12 @@ abstract class Model_Widget_Decorator {
 	 */
 	public function default_template()
 	{
-		if (($template = Kohana::find_file('views', 'widgets/frontend/' . $this->frontend_template())) === FALSE)
+		if (($template = Kohana::find_file('views', 'widgets/' . $this->frontend_template_preffix . '/' . $this->frontend_template())) === FALSE)
 		{
-			$template = Kohana::find_file('views', 'widgets/frontend/default');
+			$template = Kohana::find_file('views', 'widgets/' . $this->frontend_template_preffix .'/default');
 		}
 
 		return $template;
-	}
-	
-	/**
-	 * Получение пути до файла шаблона виджета.
-	 * Сначала происходит поиск файла по названию Сниппета, если он не 
-	 * найден, то просходит поиск шаблона по умолчанию для виджета.
-	 * 
-	 * @return string
-	 */
-	protected function _fetch_template()
-	{
-		if( empty($this->template) ) 
-		{
-			$this->template = $this->default_template();
-		}
-		else
-		{
-			$snippet = new Model_File_Snippet($this->template);
-			
-			if( $snippet->is_exists() )
-			{
-				$this->template = $snippet->get_file();
-			}
-			else if(($this->template = $snippet->find_file()) === FALSE)
-			{
-				$this->template = $this->default_template();
-			}
-		}
-		
-		return $this->template;
-	}
-
-	/**
-	 * Подготовка к рендеру виджета
-	 * Происходит инициализация View и передача в него переменных из метода
-	 * {@see Model_Widget_Decorator::fetch_data()}, а также дополнительных параметров,
-	 * переданных в блок шаблона страницы
-	 * 
-	 * @param array $params
-	 * @return View
-	 */
-	protected function _fetch_render()
-	{
-		$context = & Context::instance();
-
-		$data = $this->fetch_data();
-		$data['params'] = $this->template_params;
-		$data['page'] = $context->get_page();
-	
-		return View_Front::factory($this->template, $data)
-			->bind('header', $this->header)
-			->bind('ctx', $this->_ctx);
 	}
 
 	/**
@@ -351,7 +369,7 @@ abstract class Model_Widget_Decorator {
 	 */
 	public function get_cache_id()
 	{
-		return 'Widget::' . $this->type . '::' . $this->id;
+		return 'Widget::' . $this->type() . '::' . $this->id;
 	}
 	
 	
@@ -418,7 +436,7 @@ abstract class Model_Widget_Decorator {
 	 */
 	public function get_hash()
 	{
-		return 'widget_' . $this->type . '_' . $this->id;
+		return 'widget_' . $this->type() . '_' . $this->id;
 	}
 	
 	/**
@@ -479,8 +497,8 @@ abstract class Model_Widget_Decorator {
 		try
 		{
 			$content = View::factory('widgets/backend/' . $this->backend_template(), array(
-					'widget' => $this
-				))->set($this->backend_data());
+				'widget' => $this
+			))->set($this->backend_data());
 		}
 		catch (Kohana_Exception $e)
 		{
@@ -518,29 +536,25 @@ abstract class Model_Widget_Decorator {
 		{
 			$data['media'] = array();
 		}
+		
+		if(empty($data['media_packages']))
+		{
+			$data['media_packages'] = array();
+		}
 
 		foreach($data as $key => $value)
 		{
-			if( method_exists( $this, 'set_' . $key ))
+			if (method_exists($this, 'set_' . $key))
 			{
-				$this->{$key} = $this->{'set_'.$key}($value);
+				$this->{$key} = $this->{'set_' . $key}($value);
 			}
-			else 
+			else
 			{
 				$this->{$key} = $value;
 			}
 		}
 		
 		return $this;
-	}
-
-	/**
-	 * Рендер виджета
-	 * @param array $params Дополнительные параметры
-	 */
-	public function run(array $params = array()) 
-	{
-		return $this->render($params);
 	}
 	
 	/**
@@ -562,22 +576,29 @@ abstract class Model_Widget_Decorator {
 	 */
 	public function set_media($files)
 	{
-		foreach($files as $i => $link)
+		foreach ($files as $i => $link)
 		{
-			if( strpos($link, '.css') === FALSE AND strpos($link, '.js') === FALSE)
+			if (strpos($link, '.css') === FALSE AND strpos($link, '.js') === FALSE)
 			{
 				unset($files[$i]);
 			}
-			
-			if( ! Valid::url($link) )
+
+			if (!Valid::url($link))
 			{
 				$files[$i] = URL::site($link, TRUE);
 			}
 		}
-		
-		
 
 		return array_unique($files);
+	}
+
+	/**
+	 * Рендер виджета
+	 * @param array $params Дополнительные параметры
+	 */
+	public function run(array $params = array()) 
+	{
+		return $this->render($params);
 	}
 
 	/**
@@ -595,13 +616,13 @@ abstract class Model_Widget_Decorator {
 	 */
 	public function render(array $params = array())
 	{
-		// Проверка правк на видимость виджета
-		if( ! empty($this->roles))
+		// Проверка прав на видимость виджета
+		if (!empty($this->roles))
 		{
 			$auth = Auth::instance();
-			if( $auth->logged_in() )
+			if ($auth->logged_in())
 			{
-				if( ! $auth->get_user()->has_role($this->roles, FALSE) )
+				if (!$auth->get_user()->has_role($this->roles, FALSE))
 				{
 					return;
 				}
@@ -611,33 +632,38 @@ abstract class Model_Widget_Decorator {
 				return;
 			}
 		}
-		
-		if(Kohana::$profiling === TRUE)
+
+		if (Kohana::$profiling === TRUE)
 		{
 			$benchmark = Profiler::start('Widget render', $this->name);
 		}
 
 		$this->_fetch_template();
 		$this->set_params($params);
-		
+
 		$allow_omments = (bool) Arr::get($this->template_params, 'comments', TRUE);
 		$caching = (bool) Arr::get($this->template_params, 'caching', $this->caching);
 
-		if( $this->block == 'PRE' OR $this->block == 'POST' )
+		if ($this->block == 'PRE' OR $this->block == 'POST')
 		{
 			$allow_omments = FALSE;
 		}
-		
-		if($allow_omments)
-		{
-			echo "<!--{Widget: {$this->name}}-->";
-		}
-		
-		if(Kohana::$caching === FALSE OR $caching === FALSE)
+
+		if (Kohana::$caching === FALSE OR $caching === FALSE)
 		{
 			$this->caching = FALSE;
 		}
-		
+
+		if (Arr::get($this->template_params, 'return') === TRUE)
+		{
+			return $this->_fetch_render();
+		}
+
+		if ($allow_omments)
+		{
+			echo "<!--{Widget: {$this->name}}-->";
+		}
+
 		if(
 			$this->caching === TRUE
 		AND 
@@ -647,20 +673,69 @@ abstract class Model_Widget_Decorator {
 			echo $this->_fetch_render();
 			Fragment::save_with_tags($this->cache_lifetime, $this->cache_tags);
 		}
-		else if( ! $this->caching )
+		else if (!$this->caching)
 		{
 			echo $this->_fetch_render();
 		}
 
-		if($allow_omments)
+		if ($allow_omments)
 		{
 			echo "<!--{/Widget: {$this->name}}-->";
 		}
-		
-		if(isset($benchmark))
+
+		if (isset($benchmark))
 		{
 			Profiler::stop($benchmark);
 		}
+	}
+	
+	/**
+	 * Получение пути до файла шаблона виджета.
+	 * Сначала происходит поиск файла по названию Сниппета, если он не 
+	 * найден, то просходит поиск шаблона по умолчанию для виджета.
+	 * 
+	 * @return string
+	 */
+	protected function _fetch_template()
+	{
+		if( empty($this->template) ) 
+		{
+			$this->template = $this->default_template();
+		}
+		else
+		{
+			$snippet = new Model_File_Snippet($this->template);
+			
+			if( $snippet->is_exists() )
+			{
+				$this->template = $snippet->get_file();
+			}
+			else if(($this->template = $snippet->find_file()) === FALSE)
+			{
+				$this->template = $this->default_template();
+			}
+		}
+		
+		return $this->template;
+	}
+
+	/**
+	 * Подготовка к рендеру виджета
+	 * Происходит инициализация View и передача в него переменных из метода
+	 * {@see Model_Widget_Decorator::fetch_data()}, а также дополнительных параметров,
+	 * переданных в блок шаблона страницы
+	 * 
+	 * @param array $params
+	 * @return View
+	 */
+	protected function _fetch_render()
+	{
+		$data = $this->fetch_data();
+		$data['params'] = $this->template_params;
+		$data['widget_id'] = $this->id;
+		
+		return View_Front::factory($this->template, $data)
+			->bind('header', $this->header);
 	}
 	
 	/**
@@ -671,7 +746,7 @@ abstract class Model_Widget_Decorator {
 	protected function _set_type()
 	{
 		$class_name = get_called_class();
-		$this->type = strtolower(substr($class_name, 13));
+		$this->_type = strtolower(substr($class_name, 13));
 		
 		return $this;
 	}
@@ -683,19 +758,24 @@ abstract class Model_Widget_Decorator {
 	 */
 	public function on_page_load() 
 	{
-		if( ! empty($this->media) )
+		if (!empty($this->media))
 		{
-			foreach($this->media as $link)
+			foreach ($this->media as $link)
 			{
-				if( strpos($link, '.css') !== FALSE)
+				if (strpos($link, '.css') !== FALSE)
 				{
 					Assets::css($link, $link);
 				}
-				else if(strpos($link, '.js') !== FALSE)
+				else if (strpos($link, '.js') !== FALSE)
 				{
 					Assets::js($link, $link);
 				}
 			}
+		}
+		
+		if (!empty($this->media_packages))
+		{
+			Assets::package($this->media_packages);
 		}
 	}
 	
@@ -747,28 +827,49 @@ abstract class Model_Widget_Decorator {
 		return (string) $this->render();
 	}
 	
-	public function __sleep()
+	/**
+	 * Параметры, которые не должны сериализоваться при сохранении объекта
+	 * @return array
+	 */
+	protected function _serialize_vars()
 	{
 		$vars = get_object_vars($this);
-
+		
 		unset(
 			$vars['_ctx'],
-			$vars['id'],
-			$vars['type'],
+			$vars['_type'],
 			$vars['template'],
 			$vars['name'], 
 			$vars['description'],
 			$vars['backend_template'],
 			$vars['frontend_template'],
-			$vars['use_template'],
+			$vars['frontend_template_preffix'],
+			$vars['_use_template'],
+			$vars['_use_caching'],
+			$vars['_is_handler'],
 			$vars['block'],
 			$vars['position'],
 			$vars['template_params']
 		);
-
-		return array_keys($vars);
+		
+		return $vars;
 	}
 	
+	/**
+	 * Метод вызывается в момент сохранения объекта в БД
+	 * 
+	 * @return array
+	 */
+	public function __sleep()
+	{
+		return array_keys($this->_serialize_vars());
+	}
+	
+	/**
+	 * Метод вызывается в момент загрузки объекта из БД
+	 * 
+	 * @return array
+	 */
 	public function __wakeup()
 	{
 		$this->_ctx = Context::instance();

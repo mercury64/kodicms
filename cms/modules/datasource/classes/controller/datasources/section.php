@@ -1,22 +1,38 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Datasource
+ * @category	Controller
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Controller_Datasources_Section extends Controller_System_Datasource
 {	
 	public function before()
 	{
-		if($this->request->action() != 'create')
+		if ($this->request->action() != 'create')
 		{
 			$ds_id = (int) $this->request->param('id');
 			$this->section($ds_id);
 
-			if(Acl::check($this->section()->type().$ds_id.'.section.edit'))
+			if ($this->section()->has_access_edit())
 			{
 				$this->allowed_actions[] = 'edit';
 			}
-			
-			if(Acl::check($this->section()->type().$ds_id.'.section.remove'))
+
+			if ($this->section()->has_access_remove())
 			{
 				$this->allowed_actions[] = 'remove';
+			}
+		}
+		else
+		{
+			$type = strtolower($this->request->param('id'));
+			if(ACL::check($type . '.section.create'))
+			{
+				$this->allowed_actions[] = 'create';
 			}
 		}
 
@@ -39,23 +55,22 @@ class Controller_Datasources_Section extends Controller_System_Datasource
 			return $this->_create($type);
 		}
 		
-		$this->template->title = __('Add section :type', array(':type' => Arr::get($types, $type)));
-
-		$this->breadcrumbs
-				->add($this->template->title);
+		$this->set_title(__('Add section :type', array(':type' => Arr::get($types, $type))));
 		
 		try
 		{
 			$this->template->content = View::factory('datasource/'.$type.'/section/create', array(
 				'type' => $type,
-				'data' => Flash::get('post_data')
+				'data' => Flash::get('post_data'),
+				'users' => ORM::factory('user')->find_all()->as_array('id', 'username')
 			));
 		} 
 		catch (Exception $exc)
 		{
 			$this->template->content = View::factory('datasource/section/create', array(
 				'type' => $type,
-				'data' => Flash::get('post_data')
+				'data' => Flash::get('post_data'),
+				'users' => ORM::factory('user')->find_all()->as_array('id', 'username')
 			));
 		}
 	}
@@ -68,19 +83,30 @@ class Controller_Datasources_Section extends Controller_System_Datasource
 	{
 		$section = Datasource_Section::factory($type);
 		
+		$data = $this->request->post();
+		
+		$data['created_by_id'] = Auth::get_id();
+
 		try
 		{
-			$ds_id = $section->create($this->request->post());
+			$ds_id = $section
+				->validate($data)
+				->create($data);
 		}
 		catch (Validation_Exception $e)
 		{
 			Messages::errors($e->errors('validation'));
 			$this->go_back();
 		}
+		catch (DataSource_Exception_Section $e)
+		{
+			Messages::errors($e->getMessage());
+			$this->go_back();
+		}
 		
 		Messages::success( __( 'Datasource has been saved!' ) );
 
-		$this->go( Route::get('datasources')->uri(array(
+		$this->go(Route::get('datasources')->uri(array(
 			'directory' => 'datasources',
 			'controller' => 'section',
 			'action' => 'edit',
@@ -95,27 +121,31 @@ class Controller_Datasources_Section extends Controller_System_Datasource
 			return $this->_edit($this->section());
 		}
 		
-		$this->template->title = __('Edit section :name', array(
-			':name' => $this->section()->name
-		));
-		
 		$this->breadcrumbs
 			->add($this->section()->name, Route::get('datasources')->uri(array(
 				'controller' => 'data',
 				'directory' => 'datasources',
-			)) . URL::query(array('ds_id' => $this->section()->id()), FALSE))
-			->add($this->template->title);
+			)) . URL::query(array('ds_id' => $this->section()->id()), FALSE));
 		
+		$this->set_title(__('Edit section :name', array(
+			':name' => $this->section()->name
+		)));
+		
+		$this->template_js_params['DS_ID'] = $this->section()->id();
+		$this->template_js_params['DS_TYPE'] = $this->section()->type();
+			
 		try
 		{
 			$this->template->content = View::factory('datasource/'.$this->section()->type().'/section/edit', array(
-				'ds' => $this->section()
+				'ds' => $this->section(),
+				'users' => ORM::factory('user')->find_all()->as_array('id', 'username')
 			));
 		} 
 		catch (Exception $exc)
 		{
 			$this->template->content = View::factory('datasource/section/edit', array(
-				'ds' => $this->section()
+				'ds' => $this->section(),
+				'users' => ORM::factory('user')->find_all()->as_array('id', 'username')
 			));
 		}
 	}
@@ -126,16 +156,24 @@ class Controller_Datasources_Section extends Controller_System_Datasource
 	 */
 	private function _edit($ds)
 	{
+		$data = $this->request->post();
+		
 		try
 		{
-			$ds->save($this->request->post());
+			$ds->values($data);
+			$ds->update();
 		}
 		catch (Validation_Exception $e)
 		{
 			Messages::errors($e->errors('validation'));
 			$this->go_back();
 		}
-		
+		catch (DataSource_Exception_Section $e)
+		{
+			Messages::errors($e->getMessage());
+			$this->go_back();
+		}
+
 		Messages::success( __( 'Datasource has been saved!' ) );
 
 		// save and quit or save and continue editing?

@@ -2,17 +2,25 @@
 
 return array(
 	array(
-		'name' => 'System',
+		'name' => 'Plugins',
+		'divider' => TRUE,
+		'icon' => 'puzzle-piece',
+		'priority' => 9000,
 		'children' => array(
 			array(
-			'name' => 'Plugins', 
-			'url' => Route::get('backend')->uri(array('controller' => 'plugins')),
-			'priority' => 999,
-			'divider' => TRUE,
-			'icon' => 'puzzle-piece',
-			'permissions' => 'plugins.index',
+				'name' => 'List',
+				'url' => Route::get('backend')->uri(array('controller' => 'plugins')),
+				'permissions' => 'plugins.index',
+				'priority' => 400,
+				'icon' => 'list'
+			),
+			array(
+				'name' => 'Repository',
+				'url' => Route::get('backend')->uri(array('controller' => 'plugins', 'action' => 'repo')),
+				'permissions' => 'plugins.repo',
+				'priority' => 420,
+				'icon' => 'cloud',
+			),
 		)
-		)
-		
 	)
 );

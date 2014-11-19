@@ -2,14 +2,24 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Page
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Model_Widget_Page_Menu extends Model_Widget_Decorator {
 	
 	public $exclude = array();
 	
 	public $cache_tags = array('pages');
+	
+	protected $_data = array(
+		'page_level' => 0,
+		'exclude' => array(),
+		'match_all_paths' => FALSE,
+		'include_hidden' => FALSE
+	);
 
 	public function backend_data()
 	{
@@ -34,20 +44,24 @@ class Model_Widget_Page_Menu extends Model_Widget_Decorator {
 		{
 			$this->exclude = array();
 		}
+
+		parent::set_values($data);
 		
-		if( empty( $data['match_all_paths'] ))
-		{
-			$this->match_all_paths = 0;
-		}
+		$this->match_all_paths = (bool) Arr::get($data, 'match_all_paths');
+		$this->include_hidden = (bool) Arr::get($data, 'include_hidden');
 		
-		if( empty( $data['include_hidden'] ))
-		{
-			$this->include_hidden = 0;
-		}
-		
-		return parent::set_values($data);
+		return $this;
+	}
+	
+	public function set_page_level($level)
+	{
+		return (int) $level;
 	}
 
+	/**
+	 * 
+	 * @return array [$pages]
+	 */
 	public function fetch_data()
 	{
 		$pages = Model_Page_Sitemap::get( (bool) $this->include_hidden );
@@ -72,7 +86,12 @@ class Model_Widget_Page_Menu extends Model_Widget_Decorator {
 		}
 		else if($this->page_id == 0 AND ($page = $this->_ctx->get_page()) instanceof Model_Page_Front)
 		{
-			return $page->id;
+			if($this->page_level > 0)
+			{
+				return $page->parent($this->page_level)->id();
+			}
+
+			return $page->id();
 		}
 		
 		return NULL;

@@ -1,4 +1,5 @@
-<table class="table table-striped table-hover">
+<?php if ( !empty($files)): ?>
+<table class="table table-primary table-striped table-hover">
     <colgroup>
         <col width="150px" />
         <col />
@@ -26,27 +27,27 @@
         <td><?php echo $data['size']; ?></td>
         <td>
             <?php echo UI::button(NULL, array(
-                'class' => 'btn', 
+                'class' => 'btn-default', 
                 'href' => Route::get('downloader')->uri(array(
                     'path' => Download::secure_path( BACKUP_PLUGIN_FOLDER . $filename)
                 )),
                 'icon' => UI::icon( 'download' )
             ));?>
             <?php echo UI::button(NULL, array(
-                'class' => 'btn btn-mini btn-success btn-confirm', 
+                'class' => 'btn-xs btn-success btn-confirm', 
                 'href' => Route::get('backend')->uri(array(
                     'controller' => 'backup',
                     'action' => 'restore', 'id' => $filename
                 )), 
-                'icon' => UI::icon( 'off icon-white' )
+                'icon' => UI::icon( 'power-off' )
             ));?> 
             <?php echo UI::button(NULL, array(
-                'class' => 'btn btn-mini btn-danger btn-confirm', 
+                'class' => 'btn-xs btn-danger btn-confirm', 
                 'href' => Route::get('backend')->uri(array(
                     'controller' => 'backup',
                     'action' => 'delete', 'id' => $filename
                 )), 
-                'icon' => UI::icon( 'trash icon-white' )
+                'icon' => UI::icon( 'trash-o' )
             ));
             ?>
         </td>
@@ -54,3 +55,4 @@
     <?php endforeach; ?>
     </tbody>
 </table>
+<?php endif; ?>

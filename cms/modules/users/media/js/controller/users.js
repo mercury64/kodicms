@@ -28,7 +28,7 @@ cms.init.add(['users_edit', 'users_add'], function () {
 		},
 		initSelection: function(element, callback) {
 			element.val('');
-			if (USER_ID == 0) {
+			if (!USER_ID) {
 				callback([{'id':1, 'text':'login'}]);
 				return ;
 			}
@@ -58,10 +58,23 @@ cms.init.add('users_profile', function () {
 	var toolbar_l = toolbar.text().replace(/\t/g, '').replace(/\n/g, '').replace(/&nbsp;/g, '').replace(/ /g, '').length;
 	
 	if(!toolbar_l) toolbar.css({'padding': 0});
-})
-
-cms.init.add('users_add', function () {
-	$(function() {
-		$('.spoiler-toggle').click();
-	})
 });
+
+cms.init.add('users_edit', function () {
+	$('#themes .theme').on('click', function (e) {
+		if ($(this).hasClass('active'))
+			e.preventDefault();
+
+		$('#themes .active').removeClass('active');
+		$(this).addClass('active');
+
+		activateTheme($(this).data('theme'));
+		e.preventDefault();
+	});
+});
+
+
+var activateTheme = function(theme) {
+	Api.post('user-meta', {key: 'admin_theme', value: theme});
+	document.body.className = document.body.className.replace(/theme\-[a-z0-9\-\_]+/ig, 'theme-' + theme);
+}

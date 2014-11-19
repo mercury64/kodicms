@@ -2,8 +2,11 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Page
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Model_Widget_Datasource_Search extends Model_Widget_Decorator_Pagination {
 	
@@ -95,8 +98,8 @@ class Model_Widget_Datasource_Search extends Model_Widget_Decorator_Pagination {
 	}
 
 	/**
-	 *
-	 * @var array 
+	 * 
+	 * @return array [$total_found, $results, $keyword]
 	 */
 	public function fetch_data()
 	{
@@ -163,6 +166,6 @@ class Model_Widget_Datasource_Search extends Model_Widget_Decorator_Pagination {
 	 */
 	public function get_cache_id()
 	{
-		return 'Widget::' . $this->type . '::' . $this->id . '::' . $this->keyword();
+		return 'Widget::' . $this->type() . '::' . $this->id . '::' . $this->keyword();
 	}
 }

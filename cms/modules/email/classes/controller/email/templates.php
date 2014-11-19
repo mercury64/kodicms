@@ -1,9 +1,12 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
 /**
- * @package		KodiCMS
+ * @package		KodiCMS/Email
  * @category	Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Controller_Email_Templates extends Controller_System_Backend {
 	
@@ -12,8 +15,9 @@ class Controller_Email_Templates extends Controller_System_Backend {
 		parent::before();
 
 		$this->breadcrumbs
-			->add(__('Email'))
 			->add(__('Email templates'), Route::get('email_controllers')->uri(array('controller' => 'templates')));
+
+		$this->template_js_params['EMAIL_HTML_TYPE'] = Model_Email_Template::TYPE_HTML;
 	}
 	
 	public function action_index()
@@ -23,6 +27,8 @@ class Controller_Email_Templates extends Controller_System_Backend {
 			'total_items' => $templates->reset(FALSE)->count_all(),
 			'items_per_page' => 20
 		));
+		
+		$this->set_title(__('Email templates'), FALSE);
 		
 		$this->template->content = View::factory( 'email/templates/index', array(
 			'templates' => $templates->with('type')->find_all(),
@@ -52,14 +58,10 @@ class Controller_Email_Templates extends Controller_System_Backend {
 		
 		WYSIWYG::load_filters();
 		
-		$this->template->title = __('Add email template');
-		$this->breadcrumbs
-			->add($this->template->title);
-
+		$this->set_title(__('Add email template'));		
 		$this->template->content = View::factory( 'email/templates/edit', array(
 			'action' => 'add',
-			'template' => $template,
-			'types' => ORM::factory('email_type')->select_array()
+			'template' => $template
 		) );
 	}
 	
@@ -138,14 +140,13 @@ class Controller_Email_Templates extends Controller_System_Backend {
 		
 		WYSIWYG::load_filters();
 
-		$this->template->title = __('Edit email template');
-		$this->breadcrumbs
-			->add($this->template->title);
+		$this->set_title(__('Edit email template'));
 
+		$this->template_js_params['EMAIL_TEMPLATE_ID'] = $template->id;
+		
 		$this->template->content = View::factory( 'email/templates/edit', array(
 			'action' => 'edit',
-			'template' => $template,
-			'types' => ORM::factory('email_type')->select_array()
+			'template' => $template
 		) );
 	}
 	

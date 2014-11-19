@@ -29,9 +29,13 @@
  *         </body>
  *     </html>
  *
- * @package   Assets
- * @author    Corey Worrell
- * @version   1.0
+ * @package		KodiCMS/Assets
+ * @author		Corey Worrell
+ * @author		butschster <butschster@gmail.com>
+ * @version		1.0
+ * @link		http://kodicms.ru
+ * @copyright  (c) 2012-2014 butschster
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Assets_Core {
 
@@ -63,35 +67,81 @@ class Assets_Core {
 	 */
 	public static $groups = array();
 	
-	
-	public static function package($names)
+	/**
+	 * 
+	 * @param string|array $names
+	 * @param boolean $footer
+	 * @return boolean
+	 */
+	public static function package($names, $footer = FALSE)
 	{
 		if(!is_array($names))
 		{
 			$names = array($names);
 		}
 
-		foreach ( $names as $name )
+		foreach ($names as $name)
 		{
 			$package = Assets_Package::load($name);
 
-			if($package === NULL) continue;
+			if ($package === NULL)
+				continue;
 
 			foreach ($package as $item)
 			{
-				switch($item['type'])
+				switch ($item['type'])
 				{
 					case 'css':
 						Assets::$css[$item['handle']] = $item;
 						break;
 					case 'js':
+						$item['footer'] = (bool) $footer;
 						Assets::$js[$item['handle']] = $item;
 						break;
 				}
 			}
 		}
-		
+
 		return TRUE;
+	}
+	
+	/**
+	 * 
+	 * @param string $path
+	 * @param string $ext
+	 * @param string $cache_key
+	 * @param integer $lifetime
+	 * @return string
+	 */
+	public static function merge_files($path, $ext, $cache_key = NULL, $lifetime = Date::DAY)
+	{
+		$cache = Cache::instance();
+		
+		if($cache_key === NULL)
+		{
+			$cache_key = 'assets::merge::' . URL::title($path, '::') . '::' . $ext;
+		}
+
+		$content = $cache->get($cache_key);
+
+		if ($content === NULL)
+		{
+			$files = Kohana::find_file('media', FileSystem::normalize_path($path), $ext, TRUE);
+			if (!empty($files))
+			{
+				foreach ($files as $file)
+				{
+					$content .= file_get_contents($file) . "\n";
+				}
+
+				if (Kohana::$caching === TRUE)
+				{
+					$cache->set($cache_key, $content, $lifetime);
+				}
+			}
+		}
+
+		return $content;
 	}
 
 	/**
@@ -216,7 +266,7 @@ class Assets_Core {
 		return Assets::$js[$handle] = array(
 			'src'    => $src,
 			'deps'   => (array) $deps,
-			'footer' => $footer,
+			'footer' => (bool) $footer,
 			'handle' => $handle,
 			'type' => 'js'
 		);
@@ -403,16 +453,10 @@ class Assets_Core {
 		{
 			Assets::$_js_minify[] = $js['src'];
 		}
-		
-		foreach (Assets::_sort(Assets::$css) as $css)
-		{
-			Assets::$_css_minify[] = $css['src'];
-		}
-		
-		Assets::css('cache', Assets::_minify(Assets::$_css_minify, 'css'));
+
 		Assets::js('cache', Assets::_minify(Assets::$_js_minify, 'js'));
 	}
-	
+
 	protected static function _minify($array, $ext)
 	{
 		$files = '';
@@ -435,8 +479,6 @@ class Assets_Core {
 		{
 			$file_content = file_get_contents($src);
 			$minified .= $file_content . ";\n\n\n";
-			
-//			echo debug::vars($src, Text::bytes(strlen($file_content)));
 		}
 		
 		if($ext == 'js')
@@ -448,11 +490,10 @@ class Assets_Core {
 		return ADMIN_RESOURCES . 'cache/' . $filename;
 	}
 	
-	protected function _compress_script( $script ) 
+	protected function _compress_script($script)
 	{
-		return Assets_Min_JavaScript::minify( $script );
+		return Assets_Min_JavaScript::minify($script);
 	}
-
 
 	/**
 	 * Sorts assets based on dependencies

@@ -2,7 +2,10 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Block {
 
@@ -10,21 +13,25 @@ class Block {
 	 * Проверка блока на наличие в нем виджетов
 	 * 
 	 * @param type string|array
+	 * @return boolean
 	 */
-	public static function not_empty( $name )
+	public static function is_empty($name)
 	{
-		if( ! is_array($name) )
+		if (!is_array($name))
 		{
 			$name = array($name);
 		}
-		
+
 		$blocks = Context::instance()->get_blocks();
 
-		foreach($name as $block)
+		foreach ($name as $block)
 		{
-			if(in_array($block, $blocks)) return FALSE;
+			if (in_array($block, $blocks))
+			{
+				return FALSE;
+			}
 		}
-		
+
 		return TRUE;
 	}
 
@@ -34,67 +41,34 @@ class Block {
 	 * @param string $name
 	 * @param array $params
 	 */
-	public static function run( $name, array $params = array() )
+	public static function run($name, array $params = array())
 	{
 		if ($name == 'PRE' OR $name == 'POST')
 		{
 			return;
 		}
 
-		$ctx = & Context::instance();
+		$widgets = self::get($name, $params);
 
-		$blocks = & $ctx->get_widget_by_block( $name );
-		
-		if( $blocks !== NULL )
+		foreach ($widgets as $widget)
 		{
-			if(is_array($blocks))
+			if ($widget instanceof View)
 			{
-				foreach($blocks as $block)
-				{
-					if($block instanceof View) 
-					{
-						echo $block
-							->bind('ctx', $ctx)
-							->set('params', $params)
-							->render();
-					}
-					else if($block instanceof Model_Widget_Decorator ) 
-					{
-
-						$block
-							->set_params($params)
-							->render();
-					}
-					else if( $block instanceof Model_Widget_Part ) 
-					{
-						echo $block;
-					}
-				}
+				echo $widget
+					->render();
 			}
-			else
+			else if ($widget instanceof Model_Widget_Decorator)
 			{
-				if($blocks instanceof View) 
-				{
-					echo $blocks
-						->bind('ctx', $ctx)
-						->set('params', $params)
-						->render();
-				}
-				else if($blocks instanceof Model_Widget_Decorator ) 
-				{
-
-					$blocks
-						->set_params($params)
-						->render();
-				}
-				else if( $blocks instanceof Model_Widget_Part ) 
-				{
-					echo $blocks;
-				}
+				$widget
+					->render();
 			}
-		}	
+			else if ($widget instanceof Model_Widget_Part)
+			{
+				echo $widget;
+			}
+		}
 	}
-	
+
 	/**
 	 * Получение виджетов блока без вывода.
 	 * 
@@ -113,55 +87,31 @@ class Block {
 	 * 
 	 * @param string $name
 	 * @param array $params Дополнительные параметры доступные в виджете
+	 * @return array
 	 */
-	public static function get( $name, array $params = array() )
+	public static function get($name, array $params = array())
 	{
-		$ctx = & Context::instance();
+		$ctx = Context::instance();
 
-		$blocks = & $ctx->get_widget_by_block( $name );
+		$widgets = $ctx->get_widgets_by_block($name);
 		
-		if( $blocks === NULL )
+		foreach ($widgets as $widget)
 		{
-			return NULL;
-		}
-
-		if(is_array($blocks))
-		{
-			foreach($blocks as & $$block)
+			if ($widget instanceof View)
 			{
-				if($block instanceof View) 
-				{
-					$block
-						->bind('ctx', $ctx)
-						->set('params', $params);
-				}
-				else if($block instanceof Model_Widget_Decorator ) 
-				{
-
-					$block
-						->set_params($params);
-				}
-			}
-		}
-		else
-		{
-			if($blocks instanceof View) 
-			{
-				$blocks
+				$widget
 					->bind('ctx', $ctx)
 					->set('params', $params);
 			}
-			else if($blocks instanceof Model_Widget_Decorator ) 
+			else if ($widget instanceof Model_Widget_Decorator)
 			{
-
-				$blocks
-					->set_params($params);
+				$widget->set_params($params);
 			}
 		}
-		
-		return $blocks;
+
+		return $widgets;
 	}
-	
+
 	/**
 	 * Блок типа def служит для помещения в него виджетов без вывода.
 	 * Необходим в том случае, если необходимо на странице вывести виджет 
@@ -179,24 +129,28 @@ class Block {
 	 * 
 	 * @param string $name
 	 */
-	public static function def( $name ){}
-	
+	public static function def($name)
+	{
+		
+	}
+
 	/**
 	 * Метод служит для поиска в переданном шаблоне размеченных блоков
 	 * 
 	 * @param string $content
 	 * @return string
 	 */
-	public static function parse_content( $content )
+	public static function parse_content($content)
 	{
 		$content = str_replace(' ', '', $content);
 		preg_match_all("/Block::([a-z_]{3,5})\(\'([0-9a-zA-Z\_\-\.]+)\'(\,.*)?\)/i", $content, $blocks);
-		
-		if( !empty($blocks[2]))
+
+		if (!empty($blocks[2]))
 		{
 			return $blocks[2];
 		}
 
 		return NULL;
 	}
+
 }

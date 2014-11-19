@@ -1,8 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package		KodiCMS
- * @category	Datasource
+ * @package		KodiCMS/Datasource
+ * @category	Section
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Datasource_Section {
 	
@@ -23,7 +27,7 @@ class Datasource_Section {
 	{
 		if( ! self::exists($type) )
 		{
-			throw new DataSource_Exception('Class :class_name not exists', 
+			throw new DataSource_Exception_Section('Class :class_name not exists', 
 					array(':class_name' => $class));
 		}
 		
@@ -42,6 +46,43 @@ class Datasource_Section {
 		$class = 'Datasource_Section_' . ucfirst($type);
 		
 		return class_exists($class);
+	}
+	
+	/**
+	 * 
+	 * @param string $action
+	 * @param integer|string $ds_id
+	 * @return string
+	 */
+	public static function uri($action = 'view', $ds_id = NULL)
+	{
+		if($action == 'view')
+		{
+			$uri = Route::get('datasources')->uri(array(
+				'controller' => 'data',
+				'directory' => 'datasources',
+			));
+			
+			return $ds_id !== NULL 
+				? $uri. URL::query(array('ds_id' => (int) $ds_id))
+				: $uri;
+		}
+
+		return Route::get('datasources')->uri(array(
+			'controller' => 'section',
+			'directory' => 'datasources',
+			'action' => $action,
+			'id' => $ds_id
+		));
+	}
+
+	/**
+	 * 
+	 * @return string
+	 */
+	public static function default_icon()
+	{
+		return 'folder-open-o';
 	}
 
 	/**
@@ -62,26 +103,40 @@ class Datasource_Section {
 			return self::$_cached_sections[$id];
 		}
 		
-		$query = DB::select('docs', 'indexed', 'code')
+		$query = DB::select()
 			->from('datasources')
 			->where('id', '=', (int) $id)
 			->execute()
 			->current();
-	
-		if (empty($query))
+		
+		if($query == NULL OR ($section = self::load_from_array($query)) === NULL)
 		{
 			return NULL;
 		}
 
-		$result = unserialize($query['code']);
-
-		$result->_id = $id;
-		$result->_docs = (int) $query['docs'];
-		$result->_is_indexable = (bool) $query['indexed'];
+		self::$_cached_sections[$id] = $section;
+		return $section;
+	}
+	
+	/**
+	 * Загрузка разедла из массива данных
+	 * 
+	 * @param array $data
+	 * @return Datasource_Section
+	 */
+	public static function load_from_array(array $data)
+	{
+		$section = Kohana::unserialize($data['code']);
 		
-		self::$_cached_sections[$id] = $result;
-
-		return $result;
+		$section->_id = $data['id'];
+		$section->name = $data['name'];
+		$section->description = Arr::get($data, 'description');
+		$section->_docs = (int) Arr::get($data, 'docs');
+		$section->_is_indexable = (bool) Arr::get($data, 'indexed');
+		$section->_created_by_id = (int) Arr::get($data, 'created_by_id');
+		$section->_folder_id = (int) Arr::get($data, 'folder_id');
+		
+		return $section;
 	}
 
 	/**
@@ -106,6 +161,13 @@ class Datasource_Section {
 	public $name;
 	
 	/**
+	 * Иконка раздела
+	 * 
+	 * @var string
+	 */
+	public $icon;
+	
+	/**
 	 * Описание раздела
 	 * 
 	 * @var string
@@ -120,6 +182,20 @@ class Datasource_Section {
 	protected $_docs = 0;
 	
 	/**
+	 * Идентификатор папки раздела
+	 * 
+	 * @var integer 
+	 */
+	protected $_folder_id = 0;
+
+	/**
+	 * Создатель раздела
+	 * 
+	 * @var integer
+	 */
+	protected $_created_by_id = NULL;
+	
+	/**
 	 * Таблица раздела в БД
 	 * 
 	 * @var string
@@ -132,6 +208,13 @@ class Datasource_Section {
 	 * @var boolean
 	 */
 	protected $_is_indexable = FALSE;
+	
+	/**
+	 * Показывать в корне меню
+	 * 
+	 * @var boolean
+	 */
+	protected $_show_in_root_menu = FALSE;
 	
 	/**
 	 * Объект загрузки списка документов 
@@ -167,9 +250,19 @@ class Datasource_Section {
 		
 		if ( ! class_exists( $this->_document_class_name ))
 		{
-			throw new DataSource_Exception('Document class :class_name not exists', 
+			throw new DataSource_Exception_Section('Document class :class_name not exists', 
 					array(':class_name' => $this->_document_class_name));
 		}
+	}
+	
+	/**
+	 * 
+	 * @param Model_Navigation_Section $parent_section
+	 * @return Model_Navigation_Section
+	 */
+	public function add_to_menu(Model_Navigation_Section $parent_section = NULL)
+	{	
+		return Datasource_Data_Manager::add_section_to_menu($this, $parent_section);
 	}
 	
 	/**
@@ -190,6 +283,22 @@ class Datasource_Section {
 	public function id()
 	{
 		return $this->_id;
+	}
+	
+	/**
+	 * @return integer
+	 */
+	public function created_by_id()
+	{
+		return (int) $this->_created_by_id;
+	}
+	
+	/**
+	 * @return integer
+	 */
+	public function folder_id()
+	{
+		return (int) $this->_folder_id;
 	}
 	
 	/**
@@ -215,11 +324,35 @@ class Datasource_Section {
 	/**
 	 * Возвращает название таблицы раздела
 	 * 
-	 * @return Datasource_Section_Headline
+	 * @return string
 	 */
 	public function table()
 	{
 		return $this->_ds_table;
+	}
+	
+	/**
+	 * 
+	 * @return boolean
+	 */
+	public function show_in_root_menu()
+	{
+		return (bool) $this->_show_in_root_menu;
+	}
+	
+	/**
+	 * 
+	 * @return string
+	 */
+	public function icon()
+	{
+		if (!empty($this->icon))
+		{
+			return $this->icon;
+		}
+
+		$class = get_called_class();
+		return $class::default_icon();
 	}
 
 	/**
@@ -228,15 +361,22 @@ class Datasource_Section {
 	 * @param array $values Массив полей раздела
 	 *
 	 * @return integer Идентификатор раздела
-	 * @throws DataSource_Exception
+	 * @throws DataSource_Exception_Section
 	 */
-	public function create( array $values ) 
+	public function create(array $values)
 	{
-		$this->validate($values);
+		if (!$this->has_access_create())
+		{
+			throw new DataSource_Exception_Section('You do not have permission to create section');
+		}
 
 		$this->name = Arr::get($values, 'name');
 		$this->description = Arr::get($values, 'description');
+		$this->icon = Arr::get($values, 'icon');
 		$this->_is_indexable = (bool) Arr::get($values, 'is_indexable');
+		$this->_show_in_root_menu = (bool) Arr::get($values, 'show_in_root_menu');
+		$this->_created_by_id = (int) Arr::get($values, 'created_by_id', Auth::get_id());
+		$this->_folder_id = (int) Arr::get($values, 'folder_id');
 		
 		$data = array(
 			'type' => $this->_type,
@@ -244,7 +384,9 @@ class Datasource_Section {
 			'description' => $this->description,
 			'name' => $this->name,
 			'created_on' => date('Y-m-d H:i:s'),
-			'code' => serialize($this)
+			'created_by_id' => $this->_created_by_id,
+			'folder_id' => $this->_folder_id,
+			'code' => Kohana::serialize($this),
 		);
 		
 		$query = DB::insert('datasources')
@@ -256,7 +398,7 @@ class Datasource_Section {
 		
 		if (empty($this->_id))
 		{
-			throw new DataSource_Exception('Datasource section :name not created', 
+			throw new DataSource_Exception_Section('Datasource section :name not created', 
 					array(':name' => $this->name));
 		}
 		
@@ -268,6 +410,36 @@ class Datasource_Section {
 	}
 	
 	/**
+	 * 
+	 * @param array $values
+	 * @throws Validation_Exception
+	 */
+	public function values(array $values = array())
+	{
+		$this->validate($values);
+
+		$this->name = Arr::get($values, 'name');
+		$this->description = Arr::get($values, 'description');
+		$this->icon = Arr::get($values, 'icon');
+		$this->_show_in_root_menu = (bool) Arr::get($values, 'show_in_root_menu');
+
+		if (!empty($values['folder_id']))
+		{
+			$this->_folder_id = (int) Arr::get($values, 'folder_id');
+		}
+
+		if (!empty($values['created_by_id']))
+		{
+			$this->_created_by_id = (int) $values['created_by_id'];
+		}
+
+		$this->set_indexable(Arr::get($values, 'is_indexable', FALSE));
+		$this->_headline->set_sorting(Arr::get($values, 'doc_order', array()));
+		
+		return $this;
+	}
+
+	/**
 	 * Обновление раздела.
 	 * 
 	 * При сохранении раздела в БД происходит его сериализация и сохарение данных
@@ -275,43 +447,35 @@ class Datasource_Section {
 	 * методе {@see _serialize()}
 	 * 
 	 * @param array $values
+	 * @throws DataSource_Exception_Section
 	 * @return boolean
 	 */
-	public function save( array $values = NULL) 
+	public function update()
 	{
-		if ( ! $this->loaded())
+		if (!$this->has_access_edit())
+		{
+			throw new DataSource_Exception_Section('You do not have permission to update section');
+		}
+
+		if (!$this->loaded())
 		{
 			return FALSE;
 		}
-		
-		if (is_array($values))
-		{
-			$this->validate($values);
 
-			$this->name = Arr::get($values, 'name');
-			$this->description = Arr::get($values, 'description');
-		
-			$this->set_indexable(Arr::get($values, 'is_indexable', FALSE));
-			
-			$this->_headline->set_sorting(Arr::get($values, 'doc_order', array()));
-		}
-		
-		$data = array(
-			'indexed' => $this->_is_indexable,
-			'name' => $this->name,
-			'description' => $this->description,
-			'updated_on' => date('Y-m-d H:i:s'),
-			'code' => serialize( $this )
-		);
-		
 		DB::update('datasources')
-			->set($data)
+			->set(array(
+				'indexed' => $this->_is_indexable,
+				'name' => $this->name,
+				'description' => $this->description,
+				'updated_on' => date('Y-m-d H:i:s'),
+				'created_by_id' => $this->_created_by_id,
+				'folder_id' => $this->_folder_id,
+				'code' => Kohana::serialize($this)
+				))
 			->where( 'id', '=', $this->_id )
 			->execute();
 
 		$this->update_size();
-		
-		unset($data, $values);
 		
 		Observer::notify('datasource_after_save', $this->_id);
 		
@@ -327,6 +491,11 @@ class Datasource_Section {
 	 */
 	public function remove()
 	{
+		if (!$this->has_access_remove())
+		{
+			throw new DataSource_Exception_Section('You do not have permission to remove section');
+		}
+
 		$ids = DB::select('id')
 			->from($this->table())
 			->where('ds_id', '=', $this->id())
@@ -348,20 +517,47 @@ class Datasource_Section {
 	}
 	
 	/**
+	 * 
+	 * @param integer $folder_id
+	 * @return \Datasource_Section
+	 */
+	public function move_to_folder($folder_id)
+	{
+		DB::update('datasources')
+			->set(array('folder_id' => (int) $folder_id))
+			->where( 'id', '=', $this->_id )
+			->execute();
+		
+		$this->_folder_id = (int) $folder_id;
+		
+		return $this;
+	}
+
+	/**
 	 * Создание нового документа
 	 * 
 	 * @param DataSource_Document $doc
-	 * @return DataSource_Document
+	 * @return NULL|DataSource_Document
 	 */
 	public function create_document( DataSource_Document $doc ) 
 	{
-		$doc->create();
+		try
+		{
+			$doc->create();
+		} 
+		catch (DataSource_Exception_Document $ex) 
+		{
+			$doc->onCreateException($ex);
+		}
+		catch (Kohana_Exception $ex) 
+		{
+			$doc->onCreateException($ex);
+		}
 
 		if ($doc->loaded())
 		{
 			$this->update_size();
 			$this->add_to_index(array($doc->id));
-
 			$this->clear_cache();
 		}
 		
@@ -376,15 +572,25 @@ class Datasource_Section {
 	 */	
 	public function update_document( DataSource_Document $doc ) 
 	{
-		$old = $this
-			->get_document($doc->id);
+		$old = $this->get_document($doc->id);
 	
 		if (empty($old) OR ! $doc->loaded())
 		{
 			return FALSE;
 		}
-		
-		$doc->update();
+			
+		try
+		{
+			$doc->update();
+		}
+		catch (DataSource_Exception_Document $ex) 
+		{
+			$doc->onUpdateException($ex);
+		}
+		catch (Kohana_Exception $ex) 
+		{
+			$doc->onUpdateException($ex);
+		}
 
 		if ($old->published != $doc->published) 
 		{
@@ -415,43 +621,56 @@ class Datasource_Section {
 	 * @param array $ids
 	 * @return \DataSource_Section
 	 */
-	public function remove_documents( array $ids = NULL  ) 
+	public function remove_documents(array $ids = NULL)
 	{
 		if (empty($ids))
 		{
 			return $this;
 		}
 		
+		$deleted_documents = array();
+
 		foreach ($ids as $id)
 		{
-			$document = $this->get_empty_document()->load($id);
-			if($document->loaded())
+			$document = $this->get_document($id);
+
+			try
 			{
-				$document->remove();
+				if ($document->loaded())
+				{
+					$document->remove();
+					$deleted_documents[] = $id;
+				}
+			} 
+			catch (DataSource_Exception_Document $ex)
+			{
+				$document->onRemoveException($ex);
+				continue;
 			}
 		}
 
 		$this->update_size();
-		$this->remove_from_index($ids);
+		$this->remove_from_index($deleted_documents);
 		$this->clear_cache();
 
 		return $this;
 	}
-	
+
 	/**
 	 * Загрузка документа по ID
 	 * 
 	 * @param integer $id
 	 * @return \DataSource_Document
 	 */
-	public function get_document($id)
+	public function get_document($id = NULL)
 	{
-		if( empty($id) )
+		$document = $this->get_empty_document();
+		if (empty($id))
 		{
-			return NULL;
+			return $document;
 		}
-		
-		return $this->get_empty_document()->load($id);
+
+		return $document->load($id);
 	}
 	
 	/**
@@ -490,21 +709,21 @@ class Datasource_Section {
 	 * Смена статуса документов по ID.
 	 * 
 	 * @param array $ids
-	 * @param boolean $value
+	 * @param boolean $status
 	 * @return \Datasource_Section
 	 */
 	protected function _publish(array $ids, $status) 
 	{
 		DB::update($this->_ds_table)
 			->set(array(
-				'published' => (bool) $value,
+				'published' => (bool) $status,
 				'updated_on' => date('Y-m-d H:i:s'),
 			))
 			->where('id', 'in', $ids)
 			->where('ds_id', '=', $this->_id)
 			->execute();
 
-		if($value === TRUE)
+		if($status === TRUE)
 		{
 			$this->add_to_index($ids);
 		}
@@ -544,20 +763,27 @@ class Datasource_Section {
 	 * @param array $array
 	 * @throws Validation_Exception
 	 */
-	public function validate( array $array )
+	public function validate(array $array = NULL)
 	{
 		$validation = Validation::factory($array)
 			->rules('name', array(
 				array('not_empty')
 			))
-			->label('name', __('Header') );
-		
-		if( ! $validation->check() )
+			->rules('created_by_id', array(
+				array('not_empty'),
+				array('numeric')
+			))
+			->label('name', __('Header'))
+			->label('created_by_id', __('Author'));
+
+		if (!$validation->check())
 		{
-			throw new Validation_Exception( $validation );
+			throw new Validation_Exception($validation);
 		}
+		
+		return $this;
 	}
-	
+
 	/**
 	 * Очистка кеша виджетов раздела
 	 * 
@@ -588,7 +814,18 @@ class Datasource_Section {
 	protected function _serialize()
 	{
 		$vars = get_object_vars($this);
-		unset($vars['_docs'], $vars['_is_indexable']);
+		unset(
+			$vars['_id'],
+			$vars['_docs'],
+			$vars['_is_indexable'],
+			$vars['_created_by_id'],
+			$vars['_type'], 
+			$vars['name'],
+			$vars['description'], 
+			$vars['_document_class_name'],
+			$vars['_ds_table'], 
+			$vars['_widget_types']
+		);
 		
 		return $vars;
 	}
@@ -619,7 +856,6 @@ class Datasource_Section {
 	{
 		$this->_docs = 0;
 		$this->_is_indexable = FALSE;
-		
 		$this->_document_class_name = 'Datasource_' . ucfirst($this->type()) . '_Document';
 	}
 	
@@ -636,8 +872,117 @@ class Datasource_Section {
 		$this->_headline = new $headline_class();
 		$this->_headline->set_section($this);
 	}
+	
+	/**************************************************************************
+	 * ACL
+	 **************************************************************************/
+	/**
+	 * 
+	 * @return array
+	 */
+	public function acl_actions()
+	{
+		return array(
+			array(
+				'action' => 'section.view',
+				'description' => 'View section'
+			),
+			array(
+				'action' => 'section.edit',
+				'description' => 'Edit section'
+			),
+			array(
+				'action' => 'section.remove',
+				'description' => 'Remove section'
+			),
+			array(
+				'action' => 'document.view',
+				'description' => 'View documents'
+			),
+			array(
+				'action' => 'document.create',
+				'description' => 'Create documents'
+			),
+			array(
+				'action' => 'document.edit',
+				'description' => 'Edit documents'
+			),
+			array(
+				'action' => 'document.remove',
+				'description' => 'Remove documents'
+			)
+		);
+	}
 
+    /**
+	 * Пользователь - создатель раздела
+	 * 
+	 * @param integer $user_id
+	 * @return boolean
+	 */
+	public function is_creator($user_id = NULL)
+	{
+		if($user_id === NULL)
+		{
+			$user_id = Auth::get_id();
+		}
 
+		return ACL::is_admin($user_id) OR ($this->_created_by_id == (int) $user_id);
+	}
+	/**
+	 * Проверка прав доступа
+	 * @param string $acl_type
+	 * @return boolean
+	 */
+	public function has_access($acl_type = 'section.edit', $check_own = TRUE, $user_id = NULL)
+	{
+		return (
+			ACL::check('ds_id.' . $this->id() . '.' . $acl_type)
+			OR
+			(
+				$check_own === TRUE
+				AND
+				$this->is_creator($user_id)
+			)
+		);
+	}
+	
+	/**
+	 * Проверка прав на редактирование
+	 * @return boolean
+	 */
+	public function has_access_edit($user_id = NULL)
+	{
+		return $this->has_access('section.edit', TRUE, $user_id);
+	}
+	
+	/**
+	 * Проверка прав на редактирование
+	 * @return boolean
+	 */
+	public function has_access_create()
+	{
+		return ACL::check($this->type() . '.' . 'section.create');
+	}
+	
+	/**
+	 * Проверка прав на просмотр
+	 * @return boolean
+	 */
+	public function has_access_view($user_id = NULL)
+	{
+		return $this->has_access('section.view', TRUE, $user_id);
+	}
+	
+	/**
+	 * Проверка прав на удаление
+	 * @return boolean
+	 */
+	public function has_access_remove($user_id = NULL)
+	{
+		return $this->has_access('section.remove', TRUE, $user_id);
+	}
+	
 	/**************************************************************************
 	 * Search indexation
 	 **************************************************************************/
@@ -655,39 +1000,39 @@ class Datasource_Section {
 	/**
 	 * Смена статуса поисковой индексации раздела
 	 * 
-	 * @param boolean $newState
+	 * @param boolean $state
 	 * @return \Datasource_Section
 	 */
-	public function set_indexable( $state ) 
+	public function set_indexable($state)
 	{
 		$state = (bool) $state;
 
-		if( ! $this->loaded() )
+		if (!$this->loaded())
 		{
 			$this->_is_indexable = $state;
-			
+
 			return $this;
 		}
 
-		if($state == $this->is_indexable())
+		if ($state == $this->is_indexable())
 		{
 			return $this;
 		}
 
-		if($state) 
+		if ($state)
 		{
 			$this->_is_indexable = $state;
 			$this->add_to_index();
-		} 
-		else 
+		}
+		else
 		{
 			$this->remove_from_index();
 			$this->_is_indexable = $state;
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * Загрузка списка документов по ID в формате для индексации
 	 * 

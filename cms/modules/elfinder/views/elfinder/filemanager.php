@@ -2,6 +2,7 @@
 	$(function() {
 		var elfinder = $('#elfinder').elfinder({
 			lang: '<?php echo I18n::lang_short(); ?>',
+
 			url : Api.build_url('elfinder'),
             resizable: false,
 			height: cms.content_height,
@@ -26,20 +27,14 @@
 		
 		$(window).resize(function() {
 			var node = elfinder.getUI('node');
-			var h = cms.content_height - 20;
+			var h = cms.content_height - 40;
 			node.height(h);
 			node.find('.elfinder-navbar')
 				.add(node.find('.elfinder-cwd'))
 				.add(node.find('.elfinder-cwd-wrapper'))
-				.height(h - node.find('.elfinder-toolbar').height() - node.find('.elfinder-statusbar').height() );
+				.height(h - node.find('.elfinder-toolbar').height() - node.find('.elfinder-statusbar').height() )
 		});
-		
-		$('#elfinder')
-			.addClass('outline_inner')
-			.wrap('<div class="outline"></div>');
 	});
-	
-	
 </script>
 
 <div id="elfinder"></div>

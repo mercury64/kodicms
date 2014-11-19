@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS/Snippet
  * @category	Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Controller_Snippet extends Controller_System_Backend {
 
@@ -22,9 +25,9 @@ class Controller_Snippet extends Controller_System_Backend {
 	public function action_index()
 	{
 		$this->template->title = __('Snippets');
-		$this->template->content = View::factory( 'snippet/index', array(
+		$this->template->content = View::factory('snippet/index', array(
 			'snippets' => Model_File_Snippet::find_all()
-		) );
+		));
 	}
 
 	public function action_add()
@@ -42,9 +45,9 @@ class Controller_Snippet extends Controller_System_Backend {
 			->add($this->template->title);
 
 		// check if user have already enter something
-		$snippet = Flash::get( 'post_data' );
+		$snippet = Flash::get('post_data');
 
-		if ( empty( $snippet ) )
+		if (empty($snippet))
 		{
 			$snippet = new Model_File_Snippet;
 		}
@@ -59,11 +62,12 @@ class Controller_Snippet extends Controller_System_Backend {
 	private function _add()
 	{
 		$data = $this->request->post();
-		Flash::set( 'post_data', (object) $data );
 
-		$snippet = new Model_File_Snippet( $data['name'] );
+		$snippet = new Model_File_Snippet($data['name']);
 		$snippet->content = $data['content'];
 		
+		Flash::set('post_data', $snippet);
+
 		try
 		{
 			$status = $snippet->save();
@@ -94,9 +98,10 @@ class Controller_Snippet extends Controller_System_Backend {
 		}
 	}
 
-	public function action_edit( )
+	public function action_edit()
 	{
 		$snippet_name = $this->request->param('id');
+		
 		$snippet = new Model_File_Snippet( $snippet_name );
 
 		if ( ! $snippet->is_exists() )
@@ -135,7 +140,8 @@ class Controller_Snippet extends Controller_System_Backend {
 	{
 		$data = $this->request->post();
 
-		$snippet = new Model_File_Snippet( $snippet_name );
+		$snippet = new Model_File_Snippet($snippet_name);
+
 		$snippet->name = $data['name'];
 		$snippet->content = $data['content'];
 		

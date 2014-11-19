@@ -2,11 +2,18 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Archive
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Model_Widget_Archive_Year extends Model_Widget_Archive {
 
+	/**
+	 * 
+	 * @return array [$links]
+	 */
 	public function fetch_data()
 	{
 		$page = $this->get_page();

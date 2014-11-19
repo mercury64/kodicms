@@ -1,9 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package		KodiCMS
+ * @package		KodiCMS/Page_Field
  * @category	Model
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Model_Page_Field extends ORM {
 	
@@ -27,7 +30,8 @@ class KodiCMS_Model_Page_Field extends ORM {
 			'key' => array(
 				array('not_empty'),
 				array('min_length', array(':value', 2)),
-				array('max_length', array(':value', 50))
+				array('max_length', array(':value', 50)),
+				array(array($this, 'unique_field')),
 			),
 		);
 	}
@@ -75,5 +79,15 @@ class KodiCMS_Model_Page_Field extends ORM {
 		}
 		
 		return FALSE;
+	}
+	
+	public function unique_field($field_key)
+	{
+		return !((bool) DB::select(array(DB::expr('COUNT(*)'), 'total_count'))
+			->from($this->_table_name)
+			->where('key', '=', $field_key)
+			->where('page_id', '=', $this->page_id)
+			->execute($this->_db)
+			->get('total_count'));
 	}
 }

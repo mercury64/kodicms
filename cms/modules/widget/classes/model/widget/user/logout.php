@@ -2,26 +2,21 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	User
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class Model_Widget_User_Logout extends Model_Widget_Decorator {
-	
-	public $use_template = FALSE;
-	public $use_caching = FALSE;
-
-	public function fetch_data() {}
-	
-	public function render( array $params = array() ) {}
+class Model_Widget_User_Logout extends Model_Widget_Decorator_Handler {
 
 	public function on_page_load()
 	{
-		parent::on_page_load();
-		$username = AuthUser::getUserName();
-		
-		AuthUser::logout();
+		$username = Auth::get_username();
+
+		Auth::instance()->logout(TRUE);
 		Observer::notify('admin_after_logout', $username);
-		
+
 		HTTP::redirect($this->get('next_url', Request::current()->referrer()));
 	}
 }

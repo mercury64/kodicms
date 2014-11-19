@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Widgets
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 	/**
 	 *
@@ -79,7 +87,6 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 		parent::set_values($data);
 		$this->doc_order = Arr::get($data, 'doc_order', array());
 		
-		$this->only_sub = (bool) Arr::get($data, 'only_sub');
 		$this->only_published = (bool) Arr::get($data, 'only_published');
 		$this->sort_by_rand = (bool) Arr::get($data, 'sort_by_rand');
 		
@@ -87,7 +94,6 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 		$this->doc_id = preg_replace('/[^A-Za-z,]+/', '', Arr::get($data, 'doc_id', $this->doc_id));
 		
 		$this->throw_404 = (bool) Arr::get($data, 'throw_404');
-		$this->sort_by_rand = (bool) Arr::get($data, 'sort_by_rand');
 		
 		return $this;
 	}
@@ -107,7 +113,9 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 				$this->doc_fields[] = (int) $f['id'];
 			
 				if(isset($f['fetcher']))
+				{
 					$this->doc_fetched_widgets[(int) $f['id']] = (int) $f['fetcher'];
+				}
 			}
 		}
 	}
@@ -139,7 +147,7 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 
 	/**
 	 * 
-	 * @return array
+	 * @return array [$docs, $count]
 	 */
 	public function fetch_data()
 	{
@@ -187,14 +195,16 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 	 */
 	public function get_documents( $recurse = 3 )
 	{
-		if( $this->docs !== NULL ) return $this->docs;
+		if ($this->docs !== NULL)
+		{
+			return $this->docs;
+		}
 
 		$result = array();
 		
 		$agent = DataSource_Hybrid_Agent::instance($this->ds_id);
 
-		$query = $this
-			->_get_query();
+		$query = $this->_get_query();
 		
 		$ds_fields = $agent->get_fields();
 		$fields = array();
@@ -207,7 +217,9 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 		}
 
 		$href_params = $this->_parse_doc_id();
-		
+
+		$temp_data = array();
+
 		foreach ($query->execute() as $row)
 		{
 			$result[$row['id']] = array();
@@ -216,20 +228,23 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 			$doc['id'] = $row['id'];
 			$doc['header'] = $row['header'];
 			$doc['created_on'] = $row['created_on'];
+			$doc['published'] = (bool) $row['published'];
 			
 			foreach ($fields as $fid => $field)
 			{
-				$related_widget = NULL;
-				
-				$field_class = 'DataSource_Hybrid_Field_' . $field->type;
-				$field_class_method = 'fetch_widget_field';
-				if( class_exists($field_class) AND method_exists( $field_class, $field_class_method ))
+				if (!array_key_exists($fid, $row))
 				{
-					$doc[$field->key] = call_user_func_array($field_class.'::'.$field_class_method, array( $this, $field, $row, $fid, $recurse - 1));
 					continue;
 				}
+
+				$field_class_method = 'fetch_widget_field';
+				
+				if (method_exists($field, $field_class_method))
+				{
+					$doc[$field->key] = $field->$field_class_method($this, $field, $row, $fid, $recurse - 1);
+				}
 			}
-			
+
 			$doc_params = array();
 			foreach ($href_params as $field)
 			{
@@ -243,7 +258,7 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 			
 			$doc['href'] = URL::site($this->doc_uri . implode( '/' , $doc_params ));
 		}
-		
+
 		$this->docs = $result;
 		return $result;
 	}
@@ -313,7 +328,7 @@ class Model_Widget_Hybrid_Headline extends Model_Widget_Decorator_Pagination {
 	public function get_cache_id()
 	{
 		return 'Widget::' 
-			. $this->type . '::' 
+			. $this->type() . '::' 
 			. $this->id . '::' 
 			. $this->list_offset . '::' 
 			. $this->list_size;

@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS/Users
  * @category	Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Controller_Users extends Controller_System_Backend {
 
@@ -13,7 +16,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 
 	public function before()
 	{
-		if(in_array($this->request->action(), array('edit')) AND AuthUser::getId() == $this->request->param('id'))
+		if(in_array($this->request->action(), array('edit')) AND Auth::get_id() == $this->request->param('id'))
 		{
 			$this->allowed_actions[] = $this->request->action();
 		}
@@ -116,9 +119,9 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 	{
 		$id = $this->request->param('id');
 		
-		if(empty($id) AND AuthUser::isLoggedIn())
+		if(empty($id) AND Auth::is_logged_in())
 		{
-			$id = AuthUser::getId();
+			$id = Auth::get_id();
 		}
 		
 		$user = ORM::factory('user', $id);
@@ -132,6 +135,8 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		$this->template->title = __(':user profile', array(':user' => $user->username));
 		$this->breadcrumbs
 			->add($this->template->title);
+		
+		$this->template_js_params['USER_ID'] = $user->id;
 		
 		$this->template->content = View::factory('users/profile', array(
 			'user' => $user,
@@ -169,6 +174,8 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 			)))
 			->add($this->template->title);
 
+		$this->template_js_params['USER_ID'] = $user->id;
+
 		$this->template->content = View::factory('users/edit', array(
 			'action' => 'edit',
 			'user' => $user
@@ -181,7 +188,7 @@ class KodiCMS_Controller_Users extends Controller_System_Backend {
 		$profile = $this->request->post('profile');
 		$this->auto_render = FALSE;
 
-		if( ACL::check('users.change_password') OR $user->id == AuthUser::getId() )
+		if( ACL::check('users.change_password') OR $user->id == Auth::get_id() )
 		{
 			if ( strlen( $data['password'] ) == 0 )
 			{

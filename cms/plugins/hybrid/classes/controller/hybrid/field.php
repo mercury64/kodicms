@@ -1,5 +1,13 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Hybrid
+ * @category	Controller
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Controller_Hybrid_Field extends Controller_System_Datasource
 {
 	public $field = NULL;
@@ -19,7 +27,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			
 			$ds = $this->section($this->field->ds_id);
 			
-			if(Acl::check($ds->type().$this->field->ds_id.'.field.edit'))
+			if($this->field->has_access_edit())
 			{
 				$this->allowed_actions[] = 'edit';
 			}
@@ -30,13 +38,18 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			$ds_id = (int) $this->request->param('id');
 			$ds = $this->section($ds_id);
 			
-			if(Acl::check($ds->type().$ds_id.'.field.edit'))
+			if($ds->has_access('field.create'))
 			{
 				$this->allowed_actions[] = 'add';
 			}
 		}
 
 		parent::before();
+		
+		if(!empty($ds))
+		{
+			$this->template_js_params['DS_ID'] = $ds->id();
+		}
 	}
 	
 	public function action_template()
@@ -50,7 +63,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		));
 	}
 
-	public function action_add( )
+	public function action_add()
 	{
 		$ds_id = (int) $this->request->param('id');
 		$ds = $this->section($ds_id);
@@ -59,6 +72,9 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		{
 			return $this->_add($ds);
 		}
+		
+		$this->set_title(__('Add field'));
+		
 		$this->breadcrumbs
 			->add($ds->name, Route::get('datasources')->uri(array(
 				'controller' => 'data',
@@ -69,8 +85,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 				'controller' => 'section',
 				'action' => 'edit',
 				'id' => $ds->id()
-			)))
-			->add(__('Add field'));
+			)));
 		
 		$this->template->content = View::factory('datasource/hybrid/field/add', array(
 			'ds' => $ds,
@@ -97,21 +112,37 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			Messages::errors($e->errors('validation'));
 			$this->go_back();
 		}
-		
-		if( ! $field_id )
+		catch (Kohana_Exception $e)
 		{
+			Messages::errors($e->getMessage());
 			$this->go_back();
 		}
 		
+		if (!$field_id)
+		{
+			$this->go_back();
+		}
+
 		Session::instance()->delete('post_data');
 		
-		$this->go( Route::get('datasources')->uri(array(
-			'directory' => 'hybrid',
-			'controller' => 'field',
-			'action' => 'edit',
-			'id' => $field_id
-		)));
-		
+		if ( $this->request->post('save_and_create') !== NULL )
+		{
+			$this->go(Route::get('datasources')->uri(array(
+				'controller' => 'field',
+				'directory' => 'hybrid',
+				'action' => 'add',
+				'id' => $ds->id()
+			)));
+		}
+		else
+		{
+			$this->go( Route::get('datasources')->uri(array(
+				'directory' => 'hybrid',
+				'controller' => 'field',
+				'action' => 'edit',
+				'id' => $field_id
+			)));
+		}
 	}
 
 	public function action_edit()
@@ -123,6 +154,8 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			return $this->_edit($this->field);
 		}
 		
+		$this->set_title(__('Edit field :field_name', array(':field_name' => $this->field->header)));
+		
 		$this->breadcrumbs
 			->add($ds->name, Route::get('datasources')->uri(array(
 				'controller' => 'data',
@@ -133,8 +166,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 				'controller' => 'section',
 				'action' => 'edit',
 				'id' => $ds->id()
-			)))
-			->add($this->field->header);
+			)));
 
 		$this->template->content = View::factory('datasource/hybrid/field/edit', array(
 			'ds' => $ds,
@@ -156,6 +188,11 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		{
 			Session::instance()->set('post_data', $this->request->post());
 			Messages::errors($e->errors('validation'));
+			$this->go_back();
+		}
+		catch (Kohana_Exception $e)
+		{
+			Messages::errors($e->getMessage());
 			$this->go_back();
 		}
 		
@@ -184,24 +221,24 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		
 		$sections = array();
 		
-		foreach ( Datasource_Data_Manager::types() as $key => $value )
+		foreach (Datasource_Data_Manager::types() as $key => $value)
 		{
-			if($key != 'hybrid' AND ! empty($map[$key]))
+			if ($key != 'hybrid' AND ! empty($map[$key]))
 			{
-				foreach ( $map[$key] as $id => $name )
+				foreach ($map[$key] as $id => $section)
 				{
-					$sections[$key][$id] = $name;
+					$sections[$key][$id] = $section->name;
 				}
 			}
 			else
 			{
-				foreach ( $hds as $id => $data )
+				foreach ($hds as $id => $section)
 				{
-					$sections[$key][$id] = $data['name'];
+					$sections[$key][$id] = $section->name;
 				}
 			}
 		}
-		
+
 		return $sections;
 	}
 }

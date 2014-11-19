@@ -3,7 +3,7 @@
 		var elfinder = $('body').elfinder({
 			lang: '<?php echo I18n::lang_short(); ?>',
 			url : Api.build_url('elfinder'),
-			height: 595,
+			height: 590,
 			resizable: false,
 			getFileCallback : function(file) {
 				if(_.isObject(file)) {
@@ -37,4 +37,8 @@
 			<?php if(!ACL::check('filemanager.edit')): ?>,allowShortcuts : false<?php endif; ?>
 		}).elfinder('instance');
 	};
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> upstream/dev

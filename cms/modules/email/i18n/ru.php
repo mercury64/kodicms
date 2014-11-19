@@ -6,6 +6,10 @@ return array(
 	'Email settings' => 'Настройки почты',
 	'Default email address' => 'Email адрес по умолчанию',
 	'Email driver' => 'Драйвер',
+	'Send test email' => 'Отправить тестовое письмо',
+	'Test email' => 'Тестовое письмо',
+	'sended' => 'успешно отослано',
+	'not send' => 'не отослано',
 	'Executable path' => 'Путь к исполняемому файлу',
 	'STMP Host' => 'Сервер',
 	'STMP Port' => 'Порт',
@@ -17,6 +21,7 @@ return array(
 	'Where the sendmail program can be found, usually :path1 or :path2. :link' 
 		=> 'Путь до программы sendmail, обычно :path1 или :path2. :link',
 	'Next page after success send (URL)' => 'Следующая страница при успешной отправке (URL)',
+	'To send a test message, save the settings' => 'Для отправки тестового письма необходимо сохранить настройки',
 	
 	/*********************** Email templates *********************************/
 	'Email templates' => 'Почтовые шаблоны',
@@ -26,7 +31,7 @@ return array(
 	'Email from' => 'От кого',
 	'Email to' => 'Кому',
 	'Email status' => 'Статус',
-	'Email message' => 'Текст мисьма',
+	'Email message' => 'Текст письма',
 	'Plain text' => 'Простой текст',
 	'Edit email template' => 'Редактирование шаблона',
 	'Add email template' => 'Создание шаблона',

@@ -33,7 +33,10 @@ $fields[] = DataSource_Hybrid_Field::factory('primitive_datetime', array(
 
 foreach ($fields as $field)
 {
-	if( ! $field->is_sortable() ) continue;
+	if( ! $field->is_sortable() ) 
+	{
+		continue;
+	}
 
 	if(!isset($order_fields[$field->id]))
 	{
@@ -48,7 +51,9 @@ foreach ($fields as $field)
 foreach ($doc_order as $data)
 {
 	if(isset($ids[key($data)]))
+	{
 		$selected_fields[key($data)] = (($data[key($data)] == Model_Widget_Decorator::ORDER_ASC) ? '+' : '-') .' '. $ids[key($data)];
+	}
 }
 
 ?>
@@ -127,60 +132,70 @@ jQuery.fn.swapWith = function(to) {
 };
 </script>
 <div id="sorting_block">
-	<div class="widget-header">
-		<h4><?php echo __('Documents order'); ?></h4>
+	<div class="panel-heading">
+		<span class="panel-title"><?php echo UI::icon('sort-alpha-desc'); ?> <?php echo __('Documents order'); ?></span>
 	</div>
-	<div class="widget-content">
+	<table class="table table-noborder table-primary">
+		<colgroup>
+			<col width="220px" />
+			<col width="110px" />
+			<col width="220px" />
+			<col />
+		</colgroup>
+		<thead>
+			<tr>
+				<td><?php echo __('Order by'); ?></td>
+				<td></td>
+				<td><?php echo __('Available fields'); ?></td>
+				<td></td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td id="sf-cont">
+					<?php echo Form::select('sf', $selected_fields, NULL, array(
+						'size' => 5, 'class' => 'no-script form-control', 'id' => 'sf'
+					)); ?>
 
-		<table class="table">
-			<colgroup>
-				<col width="220px" />
-				<col width="110px" />
-				<col />
-			</colgroup>
-			<tbody>
-				<tr>
-					<td>
-						<?php echo __('Order by'); ?>
-					</td>
-					<td>
-
-					</td>
-					<td>
-						<?php echo __('Available fields'); ?>
-					</td>
-				</tr>
-				<tr>
-					<td id="sf-cont">
-						<?php echo Form::select('sf', $selected_fields, NULL, array(
-							'size' => 5, 'class' => 'no-script', 'id' => 'sf'
+					<?php 
+					foreach($doc_order as $data) 
+					{
+						echo Form::hidden('doc_order[]['.key($data).']', $data[key($data)], array(
+							'id' => 'sf_' . key($data)
+						));
+					}
+					?>
+				</td>
+				<td class="sorting-btns">
+					<div class="btn-group btn-group-vertical">
+						<?php echo UI::button(__('Add'), array(
+							'class' => 'btn-default btn-add btn-xs',
+							'icon' => UI::icon('plus')
 						)); ?>
-
-						<?php 
-						foreach($doc_order as $data) 
-						{
-							echo Form::hidden('doc_order[]['.key($data).']', $data[key($data)], array(
-								'id' => 'sf_' . key($data)
-							));
-						}
-						?>
-					</td>
-					<td class="sorting-btns">
-						<div class="btn-group btn-group-vertical span2">
-							<?php echo UI::button('Add', array('class' => 'btn btn-add btn-block')); ?>
-							<?php echo UI::button('Remove', array('class' => 'btn btn-remove btn-block')); ?>
-							<?php echo UI::button('Move up', array('class' => 'btn btn-move up btn-block')); ?>
-							<?php echo UI::button('Move down', array('class' => 'btn btn-move down btn-block')); ?>
-							<?php echo UI::button('Asc / Desc', array('class' => 'btn btn-order btn-block')); ?>
-						</div>
-					</td>
-					<td>
-						<?php echo Form::select('af', $available_fields, NULL, array(
-							'size' => 5, 'class' => 'no-script', 'id' => 'af'
+						<?php echo UI::button(__('Remove'), array(
+							'class' => 'btn-default btn-remove btn-xs',
+							'icon' => UI::icon('minus')
 						)); ?>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+						<?php echo UI::button(__('Move up'), array(
+							'class' => 'btn-default btn-move up btn-xs',
+							'icon' => UI::icon('angle-up')
+						)); ?>
+						<?php echo UI::button(__('Move down'), array(
+							'class' => 'btn-default btn-move down btn-xs',
+							'icon' => UI::icon('angle-down')
+						)); ?>
+						<?php echo UI::button(__('Asc / Desc'), array(
+							'class' => 'btn-default btn-order btn-xs',
+							'icon' => UI::icon('sort')
+						)); ?>
+					</div>
+				</td>
+				<td>
+					<?php echo Form::select('af', $available_fields, NULL, array(
+						'size' => 5, 'class' => 'no-script form-control', 'id' => 'af'
+					)); ?>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 </div>

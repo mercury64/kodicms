@@ -1,50 +1,43 @@
-<script type="text/javascript">
-	var ROLE_ID = <?php echo (int) $role->id; ?>;
-</script>
-	
 <?php echo Form::open(Route::get('backend')->uri(array('controller' => 'roles', 'action' => $action, 'id' => $role->id)), array(
-	'class' => Bootstrap_Form::HORIZONTAL
+	'class' => array(Form::HORIZONTAL, 'panel')
 )); ?>
+	<?php echo Form::hidden('token', Security::token()); ?>
 
-<?php echo Form::hidden('token', Security::token()); ?>
-<div class="widget">
-	<?php echo View::factory('helper/tabbable'); ?>
-	<div class="widget-header">
-		<h3><?php echo __('General information'); ?></h3>
+	<div class="panel-heading">
+		<span class="panel-title"><?php echo __('General information'); ?></span>
 	</div>
-	<div class="widget-content">
-		<div class="control-group">
-			<?php echo $role->label('name', array('class' => 'control-label')); ?>
-			<div class="controls">
+	<div class="panel-body">
+		<div class="form-group form-group-lg">
+			<?php echo $role->label('name', array('class' => 'control-label col-md-3')); ?>
+			<div class="col-md-9">
 				<?php echo $role->field('name', array(
-					'class' => 'input-medium slug',
+					'class' => 'form-control slug',
 					'prefix' => 'role',
 					'data-separator' => '_'
 				)); ?>	
 			</div>
 		</div>
 		
-		<div class="control-group">
-			<?php echo $role->label('description', array('class' => 'control-label')); ?>
-			<div class="controls">
+		<div class="form-group">
+			<?php echo $role->label('description', array('class' => 'control-label col-md-3')); ?>
+			<div class="col-md-9">
 				<?php echo $role->field('description', array(
-					'class' => 'input-xxlarge',
+					'class' => 'form-control',
 					'prefix' => 'role',
-					'rows' => 5
+					'rows' => 2
 				)); ?>	
 			</div>
 		</div>
 	</div>
 
-	<?php if (Acl::check( 'roles.change_permissions') AND ($role->id > 2 OR $role->id === NULL)): ?>
+	<?php if (Acl::check('roles.change_permissions') AND ($role->id != 2 AND $role->loaded())): ?>
 	<?php echo View::factory('roles/permissions', array(
-			'permissions' => Acl::get_permissions(),
-			'role_permissions' => $role->permissions()
-		)); ?>
+		'permissions' => Acl::get_permissions(),
+		'role_permissions' => $role->permissions()
+	)); ?>
 	<?php endif; ?>
 
-	<div class="form-actions widget-footer">
+	<div class="form-actions panel-footer">
 		<?php echo UI::actions($page_name); ?>
 	</div>
-</div>
 <?php Form::close(); ?>

@@ -1,4 +1,34 @@
+cms.init.add('widgets_index', function() {
+	var editable_template = {
+		type: 'select2',
+		title: __('Widget template'),
+		send: 'always',
+		highlight: false,
+		ajaxOptions: {
+			dataType: 'json'
+		},
+		params: function(params) {
+			params.widget_id = $(this).closest('tr').data('id');
+			params.template = params.value;
+
+			return params;
+		},
+		url: '/api-widget.set_template',
+		source: SNIPPETS,
+		select2: {
+			width: 200
+		},
+		success: function(response, newValue) {
+			
+		}
+	};
+	
+	$('.editable-template').editable(editable_template);
+});
+
 cms.init.add('widgets_edit', function() {
+
+	load_snippets();
 	
 	var cache_enabled = function() {
 		var $caching_input = $('#caching');
@@ -81,7 +111,7 @@ cms.init.add('widgets_location', function() {
 	});
 
 	$('.set_to_inner_pages').on('click', function() {
-		var cont = $(this).parent().parent();
+		var cont = $(this).closest('tr');
 
 		var block_name = cont.find('.widget-blocks').select2("data")['id'];
 		var position = cont.find('input.widget-position').val();
@@ -166,5 +196,24 @@ function reload_blocks($layout) {
 				.select2('val', cb)
 				.data('blocks', blocks);
 		});
+	});
+}
+
+function load_snippets(intervalID) {
+	clearInterval(intervalID);
+	$('#snippet-select').on('select2-opening', function(e, a) {
+		var response = Api.get('snippet.list', {}, false, false);
+		var self = $(this);
+		if(response.response) {
+			$('option', this).remove();
+
+			for(key in response.response)
+				self.append($('<option>', {value: key, text: response.response[key]}));
+		}
+
+		self.off();
+		var intervalID = setInterval(function() {
+			load_snippets(intervalID);
+		}, 10000);
 	});
 }

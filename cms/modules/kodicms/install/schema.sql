@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__config` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__media` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(18) NOT NULL AUTO_INCREMENT,
   `module` varchar(50) DEFAULT NULL,
   `size` int(18) NOT NULL,
   `content_type` varchar(255) DEFAULT 'image',
@@ -14,4 +14,4 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__media` (
   `description` varchar(255) DEFAULT NULL,
   `params` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

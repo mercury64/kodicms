@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS/Widgets
  * @category	Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Controller_Widgets extends Controller_System_Backend {
 
@@ -23,6 +26,8 @@ class Controller_Widgets extends Controller_System_Backend {
 
 	public function action_index()
 	{
+		Assets::package(array('editable'));
+		
 		$this->template->title = __('Widgets');
 		
 		$widgets = ORM::factory('widget')->filter();
@@ -44,9 +49,14 @@ class Controller_Widgets extends Controller_System_Backend {
 				'name' => 'per_page',
 				'label' => __('Items per page'),
 				'value' => $per_page,
-				'class' => 'input-mini'
+				'class' => 'form-control',
+				'size' => 3
 			))
 		));
+		
+		$this->template_js_params['SNIPPETS'] = array_map(function($value, $key) {
+			return array('id' => $key, 'text' => $value);
+		}, Model_File_Snippet::html_select(), array_keys(Model_File_Snippet::html_select()));
 
 		$this->template->content = View::factory( 'widgets/index', array(
 			'widgets' => $widgets
@@ -132,10 +142,7 @@ class Controller_Widgets extends Controller_System_Backend {
 			return $this->_add();
 		}
 
-		$this->template->title = __('Create widget');
-		
-		$this->breadcrumbs
-			->add($this->template->title);
+		$this->set_title(__('Create widget'));
 
 		$this->template->content = View::factory( 'widgets/add', array(
 			'types' => Widget_Manager::map()
@@ -178,7 +185,7 @@ class Controller_Widgets extends Controller_System_Backend {
 		}
 	}
 	
-	public function action_edit( )
+	public function action_edit()
 	{
 		$id = $this->request->param('id');
 
@@ -192,6 +199,7 @@ class Controller_Widgets extends Controller_System_Backend {
 		
 		$this->template->title = $widget->name;
 		$this->breadcrumbs
+			->add($widget->type(FALSE))
 			->add($widget->name);
 
 		// check if trying to save
@@ -207,6 +215,7 @@ class Controller_Widgets extends Controller_System_Backend {
 			'templates' => Model_File_Snippet::html_select(),
 			'content' =>  $widget->fetch_backend_content(),
 			'roles' => $roles,
+			'params' => Widget_Manager::get_params($widget->type())
 		) );
 	}
 	

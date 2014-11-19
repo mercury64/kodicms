@@ -2,7 +2,10 @@
 
 /**
  * @package		KodiCMS/Behavior
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright  (c) 2012-2014 butschster
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Behavior_Settings {
 	
@@ -18,26 +21,26 @@ class Behavior_Settings {
 	 */
 	protected $_page = NULL;
 
-	public function __construct( $page )
+	public function __construct($page)
 	{
 		$this->_page = $page;
 	}
-	
+
 	public function __toString()
 	{
 		return (string) $this->render();
 	}
-	
+
 	/**
 	 * 
 	 * @param string $key
 	 * @return string
 	 */
-	public function __get( $key )
+	public function __get($key)
 	{
-		return $this->get( $key );
+		return $this->get($key);
 	}
-	
+
 	/**
 	 * 
 	 * @param string $name
@@ -47,7 +50,7 @@ class Behavior_Settings {
 	public function get($key, $default = NULL)
 	{
 		$this->_load();
-		
+
 		return Arr::get($this->_data, $key, $default);
 	}
 
@@ -58,19 +61,21 @@ class Behavior_Settings {
 	 */
 	protected function _load()
 	{
-		if( $this->_page === NULL )
+		if ($this->_page === NULL)
+		{
 			throw new Kohana_Exception('Page must be loaded');
-		
-		if( $this->_data === NULL )
+		}
+
+		if ($this->_data === NULL)
 		{
 			$this->_data = ORM::factory('Page_Behavior_Setting')
 				->find_by_page($this->_page)
 				->get('data', array());
 		}
-		
+
 		return $this;
 	}
-	
+
 	/**
 	 * @return View
 	 */

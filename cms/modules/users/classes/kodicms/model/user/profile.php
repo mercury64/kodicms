@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS/Users
  * @category	Model
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Model_User_Profile extends ORM {
 
@@ -31,8 +34,7 @@ class KodiCMS_Model_User_Profile extends ORM {
 	{
 		return array(
 			'name'			=> __('Name'),
-			'locale'		=> __('Interface language'),
-			'notice'        => __('Subscribe to email notifications')
+			'locale'		=> __('Interface language')
 		);
 	}
 	
@@ -41,17 +43,12 @@ class KodiCMS_Model_User_Profile extends ORM {
 		return array(
 			'locale' => array(
 				'type' => 'select',
-				'choices' => array($this, '_get_available_langs')
-			),
-			'notice' => array(
-				'type' => 'checkbox',
-				'checked' => FALSE,
-				'value' => 1
+				'choices' => array($this, 'get_available_langs')
 			)
 		);
 	}
 	
-	protected function _get_available_langs()
+	public function get_available_langs()
 	{
 		$langs = I18n::available_langs();
 		$system_default = Arr::get($langs, Config::get('site', 'default_locale'));

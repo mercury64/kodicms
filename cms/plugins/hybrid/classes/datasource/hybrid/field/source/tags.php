@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Hybrid
+ * @category	Field
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class DataSource_Hybrid_Field_Source_Tags extends DataSource_Hybrid_Field_Source {
 	
 	const TABLE_NAME = 'hybrid_tags';
@@ -10,15 +18,22 @@ class DataSource_Hybrid_Field_Source_Tags extends DataSource_Hybrid_Field_Source
 		'isreq' => FALSE
 	);
 	
+	public function onCreateDocument(DataSource_Hybrid_Document $doc)
+	{
+		$tags = $doc->get($this->name);
+		$tags = empty($tags) ? array() : explode(',', $tags);
+		
+		$this->update_tags(array(), $tags, $doc->id);
+	}
+	
 	public function onUpdateDocument(DataSource_Hybrid_Document $old = NULL, DataSource_Hybrid_Document $new) 
 	{
-		$old_tags = $old->get($this->name);
+		$old_tags = array_unique($this->get_tags($old->id));
 		$new_tags = $new->get($this->name);
-		
-		$o = empty($old_tags) ? array() : explode(',', $old_tags);
-		$n = empty($new_tags) ? array() : explode(',', $new_tags);
 
-		$this->update_tags($o, $n, $new->id);
+		$new_tags = empty($new_tags) ? array() : explode(',', $new_tags);
+
+		$this->update_tags($old_tags, $new_tags, $new->id);
 	}
 	
 	public function onRemoveDocument( DataSource_Hybrid_Document $doc )
@@ -27,19 +42,35 @@ class DataSource_Hybrid_Field_Source_Tags extends DataSource_Hybrid_Field_Source
 		$this->update_tags($tags, array(), $doc->id);
 	}
 	
+	public function get_tags($doc_id)
+	{
+		return DB::select('tags.name')
+			->from(self::TABLE_NAME)
+			->where('doc_id', '=', (int) $doc_id)
+			->where('field_id', '=', $this->id)
+			->join(array(Model_Tag::tableName(), 'tags'))
+				->on('tags.id', '=', 'tag_id')
+			->execute()
+			->as_array(NULL, 'name');
+	}
+	
 	public function get_type()
 	{
 		return 'TEXT NOT NULL';
 	}
 	
-	public function update_tags($old, $new, $doc_id)
+	public function update_tags(array $old, array $new, $doc_id)
 	{
+		$old = array_unique(Arr::map('trim', $old));
+		$new = array_unique(Arr::map('trim', $new));
+
 		if(empty($new))
 		{
 			foreach($old as $tag)
 			{
 				DB::update(Model_Tag::tableName())
 					->set(array('count' => DB::expr('count - 1')))
+					->where('count', '>', 0)
 					->where('name', '=', $tag)
 					->execute();
 			}
@@ -56,23 +87,24 @@ class DataSource_Hybrid_Field_Source_Tags extends DataSource_Hybrid_Field_Source
 		// insert all tags in the tag table and then populate the page_tag table
 		foreach( $new_tags as $index => $tag_name )
 		{
-			if ( empty($tag_name) )	continue;
+			if (empty($tag_name))
+			{
+				continue;
+			}
 
-			$tag = Record::findOneFrom('Model_Tag', array(
-				'where' => array(
-					array('name', '=', $tag_name)
-				)
-			));
+			$tag = Record::findOneFrom('Model_Tag', array('where' => array(
+				array('name', '=', $tag_name))));
+			
 
 			// try to get it from tag list, if not we add it to the list
-			if ( !($tag instanceof Model_Tag))
+			if (!($tag instanceof Model_Tag))
 			{
 				$tag = new Model_Tag(array('name' => trim($tag_name)));
 			}
-
+			
 			$tag->count++;
 			$tag->save();
-
+		
 			$data = array(
 				'field_id' => $this->id,
 				'doc_id' => $doc_id,
@@ -84,7 +116,7 @@ class DataSource_Hybrid_Field_Source_Tags extends DataSource_Hybrid_Field_Source
 				->values($data)
 				->execute();
 		}
-
+		
 		// remove all old tag
 		foreach( $old_tags as $index => $tag_name )
 		{
@@ -115,6 +147,7 @@ class DataSource_Hybrid_Field_Source_Tags extends DataSource_Hybrid_Field_Source
 		{
 			DB::update(Model_Tag::tableName())
 				->set(array('count' => DB::expr('count - 1')))
+				->where('count', '>', 0)
 				->where('id', '=', $id)
 				->execute();
 		}
@@ -138,25 +171,27 @@ class DataSource_Hybrid_Field_Source_Tags extends DataSource_Hybrid_Field_Source
 	 * @param string $fid
 	 * @return mixed
 	 */
-	public static function fetch_widget_field( $widget, $field, $row, $fid, $recurse )
+	public static function fetch_widget_field($widget, $field, $row, $fid, $recurse)
 	{
-		return ! empty($row[$fid]) ? explode(',', $row[$fid]) : array();
+		return !empty($row[$fid]) ? explode(',', $row[$fid]) : array();
 	}
-	
-	public function fetch_headline_value( $value )
+
+	public function fetch_headline_value($value, $document_id)
 	{
-		$tags = explode(',', $value );
-		foreach($tags as $i => $tag)
+		if(empty($value)) return NULL;
+
+		$tags = explode(',', $value);
+		foreach ($tags as $i => $tag)
 		{
-			$tags[$i] = UI::label($tag);
+			$tags[$i] = UI::label($tag, 'info label-tag');
 		}
 
 		return implode(' ', $tags);
 	}
-	
-	public function filter_condition(Database_Query $query, $condition, $value)
+
+	public function filter_condition(Database_Query $query, $condition, $value, array $params = NULL)
 	{
-		return $query
+		$query
 			->join(array(DataSource_Hybrid_Field_Source_Tags::TABLE_NAME, $this->id.'_f_ht'), 'inner')
 			->on($this->id.'_f_ht.field_id', '=', DB::expr( $this->id ))
 			->on($this->id.'_f_ht.doc_id', '=', 'd.id')

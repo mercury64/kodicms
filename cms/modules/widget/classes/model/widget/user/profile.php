@@ -2,8 +2,11 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Other
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Model_Widget_User_Profile extends Model_Widget_Decorator {
 	
@@ -12,6 +15,10 @@ class Model_Widget_User_Profile extends Model_Widget_Decorator {
 	 * @var ORM 
 	 */
 	protected $_user = NULL;
+	
+	protected $_data = array(
+		'profile_id_ctx' => 'user_id'
+	);
 
 	public function set_values(array $data) 
 	{
@@ -28,10 +35,17 @@ class Model_Widget_User_Profile extends Model_Widget_Decorator {
 		parent::on_page_load();
 		
 		$user = $this->get_user();
-		if ( ! $user->loaded() AND $this->throw_404 === TRUE)
+
+		if( ! $user->loaded() AND $this->throw_404 === TRUE )
 		{
 			$this->_ctx->throw_404('Profile not found');
 		}
+		
+		$page = $this->_ctx->get_page();
+			
+		$page->meta_params(array(
+			'profile_username' => $user->username
+		));
 		
 		$this->_ctx->set('widget_profile_id', $user->id);
 		$this->_ctx->set('widget_profile_username', $user->username);
@@ -39,7 +53,7 @@ class Model_Widget_User_Profile extends Model_Widget_Decorator {
 
 	/**
 	 * 
-	 * @return array
+	 * @return array [$user_found, $user, $profile]
 	 */
 	public function fetch_data()
 	{
@@ -58,22 +72,23 @@ class Model_Widget_User_Profile extends Model_Widget_Decorator {
 	 */
 	public function get_user()
 	{
-		if ($this->_user instanceof ORM) 
+		if($this->_user instanceof ORM) 
 		{
 			return $this->_user;
 		}
 
 		$profile_id = $this->get_profile_id();
 		
-		if(Valid::numeric($profile_id))
+		if (is_string($profile_id) AND Valid::numeric($profile_id))
 		{
 			$this->_user = ORM::factory('User', $profile_id);
 		}
 		else
 		{
-			$this->_user = Auth::instance()->get_user(ORM::factory('User'));
+			$this->_user = Auth::get_record(ORM::factory('User'));
+			$this->_ctx->set($this->profile_id_ctx, $this->_user->id);
 		}
-		
+
 		return $this->_user;
 	}
 

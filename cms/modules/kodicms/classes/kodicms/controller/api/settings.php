@@ -3,9 +3,12 @@
 /**
  * @package		KodiCMS
  * @category	API
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class KodiCMS_Controller_API_Settings extends Controller_System_API {
+class KodiCMS_Controller_API_Settings extends Controller_System_Api {
 	
 	protected $_check_token = TRUE;
 	
@@ -17,29 +20,26 @@ class KodiCMS_Controller_API_Settings extends Controller_System_API {
 	public function post_save()
 	{
 		$settings = $this->param('setting', array(), TRUE);
-		
-		$plugin_settings = array('plugin'=>$this->param('plugin', array(), FALSE));
-		
-		// Merge plugin settings with settings.
-		$settings = Arr::merge($settings, $plugin_settings);
-		
+
 		$filter = Filter::factory($settings)
-			->rule('site.allow_html_title', FALSE, Config::NO);		
-		
+			->rule('site.allow_html_title', FALSE, Config::NO);
+
 		$validation = Validation::factory(array());
-		Observer::notify('validation_settings', $validation, $filter);
+		Observer::notify('validation_settings', $validation, $filter, $settings);
 
 		$filter->run();
 		$validation = $validation->copy($filter->data());
 
-		if( ! $validation->check() ) 
+		if (!$validation->check())
+		{
 			throw new API_Validation_Exception($validation->errors('validation'));
-		
+		}
+
 		$settings = $validation->data();
 
 		Config::set_from_array($settings);
 
-		Observer::notify('save_settings', $settings );
+		Observer::notify('save_settings', $settings);
 		Kohana::$log->add(Log::INFO, ':user change Settings')->write();
 		$this->message('Settings has been saved!');
 	}

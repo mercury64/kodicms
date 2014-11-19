@@ -2,16 +2,19 @@
 
 /**
  * @package		KodiCMS/Behavior
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright  (c) 2012-2014 butschster
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class Behavior
-{
+class Behavior {
+
 	/**
 	 *
 	 * @var array 
 	 */
 	private static $behaviors = array();
-	
+
 	/**
 	 * 
 	 * @param string $behavior_id
@@ -20,26 +23,24 @@ class Behavior
 	 */
 	public static function factory($behavior_id)
 	{
-		$behavior = self::get($behavior_id);
-		if( $behavior === NULL ) 
+		$behavior_config = self::get($behavior_id);
+		if ($behavior_config === NULL)
+		{
 			throw new HTTP_Exception_404('Behavior :behavior not found!', array(
 				':behavior' => $behavior_id
 			));
-		
-		$class = $behavior_id;
-		if(isset($behavior['class']))
-		{
-			$class = $behavior['class'];
 		}
-		
-		$behavior_class = 'Behavior_'.URL::title($class, '');
-		
-		if ( ! class_exists($behavior_class) ) 
-			throw new HTTP_Exception_404('Behavior class :class not exists!', array(
-				':class' => $behavior_class
-			));
-		
-		return new $behavior_class;
+
+		$class_name = Arr::get($behavior_config, 'class', $behavior_id);
+
+		$behavior_class = 'Behavior_' . URL::title($class_name, '');
+
+		if (!class_exists($behavior_class))
+		{
+			return NULL;
+		}
+
+		return new $behavior_class($behavior_config);
 	}
 
 	/**
@@ -49,8 +50,7 @@ class Behavior
 	{
 		$config = Kohana::$config->load('behaviors');
 
-		
-		foreach ( $config as $behavior_id => $data )
+		foreach ($config as $behavior_id => $data)
 		{
 			self::$behaviors[$behavior_id] = $data;
 		}
@@ -78,12 +78,12 @@ class Behavior
 	public static function load($behavior_id, Model_Page_Front &$page, $url, $uri)
 	{
 		$behavior = self::factory($behavior_id);
-		
+
 		$uri = substr($uri, strlen($url));
-		
+
 		return $behavior
-				->set_page($page)
-				->execute_uri( $uri );
+			->set_page($page)
+			->execute_uri($uri);
 	}
 
 	/**
@@ -116,7 +116,7 @@ class Behavior
 	{
 		return array_keys(self::$behaviors);
 	}
-	
+
 	/**
 	 * 
 	 * @param string $name
@@ -127,12 +127,13 @@ class Behavior
 	public static function select_choices()
 	{
 		$options = array('' => __('none'));
-				
-		foreach ( self::findAll() as $behavior )
+
+		foreach (self::findAll() as $behavior)
 		{
-			$options[$behavior] = __(ucfirst(Inflector::humanize( $behavior )));
+			$options[$behavior] = __(ucfirst(Inflector::humanize($behavior)));
 		}
-		
+
 		return $options;
 	}
+
 }

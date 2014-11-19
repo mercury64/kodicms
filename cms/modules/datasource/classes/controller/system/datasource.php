@@ -1,8 +1,12 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
 /**
- * @package		KodiCMS
- * @category	Datasource
+ * @package		KodiCMS/Datasource
+ * @category	Controller
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Controller_System_Datasource extends Controller_System_Backend
 {
@@ -30,7 +34,7 @@ class Controller_System_Datasource extends Controller_System_Backend
 	 * @return DataSource_Section
 	 * @throws HTTP_Exception_404
 	 */
-	public function section( $id = NULL )
+	public function section($id = NULL)
 	{
 		if( $this->_section instanceof DataSource_Section) return $this->_section;
 		
@@ -45,7 +49,7 @@ class Controller_System_Datasource extends Controller_System_Backend
 		if (
 			$this->request->action() == 'index'
 		AND 
-			! ACL::check( $this->_section->type() . $id  . '.section.view' )
+			! $this->_section->has_access_view()
 		)
 		{
 			$this->_deny_access();

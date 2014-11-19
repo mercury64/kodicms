@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS/API
  * @category	Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Controller_System_API extends Controller_System_Ajax {
 	
@@ -134,18 +137,14 @@ class Controller_System_API extends Controller_System_Ajax {
 
 		$action = strtolower($action);
 
-		$is_logged_in = AuthUser::isLoggedIn();
+		$is_logged_in = Auth::is_logged_in();
 
 		try 
 		{
 			/**
 			 * Если выключено API, запретить доступ не авторизованным пользователям к нему
 			 */
-			if (
-				(Config::get('api', 'mode') == 'no' AND ! $is_logged_in)
-				OR
-				($this->is_backend() AND ! $is_logged_in)
-			)
+			if ((Config::get('api', 'mode') == 'no' AND (! $is_logged_in AND $this->is_backend())))
 			{
 				throw new HTTP_Exception_403('Forbiden');
 			}
@@ -214,6 +213,8 @@ class Controller_System_API extends Controller_System_Ajax {
 		catch (Exception $e)
 		{
 			$this->json['code'] = $e->getCode();
+			$this->json['line'] = $e->getLine();
+			$this->json['file'] = $e->getFile();
 			$this->json['message'] = $e->getMessage();
 			$this->json['response'] = NULL;
 		}
@@ -242,10 +243,10 @@ class Controller_System_API extends Controller_System_Ajax {
 				$this->json['response'] = NULL;
 			}
 		
-			$this->json = json_encode( $this->json );
+			$this->json = json_encode($this->json);
 		}
 
-		$this->response->body( $this->json );
+		$this->response->body($this->json);
 	}
 	
 	/**

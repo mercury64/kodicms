@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS
  * @category	API
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Controller_API_Layout extends Controller_System_Api {
 	
@@ -23,7 +26,8 @@ class KodiCMS_Controller_API_Layout extends Controller_System_Api {
 				'Layout not found!');
 		}
 
-		$layout->name = $this->param('name', NULL);
+		$layout->name = $this->param('name');
+
 		$layout->content = $this->param('content', NULL);
 
 		$status = $layout->save();
@@ -49,7 +53,7 @@ class KodiCMS_Controller_API_Layout extends Controller_System_Api {
 	
 	public function rest_put()
 	{
-		$layout = new Model_File_Layout( $this->param('name', NULL) );
+		$layout = new Model_File_Layout($this->param('name', NULL, TRUE));
 		$layout->content = $this->param('content', NULL);
 		
 		$status = $layout->save();
@@ -108,7 +112,7 @@ class KodiCMS_Controller_API_Layout extends Controller_System_Api {
 		$layouts = Model_File_Layout::find_all();
 		
 		$blocks = array();
-		foreach ($layouts as $layout)
+		foreach($layouts as $layout)
 		{
 			$blocks[$layout->name] = $layout->rebuild_blocks();
 		}

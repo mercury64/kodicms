@@ -1,8 +1,12 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package Datasource
- * @category Hybrid
+ * @package		KodiCMS/Datasource
+ * @category	Document
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class DataSource_Hybrid_Document extends Datasource_Document {
 	
@@ -11,6 +15,7 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 		'ds_id' => NULL,
 		'published' => NULL,
 		'header' => NULL,
+		'created_on' => NULL,
 		'meta_title' => NULL, 
 		'meta_keywords' => NULL, 
 		'meta_description' => NULL
@@ -21,6 +26,12 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 	 * @var array array([ID] => [Document value])
 	 */
 	protected $_fields = array();
+	
+	/**
+	 * Документ имеет автора
+	 * @var boolean 
+	 */
+	protected $_is_authored = TRUE;
 	
 	public function defaults()
 	{
@@ -34,14 +45,23 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 	/**
 	 * Проаверка существаования поля в документе
 	 * 
-	 * @param type $field
-	 * @return type
+	 * @param string $field
+	 * @return boolean
 	 */
 	public function __isset($field)
 	{
-		return isset($this->_fields[$field]);
+		return isset($this->_fields[$field]) || parent::__isset($field);
 	}
 	
+	/**
+	 * 
+	 * @param string $field
+	 */
+	public function __unset($field)
+	{
+		unset($this->_fields[$field]);
+		parent::__unset($field);
+	}
 	
 	/**
 	 * Геттер значений полей документов
@@ -68,7 +88,12 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 	 */
 	public function set($field, $value)
 	{
-		if(array_key_exists($field, $this->_system_fields))
+		if($this->is_read_only())
+		{
+			return $this;
+		}
+		
+		if(array_key_exists($field, $this->system_fields()))
 		{
 			return parent::set($field, $value);
 		}
@@ -96,20 +121,44 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 	 */
 	public function values()
 	{
-		return Arr::merge($this->_fields, $this->_system_fields);
+		return Arr::merge($this->_fields, $this->system_fields());
 	}
 
 	/**
 	 * Загрузка данных из массива
 	 * 
 	 * @param array $array Массив значений полей документа
+	 * @param array $expected
 	 * @return \DataSource_Hybrid_Document
 	 */
-	public function read_values(array $array = NULL) 
+	public function read_values(array $array = NULL, array $expected = NULL) 
 	{
-		foreach($this->section()->record()->fields() as $field)
+		// Default to expecting everything except the primary key
+		if ($expected === NULL)
 		{
-			if($field->family == DataSource_Hybrid_Field::FAMILY_FILE )	continue;
+			$expected = $this->section()->record()->fields();
+		}
+		else
+		{
+			$fields = $this->section()->record()->fields();
+			foreach ($fields as $name => $field)
+			{
+				if(!in_array($field->id, $expected))
+				{
+					unset($fields[$name]);
+				}
+			}
+			
+			$expected = $fields;
+		}
+		
+		foreach($expected as $field)
+		{
+			if($field->family == DataSource_Hybrid_Field::FAMILY_FILE )
+			{
+				continue;
+			}
+
 			$field->onReadDocumentValue($array, $this);
 			unset($array[$field->name]);
 		}
@@ -210,10 +259,13 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 		{
 			$preffix = 'dshybrid.';
 		}
+		
+		$columns = $this->system_fields();
+		unset($columns['id']);
 
 		$result = DB::select(array('dshybrid.id', 'id'))
-			->select('ds_id', 'published', 'header', 'meta_title', 'meta_keywords', 'meta_description')
-			->select_array( array_keys( $this->_fields ))
+			->select_array(array_keys($columns))
+			->select_array(array_keys($this->_fields))
 			->from('dshybrid')
 			->join("dshybrid_{$ds_id}", 'left')
 				->on("dshybrid_{$ds_id}.id", '=', 'dshybrid.id')
@@ -326,12 +378,14 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 	 */
 	public function remove()
 	{
+		$id = $this->id;
+
 		parent::remove();
 
-		if( ! $this->loaded() ) return NULL;
-		
+		if( ! $this->loaded() ) return FALSE;
+
 		DB::delete("dshybrid_" . $this->section()->id())
-			->where('id', '=', $this->id)
+			->where('id', '=', $id)
 			->execute();
 		
 		$this->reset();
@@ -351,12 +405,45 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 	 *				->read_files($_FILES)
 	 *				->validate($this->request->post() + $_FILES);
 	 * 
-	 * @param array $array
-	 * @param string $errors_file
+	 * @param Validation $extra_validation
+	 * @param array $expected
 	 * @return boolean|Validation
 	 */
-	public function validate($errors_file = 'validation')
+	public function validate(Validation $extra_validation = NULL, array $expected = NULL)
 	{
+		// Determine if any external validation failed
+		$extra_errors = ($extra_validation AND ! $extra_validation->check());
+
+		
+		// Default to expecting everything except the primary key
+		if ($expected === NULL)
+		{
+			$fields = $this->section()->record()->fields();
+			$expected_rules = $this->rules();
+		}
+		else
+		{
+			$fields = $this->section()->record()->fields();
+			foreach ($fields as $name => $field)
+			{
+				if(!in_array($field->id, $expected))
+				{
+					unset($fields[$name]);
+				}
+			}
+			
+			$rules = $this->rules();
+			foreach ($rules as $field => $_rules)
+			{
+				if(!in_array($field, $expected))
+				{
+					unset($rules[$field]);
+				}
+			}
+			
+			$expected_rules = $rules;
+		}
+		
 		$values = $this->values();
 		$values['csrf'] = Arr::get($this->_temp_fields, 'csrf');
 		
@@ -366,7 +453,7 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 			array('not_empty'), array('Security::check')
 		));
 		
-		foreach ($this->rules() as $field => $rules)
+		foreach ($expected_rules as $field => $rules)
 		{
 			$validation->rules($field, $rules);
 		}
@@ -376,16 +463,35 @@ class DataSource_Hybrid_Document extends Datasource_Document {
 			$validation->label($field, $label);
 		}
 
-		foreach ($this->section()->record()->fields() as $name => $field)
+		foreach ($fields as $name => $field)
 		{
 			$field->onValidateDocument($validation, $this);
 		}
 
-		if( ! $validation->check() )
+		if( ! $validation->check() OR $extra_errors )
 		{
-			throw new Validation_Exception( $validation );
+			$exception = new Validation_Exception( $validation );
+			
+			if ($extra_errors)
+			{
+				// Merge any possible errors from the external object
+				$exception->add_object($extra_validation);
+			}
+			
+			throw $exception;
 		}
 		
 		return TRUE;
+	}
+	
+	/**
+	 * Событие вызываемое в момент загрузки контроллера
+	 */
+	public function onControllerLoad() 
+	{
+		foreach ($this->section()->record()->fields() as $field)
+		{
+			$field->onControllerLoad();
+		}
 	}
 }

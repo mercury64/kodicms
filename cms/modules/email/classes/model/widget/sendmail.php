@@ -2,10 +2,13 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Other
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class Model_Widget_SendMail extends Model_Widget_Decorator {
+class Model_Widget_SendMail extends Model_Widget_Decorator_Handler {
 
 	const CTX = 0;
 	const GET = 1;
@@ -18,9 +21,6 @@ class Model_Widget_SendMail extends Model_Widget_Decorator {
 
 	protected $_errors = array();
 	protected $_values = array();
-	
-	public $use_template = FALSE;
-	public $use_caching = FALSE;
 
 	public $fields = array();
 	
@@ -88,15 +88,8 @@ class Model_Widget_SendMail extends Model_Widget_Decorator {
 		return parent::set_values($data);
 	}
 
-	public function fetch_data()
-	{
-		return array();
-	}
-
 	public function on_page_load() 
 	{
-		parent::on_page_load();
-
 		$this->_errors = array();
 
 		$this->_fetch_fields();
@@ -112,7 +105,8 @@ class Model_Widget_SendMail extends Model_Widget_Decorator {
 				$json['errors'] = $this->_errors;
 				$json['values'] = $this->_values;
 			} 
-			elseif ($this->handle_email_type($this->_values))
+			
+			elseif ($this->handle_email_type($this->_values) )
 			{
 				$json = array('status' => TRUE);
 			}
@@ -132,7 +126,7 @@ class Model_Widget_SendMail extends Model_Widget_Decorator {
 				$query = URL::query(array('status' => 'error'), FALSE);
 				$next_url = $referrer;
 			} 
-			elseif ($this->handle_email_type($this->_values))
+			elseif ($this->handle_email_type($this->_values) )
 			{
 				$query = URL::query(array('status' => 'ok'), FALSE);
 				
@@ -161,15 +155,15 @@ class Model_Widget_SendMail extends Model_Widget_Decorator {
 			
 			$this->_values[$field['id']] = $value;
 	
-			if( ! empty($field['validator']))
+			if ( ! empty($field['validator']))
 			{
 				$validations = explode(',', $field['validator']);
 				
-				foreach($validations as $validator)
+				foreach ($validations as $validator)
 				{
 					$validator = trim($validator);
 
-					if( strpos( $validator, '::' ) !== FALSE )
+					if (strpos( $validator, '::' ) !== FALSE)
 					{
 						list($class, $method) = explode('::', $validator);
 					}
@@ -243,10 +237,5 @@ class Model_Widget_SendMail extends Model_Widget_Decorator {
 		}
 
 		return $value;
-	}
-	
-	public function render( array $params = array( ) )
-	{
-		return NULL;
 	}
 }

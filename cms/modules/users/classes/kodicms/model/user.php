@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS/Users
  * @category	Model
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Model_User extends Model_Auth_User {
 	
@@ -34,6 +37,24 @@ class KodiCMS_Model_User extends Model_Auth_User {
 			'email'            => __('E-mail'),
 			'password'         => __('Password'),
 			'password_confirm' => __('Confirm Password')
+		);
+	}
+	
+	public function form_columns()
+	{
+		return array(
+			'id' => array(
+				'type' => 'input',
+				'editable' => FALSE,
+				'length' => 10
+			),
+			'password' => array(
+				'type' => 'password'
+			),
+			'password_confirm' => array(
+				'type' => 'password',
+				'free' => TRUE
+			)
 		);
 	}
 	
@@ -105,9 +126,9 @@ class KodiCMS_Model_User extends Model_Auth_User {
 	 * @param array $attributes
 	 * @return string HTML::image
 	 */
-	public function gravatar($size = 40, $default = NULL, $attributes = array())
+	public function gravatar($size = 40, $default = NULL, array $attributes = NULL)
 	{
-		return Gravatar::load($this->email, $size, $default, $attributes );
+		return Gravatar::load($this->email, $size, $default, $attributes);
 	}
 
 	/**
@@ -254,7 +275,7 @@ class KodiCMS_Model_User extends Model_Auth_User {
 			$data[$var] = $this->{$var};
 		}
 
-		return serialize($data);
+		return Kohana::serialize($data);
 	}
 
 	/**************************************************************************
@@ -291,7 +312,6 @@ class KodiCMS_Model_User extends Model_Auth_User {
 	
 	public function after_update()
 	{
-
 		Kohana::$log->add(Log::INFO, 'User :new_user has been updated by :user', array(
 			':new_user' => HTML::anchor(Route::get('backend')->uri(array(
 				'controller' => 'users',
@@ -299,26 +319,25 @@ class KodiCMS_Model_User extends Model_Auth_User {
 				'id' => $this->id
 			)), $this->username),
 		))->write();
-				
-		Observer::notify( 'user_after_update', $this );
-		
+
+		Observer::notify('user_after_update', $this);
 		return parent::after_update();
 	}
 	
 	public function before_delete()
 	{
 		// security (dont delete the first admin)
-		if ( $this->id == 1 )
+		if ($this->id == 1)
 		{
 			Kohana::$log->add(Log::INFO, ':user trying to delete administrator', array(
 				':user_id' => $this->id,
 			))->write();
-			
+
 			return FALSE;
 		}
-		
-		Observer::notify( 'user_before_delete', $this );
-		
+
+		Observer::notify('user_before_delete', $this);
+
 		return parent::before_delete();
 	}
 	
@@ -327,9 +346,9 @@ class KodiCMS_Model_User extends Model_Auth_User {
 		Kohana::$log->add(Log::INFO, 'User with id :user_id has been deleted by :user', array(
 			':user_id' => $id,
 		))->write();
-		
-		Observer::notify( 'user_after_delete', $id );
-		
+
+		Observer::notify('user_after_delete', $id);
+
 		return parent::after_delete($id);
 	}
 }

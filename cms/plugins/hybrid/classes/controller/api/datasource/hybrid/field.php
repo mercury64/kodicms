@@ -1,5 +1,13 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Hybrid
+ * @category	API
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Controller_Api_Datasource_Hybrid_Field extends Controller_System_API
 {
 	public function rest_delete()
@@ -21,6 +29,18 @@ class Controller_Api_Datasource_Hybrid_Field extends Controller_System_API
 
 		DataSource_Hybrid_Field_Factory::update_field($old_field, $field);
 		$this->message('Field ":field" added to headline', array(':field' => $field->header));
+	}
+	
+	public function post_position()
+	{
+		$field = $this->_get_field();
+		$position = (int) $this->param('value', 0, TRUE);
+
+		$old_field = clone($field);
+		$field->position = $position;
+
+		DataSource_Hybrid_Field_Factory::update_field($old_field, $field);
+		$this->response($field->position);
 	}
 	
 	public function delete_headline()

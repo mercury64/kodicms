@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Widgets
+ * @category	Behavior
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Behavior_Documents extends Behavior_Abstract
 {
 	/**
@@ -26,26 +34,26 @@ class Behavior_Documents extends Behavior_Abstract
 	
 	public function page_by_id()
 	{
-		if( ! $this->router()->param('id')) 
+		if (!$this->router()->param('id'))
 		{
 			return FALSE;
 		}
-		
+
 		return $this->execute();
 	}
 	
 	public function page_by_slug()
 	{
-		if( ! $this->router()->param('slug')) 
+		if (!$this->router()->param('slug'))
 		{
 			return FALSE;
 		}
-		
-		if(($page = Model_Page_Front::findBySlug($this->router()->param('slug'), $this->page())) === FALSE )
+
+		if (($page = Model_Page_Front::find($slug, FALSE, $this->page())) === FALSE)
 		{
-            return $this->execute();
+			return $this->execute();
 		}
-		
+
 		$this->_page = $page;
 	}
 
@@ -53,11 +61,11 @@ class Behavior_Documents extends Behavior_Abstract
 	{
 		$page_id = $this->__get_item_page_id();
 
-		if( empty($page_id) || $this->router()->matched_route() === NULL) 
+		if (empty($page_id) || $this->router()->matched_route() === NULL)
 		{
 			return FALSE;
 		}
-		
+
 		$this->_page = Model_Page_Front::findById($page_id);
 	}
 	

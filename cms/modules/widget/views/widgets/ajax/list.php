@@ -1,21 +1,23 @@
-<div class="widget">
+<div class="panel">
 	<?php if(count($widgets) > 0): ?>
 	<?php foreach ($widgets as $type => $_widgets): ?>
-	<div class="widget-header">
-		<h3><?php echo __($type); ?></h3>
+	<div class="panel-heading">
+		<span class="panel-title"><?php echo __($type); ?></span>
 	</div>
-	<div class="widget-content">
-		<ul class="inline" class="popup-widget-list">
+	<div class="panel-body padding-sm">
 		<?php foreach ($_widgets as $id => $widget): ?>
+			<?php if($widget->code()->is_handler()) continue; ?>
+		
 			<?php echo UI::button($widget->name, array(
 				'icon' => UI::icon('tag'), 'data-id' => $id, 
-				'class' => 'popup-widget-item btn'
+				'class' => 'popup-widget-item btn-default'
 			)); ?>
 		<?php endforeach; ?>
-		</ul>
 	</div>
 	<?php endforeach; ?>
 	<?php else: ?>
-	<h2><?php echo __('All widgets set to page'); ?></h2>
+	<div class="panel-body">
+		<h2><?php echo __('All widgets set to page'); ?></h2>
+	</div>
 	<?php endif; ?>
 </div>

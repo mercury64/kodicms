@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Hybrid
+ * @category	Field
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class DataSource_Hybrid_Field_Yandex_Map extends DataSource_Hybrid_Field_Primitive {
 	
 	protected $_is_required = FALSE;
@@ -10,7 +18,7 @@ class DataSource_Hybrid_Field_Yandex_Map extends DataSource_Hybrid_Field_Primiti
 
 	public function convert_value( $value )
 	{
-		Assets::js('Yandex.map', 'http://api-maps.yandex.ru/2.0/?load=package.full&lang=' . I18n::lang());
+		
 		if( is_string($value) )
 		{
 			return explode(',', $value);
@@ -75,5 +83,12 @@ class DataSource_Hybrid_Field_Yandex_Map extends DataSource_Hybrid_Field_Primiti
 		}
 
 		return $coord;
+	}
+	
+	public function onControllerLoad()
+	{
+		Assets::js('Yandex.map', 'http://api-maps.yandex.ru/2.0/?load=package.full&lang=' . I18n::lang());
+		
+		parent::onControllerLoad();
 	}
 }

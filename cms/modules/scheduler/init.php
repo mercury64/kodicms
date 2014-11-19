@@ -1,13 +1,21 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 Observer::observe('system::init', function() {
+<<<<<<< HEAD
 	if (Config::get('job', 'agent', Model_Job::AGENT_SYSTEM) === Model_Job::AGENT_CRON)
 		return;
+=======
+	if (Config::get('job', 'agent') == Model_Job::AGENT_CRON)
+	{
+		return;
+	}
+>>>>>>> upstream/dev
 
 	try
 	{
 		ORM::factory('job')->run_all();
 	} 
+<<<<<<< HEAD
 	catch (Exception $ex) 
 	{
 
@@ -44,3 +52,11 @@ Observer::observe('scheduler_callbacks', function() {
 		return $data;
 	});
 });
+=======
+	catch (Exception $ex){}
+});
+
+Observer::observe('view_setting_plugins', function() {
+	echo View::factory('jobs/settings');
+});
+>>>>>>> upstream/dev

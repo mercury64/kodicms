@@ -1,14 +1,22 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Datasource
+ * @category	Controller
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Controller_System_Datasource_Document extends Controller_System_Datasource
 {
 	public function before()
 	{
-		$ds_id = (int) $this->request->query('ds_id');
+		$ds_id = (int) Arr::get($this->request->query(), 'ds_id', $this->request->post('ds_id'));
 		
 		$this->section($ds_id);
 		
-		$this->_check_acl($this->section()->type(), $ds_id);
+		$this->_check_acl();
 
 		parent::before();
 	}
@@ -22,31 +30,14 @@ class Controller_System_Datasource_Document extends Controller_System_Datasource
 	{
 		Assets::package('backbone');
 		$id = (int) $this->request->query('id');
-		$action = $this->request->action();
-
-		if( empty($id) )
-		{
-			$doc = $this->section()->get_empty_document();
-		}
-		else
-		{
-			$doc = $this->section()->get_document($id);
-			
-			if( ! $doc)
-			{
-				throw new HTTP_Exception_404('Document ID :id not found', 
-						array(':id' => $id));
-			}
-		}
-
-		if($this->request->method() === Request::POST)
-		{
-			return $this->_save($this->section(), $doc);
-		}
+		
+		$doc = $this->_get_document($id);
 		
 		WYSIWYG::load_filters();
 		
 		$this->_load_session_data($doc);
+		
+		$doc->onControllerLoad();
 		
 		$this->breadcrumbs
 			->add($this->section()->name, Route::get('datasources')->uri(array(
@@ -54,16 +45,16 @@ class Controller_System_Datasource_Document extends Controller_System_Datasource
 				'controller' => 'data'
 			)) . URL::query(array('ds_id' => $this->section()->id()), FALSE));
 		
+		$this->template_js_params['API_FORM_ACTION'] = '/datasource-document.' . ($doc->loaded() ? 'update' : 'create'); 
+		
 		if( ! $doc->loaded() )
 		{
-			$this->template->title = __('New document');
+			$this->set_title(__('New document'));
 		}
 		else
 		{
-			$this->template->title = $doc->header;
+			$this->set_title($doc->header);
 		}
-		
-		$this->breadcrumbs->add($this->template->title);
 		
 		$this->_load_template($doc);
 	}
@@ -73,8 +64,11 @@ class Controller_System_Datasource_Document extends Controller_System_Datasource
 	 * @param Datasource_Section $ds
 	 * @param Datasource_Document $doc
 	 */
-	private function _save($ds, $doc)
+	public function action_post()
 	{
+		$id = (int) $this->request->post('id');
+		$doc = $this->_get_document($id);
+		
 		Session::instance()->set('post_data', $this->request->post());
 
 		try
@@ -83,23 +77,28 @@ class Controller_System_Datasource_Document extends Controller_System_Datasource
 				->read_values($this->request->post())
 				->read_files($_FILES)
 				->validate();
-
-			if( $doc->loaded() )
-			{
-				$ds->update_document($doc);
-			}
-			else
-			{
-				$doc = $ds->create_document($doc);
-			}
-			
-			Messages::success(__('Document saved'));
 		} 
 		catch (Validation_Exception $e)
 		{
 			Messages::errors($e->errors('validation'));
 			$this->go_back();
 		}
+		catch (DataSource_Exception_Document $e)
+		{
+			Messages::errors($e->getMessage());
+			$this->go_back();
+		}
+
+		if( $doc->loaded() )
+		{
+			$this->section()->update_document($doc);
+		}
+		else
+		{
+			$doc = $this->section()->create_document($doc);
+		}
+
+		Messages::success(__('Document saved'));
 		
 		Session::instance()->delete('post_data');
 		
@@ -109,15 +108,15 @@ class Controller_System_Datasource_Document extends Controller_System_Datasource
 			$this->go(Route::get('datasources')->uri(array(
 				'directory' => 'datasources',
 				'controller' => 'data'
-			)) . URL::query(array('ds_id' => $ds->id()), FALSE));
+			)) . URL::query(array('ds_id' => $this->section()->id()), FALSE));
 		}
 		else
 		{
 			$this->go(Route::get('datasources')->uri(array(
-				'directory' => $ds->type(),
+				'directory' => $this->section()->type(),
 				'controller' => 'document',
 				'action' => 'view'
-			)) . URL::query(array('ds_id' => $ds->id(), 'id' => $doc->id), FALSE));
+			)) . URL::query(array('ds_id' => $this->section()->id(), 'id' => $doc->id), FALSE));
 		}
 	}
 	
@@ -127,10 +126,19 @@ class Controller_System_Datasource_Document extends Controller_System_Datasource
 	 */
 	protected function _load_template($doc) 
 	{
-		$this->template->content = View::factory('datasource/'.$this->section()->type().'/document/edit')->set( array(
-			'ds' => $this->section(),
-			'doc' => $doc,
-			'action' => $this->request->action()
+		$this->template->content = View::factory('datasource/'.$this->section()->type().'/document/edit')
+			->set(array(
+				'action' => $this->request->action()
+			));
+	
+		View::set_global(array(
+			'form' => array(
+				'label_class' => 'control-label col-md-2 col-sm-3',
+				'input_container_class' => 'col-md-10 col-lg-10 col-sm-9',
+				'input_container_offset_class' => 'col-md-offset-2 col-sm-offset-3 col-md-10 col-sm-9'
+			),
+			'document' => $doc,
+			'datasource' => $this->section(),
 		));
 	}
 	
@@ -157,22 +165,43 @@ class Controller_System_Datasource_Document extends Controller_System_Datasource
 	 * @param string $type
 	 * @param integer $ds_id
 	 */
-	protected function _check_acl($type, $ds_id)
+	protected function _check_acl()
 	{
 		if(
-			Acl::check($type.$ds_id.'.document.edit')
+			$this->section()->has_access('document.view')
 		OR
-			Acl::check($type.$ds_id.'.document.view')
+			$this->section()->has_access('document.edit')
 		)
 		{
 			$this->allowed_actions[] = 'view';
 		}
 		
 		if(
-			Acl::check($type.$ds_id.'.document.edit')
+			$this->section()->has_access('document.create')
 		)
 		{
 			$this->allowed_actions[] = 'create';
+			$this->allowed_actions[] = 'post';
 		}
+	}
+	
+	protected function _get_document($id)
+	{
+		if( empty($id) )
+		{
+			$doc = $this->section()->get_empty_document();
+		}
+		else
+		{
+			$doc = $this->section()->get_document($id);
+			
+			if(!$doc)
+			{
+				throw new HTTP_Exception_404('Document ID :id not found', 
+						array(':id' => $id));
+			}
+		}
+		
+		return $doc;
 	}
 }

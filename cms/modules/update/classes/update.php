@@ -1,5 +1,12 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
 
+/**
+ * @package		KodiCMS/Update
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Update {
 	
 	const VERSION_NEW = 1;
@@ -9,12 +16,14 @@ class Update {
 	const BRANCH = 'dev';
 	const REPOSITORY = 'butschster/kodicms';
 	
+	const CACHE_KEY_DB_SHEMA = 'database_schema_diff';
+	const CACHE_KEY_FILES = 'update_cache';
+	
 	/**
 	 * Версия системы с удаленного сервера
 	 * @var string 
 	 */
 	protected static $_remove_version = NULL;
-
 
 	/**
 	 * Проверка номера версии в репозитории Github
@@ -24,10 +33,31 @@ class Update {
 	{
 		$respoonse = self::request('https://raw.githubusercontent.com/:rep/:branch/cms/application/bootstrap.php');
 		preg_match('/define\(\'CMS_VERSION\'\,[\t\ ]*\'([0-9\.]+)\'\)\;/i', $respoonse, $matches);
-		
 		self::$_remove_version = $matches[1];
 
 		return version_compare(CMS_VERSION, self::$_remove_version);
+	}
+	
+	/**
+	 * Проверка БД на расхождение
+	 * @retun string
+	 */
+	public static function check_database($caching = TRUE)
+	{
+		$cache = Cache::instance();
+
+		if($caching === FALSE OR ($diff = $cache->get(self::CACHE_KEY_DB_SHEMA)) === NULL)
+		{
+			$db_sql = Database_Helper::schema();
+			$file_sql = Database_Helper::install_schema();
+
+			$compare = new Database_Helper;
+			$diff = $compare->get_updates($db_sql, $file_sql, TRUE);
+			
+			$cache->set(self::CACHE_KEY_DB_SHEMA, $diff);
+		}
+		
+		return $diff;
 	}
 	
 	/**
@@ -46,7 +76,7 @@ class Update {
 		);
 		
 		$cache = Cache::instance();
-		$cached_files = $cache->get('update_cache');
+		$cached_files = $cache->get(self::CACHE_KEY_FILES);
 		
 		if($cached_files !== NULL)
 		{
@@ -82,16 +112,7 @@ class Update {
 				$filesize = filesize($filepath);
 				if ($filesize != $row['size'] )
 				{
-					// Linux файлы имеют размер отличный от Windows файлов из за 
-					// разного подсчета символов окончания строки LF против CR LF
-					if (Kohana::$is_windows)
-					{
-						$diff = $filesize - self::_count_file_lines($filepath) - $row['size'];
-					}
-					else
-					{
-						$diff = $filesize - $row['size'];
-					}
+					$diff = $filesize - self::_count_file_lines($filepath) - $row['size'];
 					
 					if ($diff > 1 OR $diff < - 1)
 					{
@@ -109,7 +130,7 @@ class Update {
 				$files['third_party_plugins'] = array_diff($local_plugins, $plugins);
 			}
 			
-			$cache->set('update_cache', $files);
+			$cache->set(self::CACHE_KEY_FILES, $files);
 		}
 		
 		return $files;
@@ -133,7 +154,7 @@ class Update {
 	{
 		if(self::$_remove_version === NULL)
 		{
-			self::check();
+			self::check_version();
 		}
 		
 		return self::$_remove_version;

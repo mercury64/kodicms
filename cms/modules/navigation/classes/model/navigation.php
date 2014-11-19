@@ -2,8 +2,10 @@
 
 /**
  * @package		KodiCMS/Navigation
- * @category	Model
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Model_Navigation {
 
@@ -28,12 +30,31 @@ class Model_Navigation {
 		foreach ($sitemap as $section)
 		{
 			if(!isset($section['name'])) continue;
-
-			$section_object = self::get_section($section['name']);
 			
-			if(!empty($section['children']))
+			if(isset($section['url']))
 			{
-				$section_object->add_pages($section['children']);
+				$section_object = self::get_root_section();
+
+				$page = new Model_Navigation_Page($section);
+				$section_object->add_page($page);
+			}
+			else
+			{
+				$section_object = self::get_section($section['name']);
+				if(isset($section['icon']))
+				{
+					$section_object->icon = $section['icon'];
+				}
+
+				if(isset($section['priority']))
+				{
+					$section_object->priority = (int) $section['priority'];
+				}
+
+				if(!empty($section['children']))
+				{
+					$section_object->add_pages($section['children']);
+				}
 			}
 		}
 	}
@@ -43,18 +64,11 @@ class Model_Navigation {
 	 * @param string $name
 	 * @return Model_Navigation_Section
 	 */
-	public static function get_section($name, Model_Navigation_Section $parent = NULL)
+	public static function get_section($name, Model_Navigation_Section $parent = NULL, $priority = 1)
 	{
 		if($parent === NULL)
 		{
-			if(self::$_root_section === NULL)
-			{
-				self::$_root_section = new Model_Navigation_Section(array(
-					'name' => 'root'
-				));
-			}
-			
-			$parent = & self::$_root_section;
+			$parent = self::get_root_section();
 		}
 
 		$section = $parent->find_section($name);
@@ -62,13 +76,26 @@ class Model_Navigation {
 		if( $section === NULL )
 		{
 			$section = new Model_Navigation_Section(array(
-				'name' => $name
+				'name' => $name,
+				'priority' => $priority
 			));
 
 			$parent->add_page($section);
 		}
 		
 		return $section;
+	}
+	
+	public static function get_root_section()
+	{
+		if(self::$_root_section === NULL)
+		{
+			self::$_root_section = new Model_Navigation_Section(array(
+				'name' => 'root'
+			));
+		}
+		
+		return self::$_root_section;
 	}
 
 	/**
@@ -94,17 +121,10 @@ class Model_Navigation {
 	 * @return array
 	 */
 	public static function get($uri = NULL)
-	{
-//		self::sort();
-		
+	{		
 		if($uri === NULL)
 		{
 			$uri = Request::current()->uri();
-		}
-		
-		if($uri == ADMIN_DIR_NAME)
-		{
-			$uri .= '/' . Config::get('site', 'default_tab');
 		}
 
 		$uri = strtolower($uri);
@@ -112,7 +132,7 @@ class Model_Navigation {
 		$break = FALSE;
 		
 		self::$_root_section->find_active_page_by_uri($uri);
-
+		self::$_root_section->sort();
 		return self::$_root_section;
 	}
 	
@@ -164,57 +184,5 @@ class Model_Navigation {
 
 			return ($a->id() < $b->id()) ? -1 : 1;
 		});
-	}
-	
-	/**
-	 * 
-	 * @param Bootstrap_Helper_Elements $nav
-	 * @param array $sections
-	 * @param boolean $is_active
-	 * @return \Bootstrap_Helper_Elements
-	 */
-	public static function build_dropdown(Bootstrap_Helper_Elements $nav, array $sections, & $is_active = FALSE)
-	{
-		foreach ( $sections as $section )
-		{
-			$is_active = FALSE;
-			if(count($section) == 0) continue;
-
-			$dropdown = Bootstrap_Navbar_Dropdown::factory(array(
-				'title' => $section->name(),
-			))->icon($section->icon);
-
-			foreach ( $section as $page )
-			{
-				if($page->divider === TRUE)
-				{
-					$dropdown->add_divider();
-				}
-
-				$dropdown->add(Bootstrap_Element_Button::factory(array(
-						'href' => $page->url(), 'title' => $page->name()
-				))->attributes('data-counter', $page->counter)->icon($page->icon), $page->is_active());
-
-				if($page->is_active())
-				{
-					$is_active = TRUE;
-				}
-				
-				if(count($section->sections()) > 0)
-				{
-					$is_sub_active = FALSE;
-					$dropdown = self::build_dropdown($dropdown, $section->sections(), $is_sub_active);
-					
-					if($is_sub_active === TRUE)
-					{
-						$is_active = TRUE;
-					}
-				}
-			}
-
-			$nav->add($dropdown, $is_active);
-		}
-		
-		return $nav;
 	}
 }

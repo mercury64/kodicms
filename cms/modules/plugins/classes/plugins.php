@@ -2,7 +2,10 @@
 
 /**
  * @package		KodiCMS/Plugins
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Plugins {
 
@@ -152,6 +155,25 @@ class Plugins {
 		return Arr::get( self::$_registered, $plugin_id );
 	}
 	
+	/**
+	 * 
+	 * @param string $plugin_id
+	 * @param string $key
+	 * @param mixed $default
+	 * @return mixed
+	 */
+	public static function setting( $plugin_id, $key, $default = NULL)
+	{
+		$plugin = self::get_registered($plugin_id);
+		
+		if($plugin instanceof Plugin)
+		{
+			return $plugin->get($key, $default);
+		}
+		
+		return $default;
+	}
+
 	/**
 	 * Получение списка плагинов из БД
 	 * 

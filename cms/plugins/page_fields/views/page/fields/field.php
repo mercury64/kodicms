@@ -1,48 +1,52 @@
-<div class="page-field row-fluid" data-id="<?php echo $field->id; ?>">
-	<div class="span3 system-field">
+<div class="page-field row" data-id="<?php echo $field->id; ?>">
+	<div class="col-md-3 system-field">
 		<?php if($field->loaded()): ?>
-		<?php echo FORM::input('title', $field->title, array(
+		<?php echo Form::input('title', $field->title, array(
 			'placeholder' => __('Field title'), 'data-slug' => '.field-slug',
-			'class' => 'input-block-level', 'disabled'
+			'class' => 'form-control', 'disabled'
 		)); ?>
 		<?php else: ?>
 
-		<?php echo FORM::input('title', $field->title, array(
+		<?php echo Form::input('title', $field->title, array(
 			'placeholder' => __('Field title'), 'data-slug' => '.field-slug',
-			'class' => 'input-block-level'
+			'class' => 'form-control'
 		)); ?>
 		<?php endif; ?>
 	</div>
 	
-	<div class="span2 system-field">
+	<div class="col-md-2 system-field">
 		<?php if($field->loaded()): ?>
-		<?php echo FORM::input('key', $field->key, array(
+		<?php echo Form::input('key', $field->key, array(
 			'placeholder' => __('Field key'), 'disabled',
-			'class' => 'input-block-level slug field-slug', 'data-separator' => '_'
+			'class' => 'form-control slug field-slug', 'data-separator' => '_'
 		)); ?>
 		<?php else: ?>
-		<?php echo FORM::input('key', $field->key, array(
+		<?php echo Form::input('key', $field->key, array(
 			'placeholder' => __('Field key'), 
-			'class' => 'input-block-level slug field-slug', 'data-separator' => '_'
+			'class' => 'form-control slug field-slug', 'data-separator' => '_'
 		)); ?>
 		<?php endif; ?>
 	</div>
 
-	<div class="span6 input-append">
-		<?php echo FORM::input('value', $field->value, array(
-			'placeholder' => (empty($field->value) AND $field->loaded()) ? '' : __('Field value'), 
-			'class' => 'input-block-level input-filemanager'
-		)); ?>
+	<div class="col-md-7">
+		<div class="input-group">
+			<?php echo Form::input('value', $field->value, array(
+				'placeholder' => (empty($field->value) AND $field->loaded()) ? '' : __('Field value'), 
+				'class' => 'form-control', 'data-filemanager' => 'true'
+			)); ?>
 
-		<?php if($field->loaded()): ?>
-		<?php echo FORM::button('remove_field', UI::icon( 'trash'), array(
-			'class' => 'btn btn-danger btn-remove'
-		)); ?>
-		<?php else: ?>
-		<?php echo FORM::button('add_field', UI::icon( 'plus'), array(
-			'class' => 'btn btn-success btn-add'
-		)); ?>
-		<?php endif; ?>
+			<div class="input-group-btn">
+				<?php if($field->loaded()): ?>
+				<?php echo Form::button('remove_field', UI::icon( 'trash-o'), array(
+					'class' => 'btn btn-danger btn-remove'
+				)); ?>
+				<?php else: ?>
+				<?php echo Form::button('add_field', UI::icon( 'plus'), array(
+					'class' => 'btn btn-success btn-add'
+				)); ?>
+				<?php endif; ?>
+			</div>
+		</div>
 	</div>
 	
 	<?php if($field->loaded()): ?>

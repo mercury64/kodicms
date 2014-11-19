@@ -3,23 +3,9 @@
 /**
  * @package		KodiCMS
  * @category	System Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class KodiCMS_Controller_System_Ajax extends Controller_System_Security {
-
-	public function before()
-	{
-//		if(
-//			Request::current()->is_ajax() === FALSE 
-//			OR
-//			Request::current()->method() != Request::POST
-//		)
-//		{
-//			throw new Http_Exception_404('Доступ запрещен');
-//			return;
-//		}
-
-		parent::before();
-	}
-
-}
+class KodiCMS_Controller_System_Ajax extends Controller_System_Security {}

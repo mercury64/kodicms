@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Hybrid
+ * @category	Field
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class DataSource_Hybrid_Field_File_File extends DataSource_Hybrid_Field_File {
 
 	/**
@@ -28,14 +36,15 @@ class DataSource_Hybrid_Field_File_File extends DataSource_Hybrid_Field_File {
 	public function create()
 	{
 		if (parent::create())
-		{
+		{			
 			if ($this->create_folder())
 			{
 				$this->update();
+
 				return $this->id;
 			}
 
-			$this->remove_folder();
+			$this->remove();
 		}
 
 		return FALSE;
@@ -140,10 +149,9 @@ class DataSource_Hybrid_Field_File_File extends DataSource_Hybrid_Field_File {
 		foreach ($disallowed as $type)
 		{
 			if (
-					(
-					(strpos($type, '/') !== FALSE) AND
-					preg_match($type, $file_type)
-					) OR $type == $file_type
+				((strpos($type, '/') !== FALSE) AND preg_match($type, $file_type)) 
+				OR 
+				$type == $file_type
 			)
 			{
 				return FALSE;
@@ -159,12 +167,20 @@ class DataSource_Hybrid_Field_File_File extends DataSource_Hybrid_Field_File {
 	 */
 	public function create_folder()
 	{
-		if (!empty($this->folder) AND $this->ds_id AND !file_exists(PUBLICPATH . $this->folder))
+		if (!empty($this->folder) AND $this->ds_id)
 		{
-			if (mkdir(PUBLICPATH . $this->folder, 0777, TRUE))
+			if(!is_dir(PUBLICPATH . $this->folder))
 			{
-				return TRUE;
+				if (!mkdir(PUBLICPATH . $this->folder, 0777, TRUE))
+				{
+					throw new DataSource_Hybrid_Exception_Field('Could not create field :field directory :dir', array(
+						':dir' => Debug::path(PUBLICPATH . $this->folder),
+						':field' => $this->type
+					));
+				}
 			}
+			
+			return TRUE;
 		}
 
 		return FALSE;
@@ -364,7 +380,7 @@ class DataSource_Hybrid_Field_File_File extends DataSource_Hybrid_Field_File {
 		return !empty($row[$fid]) ? str_replace(array('/', '\\'), '/', $row[$fid]) : NULL;
 	}
 
-	public function fetch_headline_value($value)
+	public function fetch_headline_value($value, $document_id)
 	{
 		if ($this->is_image(PUBLICPATH . $value))
 		{
@@ -375,7 +391,7 @@ class DataSource_Hybrid_Field_File_File extends DataSource_Hybrid_Field_File {
 			return HTML::anchor(PUBLIC_URL . $value, __('File'), array('target' => 'blank'));
 		}
 
-		return parent::fetch_headline_value($value);
+		return parent::fetch_headline_value($value, $document_id);
 	}
 
 }

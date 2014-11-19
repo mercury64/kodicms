@@ -1,79 +1,86 @@
 <script id="part-body" type="text/template">
-	<div class="part" id="part<%=name %>">
-		<div class="widget-header  widget-inverse">
-			<h4 <?php if( ACL::check('page.parts')): ?>class="part-name"<?php endif; ?> title="<?php echo __('Double click to edit part name.'); ?>"><%=name %></h4><input type="text" class="edit-name" value="<%=name %>" />
+	<div class="part panel panel-darken no-margin-b" id="part<%=name %>">
+		<div class="panel-heading padding-xs-vr form-inline">
+			<span class="<?php if( ACL::check('page.parts')): ?>part-name<?php endif; ?> panel-title" title="<?php echo __('Double click to edit part name.'); ?>"><%=name %></span>
+			<input type="text" class="edit-name form-control input-sm" value="<%=name %>" />
 			
 			<% if ((is_protected == <?php echo Model_Page_Part::PART_PROTECTED; ?> && is_developer == 1) || is_protected == <?php echo Model_Page_Part::PART_NOT_PROTECTED; ?> ) { %>
-			<div class="widget-options pull-right">
-				<?php if( ACL::check('page.parts')): ?>
-				<?php echo UI::button(UI::icon( 'cog' ), array(
-					'class' => 'part-options-button btn btn-mini')
-				); ?>
-				<?php endif; ?>
-				
-				<% if ( is_expanded == 0 ) { %>
-				<?php echo UI::button(UI::icon( 'chevron-down icon-white' ), array(
-					'class' => 'part-minimize-button btn btn-mini btn-inverse')
-				); ?>		
-				<% } else { %>		
-				<?php echo UI::button(UI::icon( 'chevron-up icon-white' ), array(
-					'class' => 'part-minimize-button btn btn-mini btn-inverse')
-				); ?>
-				<% } %>
+			<div class="panel-heading-controls">
+				<div class="btn-group">
+					<?php echo Observer::notify('part_controls'); ?>
+
+					<?php if( ACL::check('page.parts')): ?>
+					<?php echo UI::button(UI::icon( 'cog' ), array(
+						'class' => 'part-options-button btn-default btn-xs')
+					); ?>
+					<?php endif; ?>
+
+					<% if ( is_expanded == 0 ) { %>
+					<?php echo UI::button(UI::icon( 'chevron-down' ), array(
+						'class' => 'part-minimize-button btn-inverse btn-xs')
+					); ?>		
+					<% } else { %>		
+					<?php echo UI::button(UI::icon( 'chevron-up' ), array(
+						'class' => 'part-minimize-button btn-inverse btn-xs')
+					); ?>
+					<% } %>
+				</div>
 			</div>
 			<% } %>
 		</div>
 		
 		<% if ((is_protected == <?php echo Model_Page_Part::PART_PROTECTED; ?> && is_developer == 1) || is_protected == <?php echo Model_Page_Part::PART_NOT_PROTECTED; ?> ) { %>
-		<div class="widget-content part-options">
-		<?php if( ACL::check('page.parts')): ?>
-			<div class="row-fluid">
-				<div class="span4 item-filter-cont form-inline">
-					<label><?php echo __( 'WYSIWYG' ); ?></label>
-					<select class="item-filter" name="part_filter">
-						<option value="">&ndash; <?php echo __( '--- none ---' ); ?> &ndash;</option>
-						<?php foreach ( WYSIWYG::findAll() as $filter ): ?> 
-							<option value="<?php echo $filter; ?>" <% if (filter_id == "<?php echo $filter; ?>") { print('selected="selected"')} %> ><?php echo Inflector::humanize( $filter ); ?></option>
-						<?php endforeach; ?> 
-					</select>
+		<div class="part-options" style="display: none;">
+			<div class="panel-body padding-sm form-inline">
+			<?php if( ACL::check('page.parts')): ?>
+				<div class="row">
+					<div class="col-md-4 item-filter-cont">
+						<label>
+							<?php echo __( 'WYSIWYG' ); ?>&nbsp;&nbsp;&nbsp;
+							<select class="item-filter" name="part_filter">
+								<option value="">&ndash; <?php echo __( '--- none ---' ); ?> &ndash;</option>
+								<?php foreach ( WYSIWYG::findAll() as $filter ): ?> 
+									<option value="<?php echo $filter; ?>" <% if (filter_id == "<?php echo $filter; ?>") { print('selected="selected"')} %> ><?php echo Inflector::humanize( $filter ); ?></option>
+								<?php endforeach; ?> 
+							</select>
+						</label>
+					</div>			
+					<div class="col-md-8 text-right">
+						<?php echo Observer::notify('part_option'); ?>
+						<% if ( is_developer == 1 ) { %>
+						<label class="checkbox-inline">
+							<input type="checkbox" name="is_protected" class="px is_protected" <% if (is_protected == <?php echo Model_Page_Part::PART_PROTECTED; ?>) { print('checked="checked"')} %>> <?php echo __( 'Is protected' ); ?>
+						</label>
+						<label class="checkbox-inline">
+							<input type="checkbox" name="is_indexable" class="px is_indexable" <% if (is_indexable == 1) { print('checked="checked"')} %>> <?php echo __( 'Is indexable' ); ?>
+						</label>
+						<% } %>
+						<?php echo UI::button(__( 'Remove part :part_name', array( ':part_name' => '<%= name %>' ) ), array(
+							'class' => 'item-remove btn-xs btn-danger', 'icon' => UI::icon( 'trash-o' )
+						) ); ?>
+					</div>
 				</div>
-				<div class="span4">
-					<?php echo Observer::notify('part_option'); ?>
-				</div>				
-				<div class="span4 text-right">
-					<% if ( is_developer == 1 ) { %>
-					<label class="checkbox inline">
-						<input type="checkbox" name="is_protected" class="is_protected" <% if (is_protected == <?php echo Model_Page_Part::PART_PROTECTED; ?>) { print('checked="checked"')} %>> <?php echo __( 'Is protected' ); ?>
-					</label>
-					<label class="checkbox inline">
-						<input type="checkbox" name="is_indexable" class="is_indexable" <% if (is_indexable == 1) { print('checked="checked"')} %>> <?php echo __( 'Is indexable' ); ?>
-					</label>
-					<% } %>
-					<?php echo UI::button(__( 'Remove part :part_name', array( ':part_name' => '<%= name %>' ) ), array(
-						'class' => 'item-remove btn btn-mini btn-danger', 'icon' => UI::icon( 'trash icon-white' )
-					) ); ?>
-				</div>
-				
+				<?php else: ?>
+				<select class="item-filter" name="part_filter">
+					<option value="">&ndash; <?php echo __( '--- none ---' ); ?> &ndash;</option>
+					<?php foreach ( WYSIWYG::findAll() as $filter ): ?> 
+						<option value="<?php echo $filter; ?>" <% if (filter_id == "<?php echo $filter; ?>") { print('selected="selected"')} %> ><?php echo Inflector::humanize( $filter ); ?></option>
+					<?php endforeach; ?> 
+				</select>
+				<?php endif; ?>
 			</div>
-			<?php else: ?>
-			<select class="item-filter" name="part_filter">
-				<option value="">&ndash; <?php echo __( '--- none ---' ); ?> &ndash;</option>
-				<?php foreach ( WYSIWYG::findAll() as $filter ): ?> 
-					<option value="<?php echo $filter; ?>" <% if (filter_id == "<?php echo $filter; ?>") { print('selected="selected"')} %> ><?php echo Inflector::humanize( $filter ); ?></option>
-				<?php endforeach; ?> 
-			</select>
-			<?php endif; ?>
+			<hr class="no-margin" />
 		</div>
 		<% } %>
 		
 
 		<% if (is_protected == <?php echo Model_Page_Part::PART_PROTECTED; ?> && is_developer == 0 ) { %>
-		<div class="widget-content ">
+		<div class="panel-body">
 			<p class="text-warning"><?php echo __( 'Content of page part :part_name is protected from changes.', array( ':part_name' => '<%= name %>' ) ); ?></p>
 		</div>
 		<% } else { %>
-		<div class="widget-content  widget-nopad part-textarea" <% if ( is_expanded == 0 ) { %>style="display:none;"<% } %>>
-			<textarea id="pageEditPartContent-<%= name %>" name="part_content[<%= id %>]"><%= content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") %></textarea>
+		<div class="part-textarea" <% if ( is_expanded == 0 ) { %>style="display:none;"<% } %>>
+			<textarea class="form-control" rows="8" id="pageEditPartContent-<%= name %>" name="part_content[<%= id %>]"><%= content.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") %></textarea>
 		</div>
 		<% } %>
 	</div>

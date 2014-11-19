@@ -1,9 +1,13 @@
 <?php defined('SYSPATH') OR die('No direct script access.');
+
 /**
  * Database log writer. Stores log information in a database.
  *
  * @package		KodiCMS/Logs
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Log_Database extends Log_Writer {
 
@@ -66,7 +70,7 @@ class Log_Database extends Log_Writer {
 			
 			$data = array(
 				'created_on' => date('Y-m-d H:i:s'),
-				'user_id' => AuthUser::getId(),
+				'user_id' => Auth::get_id(),
 				'level' => $message['level'],
 				'message' => $message['body'],
 				'additional' => json_encode($message['additional'])

@@ -1,5 +1,13 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @package		KodiCMS/Widgets
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Model_Widget_Hybrid_Document extends Model_Widget_Decorator {
 			
 	/**
@@ -104,32 +112,27 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Decorator {
 		parent::on_page_load();
 		
 		$doc = $this->get_document();
-		
-		$page = $this->_ctx->get_page();
+
+		if (empty($doc) AND $this->throw_404)
+		{
+			$this->_ctx->throw_404();
+		}
 
 		if($this->seo_information === TRUE)
 		{
-			$page->title = $doc['header'];
-			$page->meta_title = $doc['meta_title'];
-			$page->meta_keywords = $doc['meta_keywords'];
-			$page->meta_description = $doc['meta_description'];
-		}
-	}
-	
-	public function change_crumbs( Breadcrumbs &$crumbs )
-	{
-		parent::change_crumbs( $crumbs );
-		$page = $this->_ctx->get_page();
-		$doc = $this->get_document();
-		
-		$crumb = $crumbs->get_by('url', $page->url);
-		
-		if($crumb !== NULL)
-		{
-			$crumb->name = $doc['header'];
+			$page = $this->_ctx->get_page();
+
+			$page->meta_params('document_header', $doc['header'], 'title');
+			$page->meta_params('document_meta_title', $doc['meta_title'], 'meta_title');
+			$page->meta_params('document_meta_keywords', $doc['meta_keywords'], 'meta_keywords');
+			$page->meta_params('document_meta_description', $doc['meta_description'], 'meta_description');
 		}
 	}
 
+	/**
+	 * 
+	 * @return array [$doc]
+	 */
 	public function fetch_data()
 	{
 		$result = array();
@@ -166,57 +169,41 @@ class Model_Widget_Hybrid_Document extends Model_Widget_Decorator {
 		{
 			return Model_Widget_Hybrid_Document::$_cached_documents[$id];
 		}
-		
-		$agent = DataSource_Hybrid_Agent::instance($this->ds_id);
 
-		$query = $agent->get_query_props( $this->doc_fields );
-		$fields = $agent->get_fields();
+		$agent = DataSource_Hybrid_Agent::instance($this->ds_id);
+		$result = $agent->get_document($id, $this->doc_fields, $this->doc_id_field);
 		
-		if(isset($fields[$this->doc_id_field]))
+		if (empty($result))
 		{
-			$id_field = $fields[$this->doc_id_field]->name;
-		}
-		else
-		{
-			$id_field = 'ds.id';
-		}
-		
-		$result = $query->where($id_field, '=', $id)
-			->where('d.published', '=', 1)
-			->group_by('d.id')
-			->limit(1)
-			->execute()
-			->current();
-		
-		if(empty($result) )
-		{	
-			if($this->throw_404)
-			{
-				$this->_ctx->throw_404();
-			}
-			
 			return $result;
 		}
 
+		$hybrid_fields = $agent->get_fields();
 		foreach ($result as $key => $value)
 		{
-			if( ! isset($fields[$key])) continue;
-
-			$field = & $fields[$key];
-			$related_widget = NULL;
-				
-			$field_class = 'DataSource_Hybrid_Field_' . $field->type;
-			$field_class_method = 'fetch_widget_field';
-
-			if( class_exists($field_class) AND method_exists( $field_class, $field_class_method ))
+			if (!isset($hybrid_fields[$key]))
 			{
-				$result['_' . $field->key] = $result[$key];
-				$result[$field->key] = call_user_func_array($field_class.'::'.$field_class_method, array( $this, $field, $result, $key, $recurse));
+				continue;
 			}
+
+			$field = & $hybrid_fields[$key];
 			
+			$field_class_method = 'fetch_widget_field';
+			
+			$result['_' . $field->key] = $result[$key];
+
+			if (method_exists($field, $field_class_method))
+			{
+				$result[$field->key] = $field->$field_class_method($this, $field, $result, $key, $recurse - 1);
+			}
+			else
+			{
+				$result[$field->key] = $result[$key];
+			}
+
 			unset($result[$key]);
 		}
-		
+
 		Model_Widget_Hybrid_Document::$_cached_documents[$id] = $result;
 		
 		return $result;

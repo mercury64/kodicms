@@ -30,12 +30,11 @@ return array(
 	
 	'Roles restrict user privileges and turn parts of the administrative interface on or off.'
 		=> 'Роли определяют права пользователей, позволяют включать/выключать разделы панели управления.',
-	'Subscribe to email notifications'
-		=> 'Получать уведомления по почте',
 	'Last login' => 'Последний вход',
 	':user profile' => 'Профиль пользователя :user',
 	'Section :section' => 'Раздел :section',
 	'Edit role' => 'Редактирование роли',
+	'Admin theme' => 'Тема',
 	
 	//============Profile============//
 	'Profile' => 'Профиль',
@@ -57,6 +56,5 @@ return array(
 	'Delete roles' => 'Удалять роли',
 	'Section' => 'Раздел',
 	'Section permissions' => 'Доступ к разделам',
-	'Notifications' => 'Уведомления',
 	'View user permissions' => 'Видеть права пользователя'
 );

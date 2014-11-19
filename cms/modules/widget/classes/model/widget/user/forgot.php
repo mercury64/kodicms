@@ -2,27 +2,21 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	User
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class Model_Widget_User_Forgot extends Model_Widget_Decorator {
-	
-	public $use_template = FALSE;
-	public $use_caching = FALSE;
-	
+class Model_Widget_User_Forgot extends Model_Widget_Decorator_Handler {
+
 	protected $_data = array(
 		'email_id_ctx' => 'email',
 		'next_url' => '/',
 	);
 
-	public function fetch_data() {}
-	
-	public function render( array $params = array() ) {}
-
 	public function on_page_load()
 	{
-		parent::on_page_load();
-		
 		$email_ctx_id = $this->get('email_id_ctx', 'email');
 		$email = $this->_ctx->get($email_ctx_id);
 		

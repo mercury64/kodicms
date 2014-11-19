@@ -9,15 +9,15 @@ KodiCMS is a CMS based on [Kohana framework](http://kohanaframework.org/).
 
 ## Features
 
-* based on [Kohana framework](http://kohanaframework.org/)
-* Backend UI based on [Twitter Bootstrap 2.3](http://twitter.github.com/bootstrap/)
+* Based on [Kohana framework](http://kohanaframework.org/)
+* Backend UI based on [Twitter Bootstrap 3.2.0](http://getbootstrap.com/) and admin theme [PixelAdmin](https://wrapbootstrap.com/theme/pixeladmin-premium-admin-theme-WB07403R9)
 * Enhanced with plugins
 * Modularity
 * Use `Observer` to extend the basic functionality
 * Unlimited level pages
 * High speed
-* Обработка ошибочных URL. (Если посетитель допустил ошибку URL, скорее всего он не получит в ответ: Страница не найдена)
 * Widgets
+* File manager [elFinder](https://github.com/Studio-42/elFinder)
 * Syntax Highlighter [Ace](http://ace.c9.io/)
 * Role-based access control (ACL)
 * Integration with social networks
@@ -26,6 +26,8 @@ KodiCMS is a CMS based on [Kohana framework](http://kohanaframework.org/).
 * Easy installer
 * API
 * Ease of development
+* Cache drivers (file, sqlite, apc, memcache, mongodb)
+* Session storages (native, cookie, database)
 
 
 ## Demo
@@ -121,37 +123,6 @@ KodiCMS is a CMS based on [Kohana framework](http://kohanaframework.org/).
 			deny all;
 		}
 	}
-
-
-### Example file . htaccess for Apache
-
-	# Set environment
-	SetEnv KOHANA_ENV production
-	# SetEnv KOHANA_ENV development
-	SetEnv KOHANA_BASE /
-	SetEnv BASE_URL http://www.example.com
-	
-	# Turn on URL rewriting
-	RewriteEngine On
-	
-	# Installation directory
-	RewriteBase /
-	
-	# Protect hidden files from being viewed
-	<Files .*>
-		Order Deny,Allow
-		Deny From All
-	</Files>
-	
-	# Protect application and system files from being viewed
-	RewriteRule ^(?:cms|layouts|public|snippets)\b.* index.php/$0 [L]
-	
-	# Allow any files or directories that exist to be displayed directly
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
-	
-	# Rewrite all other URLs to index.php/URL
-	RewriteRule .* index.php/$0 [PT]# Set environment
 
 
 ## Bug tracker

@@ -10,7 +10,7 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 ## Ключевые особенности
 
 * Ядро на базе [Kohana framework](http://kohanaframework.org/)
-* Backend UI на базе [Twitter Bootstrap 2.3](http://twitter.github.com/bootstrap/)
+* Backend UI на базе [Twitter Bootstrap 3.2.0](http://getbootstrap.com/) и темы [PixelAdmin](https://wrapbootstrap.com/theme/pixeladmin-premium-admin-theme-WB07403R9)
 * Расширение при помощи плагинов
 * Модульность
 * Использование `Observer` для расширения базового функционала
@@ -18,6 +18,7 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 * Высокая скорость работы
 * Обработка ошибочных URL. (Если посетитель допустил ошибку URL, скорее всего он не получит в ответ: Страница не найдена)
 * Виджеты
+* Файловый менеджер [elFinder](https://github.com/Studio-42/elFinder)
 * Визуальный редактор [Ace](http://ace.c9.io/)
 * Разграничение прав для пользователей (ACL)
 * Интеграция с соц. сетями
@@ -26,6 +27,8 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 * Удобный инсталлятор
 * API
 * Простота разработки
+* Возможность выбрать место хранения кеша (file, sqlite, apc, memcache, mongodb)
+* Возможность выбора места хранения сессии (native, cookie, database)
 
 
 ## Демо сайт
@@ -54,27 +57,38 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 с последней версией.
 
 2. Разместите файлы на вашем web-сервере.
+	> При установке сайта не в корневую директорию, необходимо в двух местах внести изменения.
+	> В файлах:
+	> * `.htaccess => RewriteBase /subfolder/`
+	> * `cms\app\bootstrap.php` => `Kohana::init( array( 'base_url' => '/subfolder/', ... ) );`
 
-> При установке сайта не в корневую директорию, необходимо в двух местах внести изменеия.
-> В файлах:
-> * `.htaccess => RewriteBase /subfolder/`
-> * `cms\app\bootstrap.php` => `Kohana::init( array( 'base_url' => '/subfolder/', ... ) );`
+3. Перед установкой необходимо удалить, либо очистить содержимое файла config.php, если он имеется в корне сайта.
+	Также необходимо установить права на запись и чтение для следующих папок:
+	* `cms/application/logs`
+	* `cms/application/cache`
+	* `layouts`
+	* `snippets`
 
-3. Перед установкой необходимо удалить файл config.php, если он имеется в корне сайта
+	Через консоль можно сделать с помощью команды `chmod -R a+rwx ...`, например `chmod -R a+rwx cms/application/cache`
 
 4. Откройте главную страницу через браузер. Запустится процесс интсалляции системы.
 
-> Если возникла ошибка ErrorException [ 2 ]: date() [function.date]: It is not 
-> safe to rely on the system's timezone settings. You are required to use the 
-> date.timezone setting or the date_default_timezone_set() function.
-> ....
-> В `cms/app/bootstrap.php` есть строка `date_default_timezone_set( 'UTC' )`, 
-> необходимо ее разкомментировать.
-> [Доступные временные зоны](http://www.php.net/manual/timezones)
+	> **Если возникла ошибка ErrorException [ 2 ]: date() [function.date]: It is not 
+	> safe to rely on the system's timezone settings. You are required to use the 
+	> date.timezone setting or the date_default_timezone_set() function.**
+	> ....<br />
+	> В `cms/app/bootstrap.php` есть строка `date_default_timezone_set( 'UTC' )`, 
+	> необходимо ее разкомментировать.
+	> [Доступные временные зоны](http://www.php.net/manual/timezones)
+
+	>  **Если возникла ошибка Call to a member function load() on a non-object in cms/application/classes/config.php on line 16**<br />
+	>  Необходимо выполнить пункт 3.
+
+	>  **Если возникла ошибка Fatal error: Undefined class constant Log::EMERGENCY in /cms/system/classes/kohana/kohana/exception.php on line 140**<br />
+	>  Версия PHP ниже 5.3
 
 5. Заполните все необходимые поля и нажмите кнопку "Установить". 
-6. После установки системы вы окажетесь на странице авторизации, где будет 
-указан ваш логин и пароль для входа в систему.
+6. После установки системы вы окажетесь на странице авторизации, где будет указан ваш логин и пароль для входа в систему.
 
 
 ## Установка через Cli (Консоль)
@@ -142,37 +156,6 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 			deny all;
 		}
 	}
-
-
-### Пример файла .htaccess для Apache
-
-	# Set environment
-	SetEnv KOHANA_ENV production
-	# SetEnv KOHANA_ENV development
-	SetEnv KOHANA_BASE /
-	SetEnv BASE_URL http://www.example.com
-	
-	# Turn on URL rewriting
-	RewriteEngine On
-	
-	# Installation directory
-	RewriteBase /
-	
-	# Protect hidden files from being viewed
-	<Files .*>
-		Order Deny,Allow
-		Deny From All
-	</Files>
-	
-	# Protect application and system files from being viewed
-	RewriteRule ^(?:cms|layouts|public|snippets)\b.* index.php/$0 [L]
-	
-	# Allow any files or directories that exist to be displayed directly
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
-	
-	# Rewrite all other URLs to index.php/URL
-	RewriteRule .* index.php/$0 [PT]# Set environment
 
 
 ## Баг трекер

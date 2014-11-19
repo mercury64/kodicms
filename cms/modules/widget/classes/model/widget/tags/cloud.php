@@ -2,8 +2,11 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @category	Tags
- * @author		ButscHSter
+ * @category	Widget
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Model_Widget_Tags_Cloud extends Model_Widget_Decorator {
 	
@@ -32,6 +35,10 @@ class Model_Widget_Tags_Cloud extends Model_Widget_Decorator {
 		$this->_ids = $ids;
 	}
 
+	/**
+	 * 
+	 * @return array [$tags]
+	 */
 	public function fetch_data()
 	{
 		$tags = $this->get_tags();
@@ -44,6 +51,9 @@ class Model_Widget_Tags_Cloud extends Model_Widget_Decorator {
 			$fmin = $this->min_size;
 			$tmin = min($tags);
 			$tmax = max($tags);
+			
+			($tmin == $tmin) ? $tmax++ : NULL;
+			
 			foreach ($tags as $word => $frequency) 
 			{
 				$font_size = floor(($frequency - $tmin) / ($tmax - $tmin) * ($fmax - $fmin) + $fmin);
@@ -70,7 +80,8 @@ class Model_Widget_Tags_Cloud extends Model_Widget_Decorator {
 	public function get_tags()
 	{
 		$query = DB::select()
-			->from(Model_Tag::tableName());
+			->from(Model_Tag::tableName())
+			->where('count', '>', 0);
 		
 		if(!empty($this->_ids) AND is_array($this->_ids))
 		{

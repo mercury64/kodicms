@@ -1,10 +1,23 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package Datasource
- * @category Hybrid
+ * @package		KodiCMS/Datasource
+ * @category	Section
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class DataSource_Section_Hybrid extends Datasource_Section {
+
+	/**
+	 * 
+	 * @return string
+	 */
+	public static function default_icon()
+	{
+		return 'table';
+	}
 	
 	/**
 	 * Таблица раздела
@@ -27,7 +40,7 @@ class DataSource_Section_Hybrid extends Datasource_Section {
 	protected $_widget_types = array('hybrid_headline', 'hybrid_document');
 	
 	/**
-	 * Индексируемы поля раздела
+	 * Индексируемые поля раздела
 	 * 
 	 * @var array 
 	 */
@@ -130,18 +143,16 @@ class DataSource_Section_Hybrid extends Datasource_Section {
 	 * Сохранение раздела
 	 * 
 	 * @param array $values
+	 * @throws Validation_Exception
 	 * @return boolean
 	 */
-	public function save(array $values = NULL)
-	{
-		if( ! $this->loaded())
-		{
-			return FALSE;
-		}
+	public function values(array $values = array())
+	{		
+		parent::values($values);
 		
-		$this->template = empty($values['template']) ? NULL : $values['template'];
+		$this->template = Arr::get($values, 'template');
 		
-		$this->search_intro_field = empty($values['search_intro_field']) ? NULL : $values['search_intro_field'];
+		$this->search_intro_field = Arr::get($values, 'search_intro_field');
 		unset($values['search_intro_field']);
 		
 		$this->search_index_fields = (array) Arr::get($values, 'search_index_fields', array());
@@ -149,10 +160,6 @@ class DataSource_Section_Hybrid extends Datasource_Section {
 		
 		$this->search_index_doc_id_fields = (array) Arr::get($values, 'search_index_doc_id_fields', array());
 		unset($values['search_index_doc_id_fields']);
-
-		$status = parent::save($values);
-		
-		return $status;
 	}
 
 	/**
@@ -162,9 +169,17 @@ class DataSource_Section_Hybrid extends Datasource_Section {
 	 */
 	public function remove() 
 	{
+		$id = $this->id();
+
+		parent::remove();
+		
 		$this->record()->destroy();
-		DataSource_Hybrid_Factory::remove($this->id());
-		return parent::remove();
+		DataSource_Hybrid_Factory::remove($id);
+		
+		$this->_record = NULL;
+		$this->_agent = NULL;
+
+		return $this;
 	}
 	
 	/**
@@ -254,23 +269,38 @@ class DataSource_Section_Hybrid extends Datasource_Section {
 	 */
 	public function remove_documents( array $ids = NULL  ) 
 	{
-		if( empty($ids) ) return $this;
+		if (empty($ids))
+		{
+			return $this;
+		}
 		
+		$deleted_documents = array();
+
 		foreach ($ids as $id)
 		{
-			$document = $this->get_empty_document()->load($id);
-			if($document->loaded())
+			try
 			{
-				$this->record()->destroy_document($document);
-				$document->remove();
+				$document = $this->get_document($id);
+				if($document->loaded())
+				{
+					$this->record()->destroy_document($document);
+					$document->remove();
+					
+					$deleted_documents[] = $id;
+				}
+			}
+			catch (DataSource_Exception_Document $ex)
+			{
+				$document->onRemoveException($ex);
+				continue;
 			}
 		}
 
 		$this->update_size();
-		$this->remove_from_index($ids);
+		$this->remove_from_index($deleted_documents);
 		$this->clear_cache();
 
-		return parent::remove_documents($ids);
+		return $this;
 	}
 	
 	/**
@@ -294,6 +324,32 @@ class DataSource_Section_Hybrid extends Datasource_Section {
 		}
 		
 		return $template;
+	}
+	
+	/**
+	 * 
+	 * @return array
+	 */
+	public function acl_actions()
+	{
+		$actions = parent::acl_actions();
+		
+		$actions[] = array(
+			'action' => 'field.create',
+			'description' => 'Create hybrid fields'
+		);
+		
+		$actions[] = array(
+			'action' => 'field.edit',
+			'description' => 'Edit hybrid fields'
+		);
+	
+		$actions[] = array(
+			'action' => 'field.remove',
+			'description' => 'Remove hybrid fields'
+		);
+		
+		return $actions;
 	}
 
 	protected function _serialize()

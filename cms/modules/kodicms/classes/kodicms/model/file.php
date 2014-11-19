@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS
  * @category	Model
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Model_File {
 	
@@ -48,29 +51,40 @@ class KodiCMS_Model_File {
 	 * 
 	 * @param string $name
 	 */
-	public function __construct( $name = '' )
+	public function __construct($name = '')
 	{
-		$this->set_name($name);
-		
-		if(strpos($this->name, DOCROOT) === FALSE)
+		$this->_name = $name;
+
+		if ($file = $this->find_file())
 		{
-			$this->_path = DOCROOT . $this->_folder . DIRECTORY_SEPARATOR;
-			$this->_file = $this->_path . $this->name;
+			$this->_path = pathinfo($file, PATHINFO_DIRNAME);
+			$this->_file = $file;
+
+			$this->name = pathinfo($file, PATHINFO_FILENAME);
 		}
 		else
 		{
 			$this->_path = pathinfo($this->name, PATHINFO_DIRNAME);
-			$this->_file = $this->name;
-
+	
+			if(empty($this->_path) OR $this->_path == '.')
+			{
+				$this->_path = DOCROOT . $this->_folder;
+				$this->_file = $this->_path . DIRECTORY_SEPARATOR . $this->name;
+			}
+			else
+			{
+				$this->_file = $this->name;
+			}
+			
 			$this->name = pathinfo($this->name, PATHINFO_FILENAME);
 		}
-		
-		if(strpos($this->_file, EXT) === FALSE)
+
+		if (strpos($this->_file, EXT) === FALSE)
 		{
 			$this->_file .= EXT;
 		}
 	}
-	
+
 	public function __toString() 
 	{
 		return (string) $this->_content;
@@ -144,7 +158,7 @@ class KodiCMS_Model_File {
 	 */
 	public function set_name($name)
 	{
-		if( ! empty($this->_name) )
+		if (!empty($this->_name))
 		{
 			$this->_changed['name'] = $this->_name;
 		}
@@ -189,16 +203,16 @@ class KodiCMS_Model_File {
 		$object = new $class;
 
 		$files = array();
-		$paths = array(DOCROOT) + Kohana::include_paths();
+		$paths = Kohana::include_paths();
 		
 		$found_files = Kohana::list_files($object->_folder, $paths);
-		
 		foreach ($found_files as $file)
 		{
-			if (strpos($file, EXT) === FALSE)
+			if(is_array($file) OR strpos($file, EXT) === FALSE) 
 			{
-			  continue;
+				continue;
 			}
+			
 			$files[] = new $class($file);
 		}
 		
@@ -238,10 +252,10 @@ class KodiCMS_Model_File {
 				$this->_content = '';
 			}
 		}
-		
+
 		return $this->_content;
 	}
-	
+
 	/**
 	 * 
 	 * @return string
@@ -268,7 +282,7 @@ class KodiCMS_Model_File {
 	{
 		return file_exists($this->_file);
 	}
-	
+
 	/**
 	 * 
 	 * @return boolean
@@ -277,7 +291,7 @@ class KodiCMS_Model_File {
 	{
 		return is_writable($this->_file);
 	}
-	
+
 	/**
 	 * 
 	 * @return string
@@ -286,7 +300,7 @@ class KodiCMS_Model_File {
 	{
 		return filesize($this->_file);
 	}
-	
+
 	/**
 	 * Get the file's last modification time.
 	 *
@@ -297,7 +311,7 @@ class KodiCMS_Model_File {
 	{
 		return filemtime($this->_file);
 	}
-	
+
 	/**
 	 * 
 	 * @return boolean
@@ -309,20 +323,22 @@ class KodiCMS_Model_File {
 		))
 			->rule('name', 'not_empty')
 			->label('name', __('Name'));
-		
-		if( ! $validation->check() )
+
+		if (!$validation->check())
 		{
 			throw new Validation_Exception($validation);
 		}
 		
+		$this->name = FileSystem::filter_name($this->name);
+
 		// Если изменено название файла в редакторе, переименовываем файл
-		if ( !empty($this->_changed['name']) AND  $this->name != $this->_changed['name'] )
+		if (!empty($this->_changed['name']) AND $this->name != $this->_changed['name'])
 		{
-			$new_file = $this->_path . $this->name . EXT;
+			$new_file = $this->_path . DIRECTORY_SEPARATOR . $this->name . EXT;
 			@rename($this->_file, $new_file);
 			$this->_file = $new_file;
 		}
-		
+
 		if(Config::get('site', 'templates_revision') == Config::YES)
 		{
 			$this->_add_revision_of_file();

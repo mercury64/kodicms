@@ -3,7 +3,10 @@
 /**
  * @package		KodiCMS
  * @category	System Controller
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class KodiCMS_Controller_System_Template extends Controller_System_Security
 {
@@ -17,6 +20,12 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 	 * @var \Breadcrumbs 
 	 */
 	public $breadcrumbs;
+	
+	/**
+	 *
+	 * @var array 
+	 */
+	public $template_js_params = array();
 
 	/**
 	 * @var  boolean  auto render template
@@ -41,42 +50,33 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 	public function before()
 	{
 		parent::before();
-		
-		if($this->request->method() === Request::POST)
-		{
-//			$token = Arr::get($_POST, 'token');
-//			if(empty($token) OR !Security::check($token))
-//			{
-//				throw new Exception('Security token not check');
-//			}
-		}
 
 		if ($this->auto_render === TRUE)
 		{
-			if ( $this->request->is_ajax() === TRUE )
+			if ($this->request->is_ajax() === TRUE)
 			{
 				// Load the template
-				$this->template = View::factory( 'system/ajax' );
+				$this->template = View::factory('system/ajax');
 			}
 			else
 			{
-				$this->template = View::factory( $this->template );
+				$this->template = View::factory($this->template);
 			}
-			
+
 			// Initialize empty values
 			$this->template->title = NULL;
 			$this->template->content = NULL;
-			
-			$index_page_url = FALSE;
-			
+
 			$this->breadcrumbs = Breadcrumbs::factory();
-			
+
 			$routes = Route::all();
-			if( isset($routes['backend']) )
+			if (isset($routes['backend']))
 			{
 				$this->breadcrumbs
-						->add(UI::icon('home'), Route::get('backend')->uri());
+					->add(UI::icon('home'), Route::get('backend')->uri());
 			}
+			
+			$this->init_media();
 		}
 	}
 	
@@ -89,19 +89,18 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 
 		if ($this->auto_render === TRUE)
 		{
-			if ( $this->request->is_ajax() === TRUE OR $this->json !== NULL)
+			if ($this->request->is_ajax() === TRUE OR $this->json !== NULL)
 			{
-				if ( $this->json !== NULL )
+				if ($this->json !== NULL)
 				{
-					if ( is_array( $this->json ) AND !isset( $this->json['status'] ) )
+					if (is_array($this->json) AND ! isset($this->json['status']))
 					{
 						$this->json['status'] = TRUE;
 					}
 
-					$this->response
-						->headers( 'Content-type', 'application/json' );
+					$this->response->headers('Content-type', 'application/json');
 
-					$this->template = json_encode( $this->json );
+					$this->template = json_encode($this->json);
 				}
 				else
 				{
@@ -110,23 +109,29 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 			}
 			else
 			{
-				$this->template->messages = View::factory('system/blocks/messages', array(
-					'messages' => Messages::get() 
-				));
-			}
+				$js_string = '';
+				foreach ($this->template_js_params as $var => $value)
+				{
+					$value = json_encode($value);
 			
-			if($this->only_content)
+					$js_string .= "var {$var} = {$value};\n";
+				}
+				
+				Assets::group('global', 'js_params', '<script type="text/javascript">' . $js_string . '</script>', 'global');
+			}
+
+			if ($this->only_content)
 			{
 				$this->template = $this->template->content;
 			}
-			
-			if($this->template instanceof View)
+
+			if ($this->template instanceof View)
 			{
 				$this->template->set('request', $this->request);
 			}
-			
-			Observer::notify( 'template_before_render', $this->request );
-			$this->response->body( $this->template );
+
+			Observer::notify('template_before_render', $this->request);
+			$this->response->body($this->template);
 		}
 	}
 	
@@ -141,7 +146,7 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 		$path = $this->request->controller() . $separator . $this->request->action();
 		$dir = $this->request->directory();
 
-		if ( !empty( $dir ) )
+		if (!empty($dir))
 		{
 			$path = $dir . $separator . $path;
 		}
@@ -158,12 +163,36 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 	public function set_title( $title, $set_breadcrumbs = TRUE )
 	{
 		$this->template->title = $title;
-		
-		if($set_breadcrumbs === TRUE)
+
+		if ($set_breadcrumbs === TRUE)
 		{
-			$this->breadcrumbs->add($title);
+			$this->breadcrumbs->add($title, FALSE, FALSE, 999);
 		}
-		
+
 		return $this;
+	}
+	
+	public function init_media()
+	{
+		$this->template_js_params = array(
+			'CURRENT_URL' => Request::current()->url(TRUE) . URL::query(),
+			'BASE_URL' => URL::backend(ADMIN_DIR_NAME, TRUE),
+			'SITE_URL' => URL::base(TRUE),
+			'ADMIN_DIR_NAME' => ADMIN_DIR_NAME,
+			'ADMIN_RESOURCES' => ADMIN_RESOURCES,
+			'PUBLIC_URL' => PUBLIC_URL,
+			'LOCALE' => I18n::lang(),
+			'CONTROLLER' => strtolower(Request::current()->controller()),
+			'ACTION' => Request::current()->action(),
+			'USER_ID' => Auth::get_id(),
+			'FILTERS' => WYSIWYG::findAll(),
+			'DATE_FORMAT' => Config::get('site', 'date_format'),
+			'IS_BACKEND' => IS_BACKEND
+		);
+
+		foreach (Messages::get() as $type => $messages)
+		{
+			$this->template_js_params['MESSAGE_' . strtoupper($type)] = $messages;
+		}
 	}
 }

@@ -1,24 +1,26 @@
-<div class="control-group">
-	<label class="control-label"><?php echo $field->header; ?></label>
-	<div class="controls">
-		<div class="input-append">
-			<?php echo Form::input( $field->name . '[]', Arr::get($value, 0), array(
-				'class' => 'input-medium', 'id' => $field->name . 'X'
-			) ); ?>
-			<span class="add-on">-</span>
-			<?php echo Form::input( $field->name . '[]', Arr::get($value, 1), array(
-				'class' => 'input-medium', 'id' => $field->name . 'Y'
-			) ); ?>
+<div class="form-group form-inline">
+	<label class="<?php echo Arr::get($form, 'label_class'); ?>"><?php echo $field->header; ?></label>
+	<div class="<?php echo Arr::get($form, 'input_container_class'); ?>">
+		<div class="input-group">
+			<?php echo Form::input($field->name . '[]', Arr::get($value, 0), array(
+				'class' => 'form-control', 'id' => $field->name . 'X'
+			)); ?>
+			<span class="input-group-addon">-</span>
+			<?php echo Form::input($field->name . '[]', Arr::get($value, 1), array(
+				'class' => 'form-control', 'id' => $field->name . 'Y'
+			)); ?>
 			
-			<button class="btn clear-coords-<?php echo $field->name; ?>" type="button"><?php echo __('Clear coordinates'); ?></button>
+			<div class="input-group-btn">
+				<button class="btn btn-default clear-coords-<?php echo $field->name; ?>" type="button"><?php echo __('Clear coordinates'); ?></button>
+			</div>
 		</div>
 		
 		
-		<?php if(isset($field->hint)): ?>
-		<span class="help-block"><?php echo $field->hint; ?></span>
+		<?php if($field->hint): ?>
+		<p class="help-block"><?php echo $field->hint; ?></p>
 		<?php endif; ?>
 		
-		<div id="map<?php echo $field->name; ?>" style="width: 700px; height: 250px; border: 5px solid whitesmoke; margin-top: 20px;"></div>
+		<div id="map<?php echo $field->name; ?>" style="height: 250px; border: 5px solid whitesmoke; margin-top: 20px;"></div>
 	</div>
 </div>
 <script type="text/javascript">
@@ -55,8 +57,7 @@ $(function() {
 			.add('typeSelector')
 			.add(searchControl, { left: 5, top: 5 });
 
-		if(set_value )
-			createPlacemark(default_coords);
+		if(set_value) createPlacemark(default_coords);
 
 		// Слушаем клик на карте
 		myMap.events.add('click', function (e) {
@@ -110,5 +111,5 @@ $(function() {
 			});
 		}
 	}
-})
+});
 </script>

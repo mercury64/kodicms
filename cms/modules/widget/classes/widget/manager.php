@@ -2,7 +2,10 @@
 
 /**
  * @package		KodiCMS/Widgets
- * @author		ButscHSter
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
 class Widget_Manager {
 
@@ -10,9 +13,9 @@ class Widget_Manager {
 	 * Получение всех типов виджетов из конфига
 	 * @return array
 	 */
-	public static function map()
+	public static function map($type = 'widgets')
 	{
-		return Kohana::$config->load( 'widgets' )->as_array();
+		return Kohana::$config->load($type)->as_array();
 	}
 	
 	/**
@@ -21,52 +24,53 @@ class Widget_Manager {
 	 * @param string $type Тип виджеа
 	 * @return Model_Widget_Decorator
 	 */
-	public static function factory( $type )
+	public static function factory($type)
 	{
 		$class = 'Model_Widget_' . $type;
 
-		if( ! class_exists($class) )
+		if (!class_exists($class))
 		{
-			throw new Kohana_Exception('Widget :type not exists', 
-					array(':type' => $type));
+			throw new Kohana_Exception('Widget :type not exists', array(':type' => $type));
 		}
-	
+
 		$widget = new $class;
 
 		return $widget;
 	}
-	
+
 	/**
 	 * Получения списка виджетов по их типу
 	 * 
 	 * @param array $types Тип виджета
 	 * @return array array([ID] => Model_Widget_Decorator, ....)
 	 */
-	public static function get_widgets( array $types = NULL )
+	public static function get_widgets(array $types = NULL)
 	{
 		$result = array( );
 
-		$res = DB::select( 'w.*' )
-				->select( array( DB::expr( 'COUNT(:table)' )->param(
-							':table', Database::instance()->quote_column( 'pw.page_id' ) ), 'used' ) )
-				->from( array( 'widgets', 'w' ) )
-				->join( array( 'page_widgets', 'pw' ), 'left' )
-					->on( 'w.id', '=', 'pw.widget_id' )
-				->group_by( 'w.id' )
-				->order_by( 'w.name' );
-		
-		if( ! empty($types) )
+		$res = DB::select('w.*')
+				->select(array(DB::expr('COUNT(:table)')->param(':table', Database::instance()->quote_column('pw.page_id')), 'used'))
+				->from(array('widgets', 'w'))
+				->join(array('page_widgets', 'pw'), 'left')
+				->on('w.id', '=', 'pw.widget_id')
+				->group_by('w.id')
+				->order_by('w.name');
+
+		if (!empty($types))
 		{
-			$res->where( 'w.type', 'in', $types );
+			$res->where('w.type', 'in', $types);
 		}
-		
+
 		$res = $res->execute()->as_array('id');
 
-		foreach($res as $id => $widget)
+		foreach ($res as $id => $widget)
 		{
-			if(!self::exists_by_type($widget['type'])) continue;
+			if (!self::exists_by_type($widget['type']))
+			{
+				continue;
+			}
 
-			$result[$id] = unserialize($widget['code']);
+			$result[$id] = Kohana::unserialize($widget['code']);
 			$result[$id]->id = $widget['id'];
 			$result[$id]->name = $widget['name'];
 			$result[$id]->description = $widget['description'];
@@ -83,10 +87,10 @@ class Widget_Manager {
 	 */
 	public static function get_all_widgets()
 	{
-		return DB::select( 'id', 'type', 'name', 'description' )
-			->from( 'widgets' )
-			->order_by( 'type', 'asc' )
-			->order_by( 'name', 'asc' )
+		return DB::select('id', 'type', 'name', 'description')
+			->from('widgets')
+			->order_by('type', 'asc')
+			->order_by('name', 'asc')
 			->execute()
 			->as_array('id');
 	}
@@ -99,13 +103,13 @@ class Widget_Manager {
 	 * @param integer $page_id
 	 * @return array @return array array([ID] => Model_Widget_Decorator, ....)
 	 */
-	public static function get_widgets_by_page( $page_id )
+	public static function get_widgets_by_page($page_id)
 	{
 		$res = DB::select('page_widgets.block', 'page_widgets.position')
 			->select('widgets.*')
 			->from('page_widgets')
 			->join('widgets')
-				->on('widgets.id', '=', 'page_widgets.widget_id')
+			->on('widgets.id', '=', 'page_widgets.widget_id')
 			->where('page_id', '=', (int) $page_id)
 			->order_by('page_widgets.block', 'ASC')
 			->order_by('page_widgets.position', 'ASC')
@@ -114,13 +118,16 @@ class Widget_Manager {
 			->cached(Date::DAY)
 			->execute()
 			->as_array('id');
-		
-		$widgets = array();
-		foreach($res as $id => $widget)
-		{
-			if(!self::exists_by_type($widget['type'])) continue;
 
-			$widgets[$id] = unserialize($widget['code']);
+		$widgets = array();
+		foreach ($res as $id => $widget)
+		{
+			if (!self::exists_by_type($widget['type']))
+			{
+				continue;
+			}
+
+			$widgets[$id] = Kohana::unserialize($widget['code']);
 			$widgets[$id]->id = $widget['id'];
 			$widgets[$id]->name = $widget['name'];
 			$widgets[$id]->description = $widget['description'];
@@ -128,10 +135,10 @@ class Widget_Manager {
 			$widgets[$id]->block = $widget['block'];
 			$widgets[$id]->position = (int) $widget['position'];
 		}
-		
+
 		return $widgets;
 	}
-	
+
 	/**
 	 * Копирование списка виджетов с одной страницы на другую
 	 * 
@@ -139,35 +146,22 @@ class Widget_Manager {
 	 * @param integer $to_page_id
 	 * @return boolean
 	 */
-	public static function copy( $from_page_id, $to_page_id ) 
+	public static function copy($from_page_id, $to_page_id)
 	{
-		$widgets = DB::select('widget_id', 'block', 'position')
-			->from('page_widgets')
-			->where('page_id', '=', (int) $from_page_id)
-			->execute()
-			->as_array('widget_id');
+		$select = DB::select(array(DB::expr("IF(`pw2`.`page_id` IS NULL, '{$to_page_id}', `pw2`.`page_id`)"), 'page_id'), 'pw1.widget_id', 'pw1.block', 'pw1.position')
+			->from(array('page_widgets', 'pw1'))
+			->join(array('page_widgets', 'pw2'), 'left')
+				->on('pw2.page_id', '=', DB::expr($to_page_id))
+				->on('pw1.widget_id', '=', 'pw2.widget_id')
+			->where('pw1.page_id', '=', (int) $from_page_id)
+			->where('pw2.page_id', '=', NULL);
+
+		DB::insert('page_widgets')
+			->select($select)
+			->columns(array('page_id', 'widget_id', 'block', 'position'))
+			->execute();
 		
-		if(count($widgets) > 0)
-		{
-			$insert = DB::insert('page_widgets')
-				->columns(array('page_id', 'widget_id', 'block', 'position'));
-			
-			foreach($widgets as $widget_id => $data)
-			{
-				$insert->values(array(
-					'page_id' => (int) $to_page_id,
-					'widget_id' => $widget_id,
-					'block' => $data['block'],
-					'position' => (int) $data['position']
-				));
-			}
-			
-			list($insert_id, $total_rows) = $insert->execute();
-			
-			return $total_rows;
-		}
-		
-		return FALSE;
+		return TRUE;
 	}
 
 	/**
@@ -177,19 +171,19 @@ class Widget_Manager {
 	 * @return integer ID виджета
 	 * @throws HTTP_Exception_404
 	 */
-	public static function create( Model_Widget_Decorator $widget )
+	public static function create(Model_Widget_Decorator $widget)
 	{
-		if( $widget->loaded() )
+		if ($widget->loaded())
 		{
-			throw new HTTP_Exception_404( 'Widget created' );
+			throw new HTTP_Exception_404('Widget created');
 		}
 
 		$widget = ORM::factory('widget')
-			->values( array(
-				'type' => $widget->type,
+			->values(array(
+				'type' => $widget->type(),
 				'name' => $widget->name,
 				'description' => $widget->description,
-				'code' => serialize($widget)
+				'code' => Kohana::serialize($widget)
 			))
 			->create();
 
@@ -205,18 +199,18 @@ class Widget_Manager {
 	 * @return integer
 	 * @throws HTTP_Exception_404
 	 */
-	public static function update( Model_Widget_Decorator $widget )
+	public static function update(Model_Widget_Decorator $widget)
 	{
-		$orm_widget = ORM::factory('widget', $widget->id )
+		$orm_widget = ORM::factory('widget', $widget->id)
 			->values(array(
-				'type' => $widget->type,
+				'type' => $widget->type(),
 				'name' => $widget->name,
 				'template' => $widget->template,
 				'description' => $widget->description,
-				'code' => serialize($widget)
+				'code' => Kohana::serialize($widget)
 			))
 			->update();
-		
+
 		$widget->clear_cache();
 
 		return $orm_widget->id;
@@ -230,8 +224,8 @@ class Widget_Manager {
 	 */
 	public static function remove( array $ids )
 	{
-		return DB::delete( 'widgets' )
-			->where( 'id', 'in', $ids )
+		return DB::delete('widgets')
+			->where('id', 'in', $ids)
 			->execute();
 	}
 
@@ -239,29 +233,28 @@ class Widget_Manager {
 	 * Получение виджета по ID
 	 * 
 	 * @param integer $id
-	 * @return Model_Widget_Decorator
+	 * @return NULL|Model_Widget_Decorator
 	 */
 	public static function load( $id )
 	{
 		$result = DB::select()
-			->from( 'widgets' )
-			->where( 'id', '=', (int) $id )
-			->limit( 1 )
+			->from('widgets')
+			->where('id', '=', (int) $id)
+			->limit(1)
 			->execute()
 			->current();
 
-		if ( ! $result OR ! self::exists_by_type($result['type']))
+		if (!$result OR ! self::exists_by_type($result['type']))
 		{
 			return NULL;
 		}
 
-		$widget = unserialize( $result['code'] );
+		$widget = Kohana::unserialize($result['code']);
 		$widget->id = $result['id'];
 		$widget->name = $result['name'];
 		$widget->description = $result['description'];
-		$widget->type = $result['type'];
 		$widget->template = $result['template'];
-		
+
 		return $widget;
 	}
 	
@@ -277,27 +270,30 @@ class Widget_Manager {
 		DB::delete('page_widgets')
 			->where('widget_id', '=', (int) $widget_id)
 			->execute();
-		
-		if( ! empty($data))
+
+		if (!empty($data))
 		{
 			$insert = DB::insert('page_widgets')
 				->columns(array('page_id', 'widget_id', 'block', 'position'));
 
 			$i = 0;
-			foreach($data as $page_id => $block)
+			foreach ($data as $page_id => $block)
 			{
-				if($block['name'] == -1) continue;
+				if ($block['name'] == -1)
+				{
+					continue;
+				}
 
-				$insert->values(array(
-					$page_id, (int) $widget_id, $block['name'], (int) $block['position']
-				));
-
+				$insert->values(array($page_id, (int) $widget_id, $block['name'], (int) $block['position']));
 				$i++;
 			}
-			
-			if( $i > 0 ) $insert->execute();
-			
-			Observer::notify( 'widget_set_location' );
+
+			if ($i > 0)
+			{
+				$insert->execute();
+			}
+
+			Observer::notify('widget_set_location');
 		}
 	}
 	
@@ -314,23 +310,23 @@ class Widget_Manager {
 	 */
 	public static function update_location_by_page($page_id, $widget_id, array $data)
 	{
-		if( $data['block'] < 0 ) 
+		if ($data['block'] < 0)
 		{
 			DB::delete('page_widgets')
-				->where('widget_id', '=',$widget_id)
+				->where('widget_id', '=', $widget_id)
 				->where('page_id', '=', $page_id)
 				->execute();
 		}
 		else
 		{
 			DB::update('page_widgets')
-				->where('widget_id', '=',$widget_id)
+				->where('widget_id', '=', $widget_id)
 				->where('page_id', '=', $page_id)
-				->set( array('block' => $data['block'], 'position' => (int) $data['position']) )
+				->set(array('block' => $data['block'], 'position' => (int) $data['position']))
 				->execute();
 		}
-		
-		Observer::notify( 'widget_set_location' );
+
+		Observer::notify('widget_set_location');
 	}
 	
 	/**
@@ -359,29 +355,17 @@ class Widget_Manager {
 		OR 
 			empty($widget_array['data']['name'])) return;
 
-		$widget = Widget_Manager::factory( $widget_array['type'] );
+		$widget = Widget_Manager::factory($widget_array['type']);
 		
 		try 
 		{
 			$widget->name = $widget_array['data']['name'];
 			$widget->description = Arr::get($widget_array, 'description');
-	
+
+			$widget->set_values($widget_array['data']);
+			$widget->set_cache_settings($widget_array['data']);
+
 			$id = Widget_Manager::create($widget);
-		}
-		catch (Exception $e)
-		{
-			return FALSE;
-		}
-		
-		$widget = Widget_Manager::load( $id );
-		
-		try 
-		{
-			$widget
-				->set_values( $widget_array['data'] )
-				->set_cache_settings( $widget_array['data'] );
-	
-			Widget_Manager::update($widget);
 		}
 		catch (Exception $e)
 		{
@@ -407,10 +391,10 @@ class Widget_Manager {
 	public static function get_system_blocks()
 	{
 		return array(
-			-1 => __('--- Remove from page ---'), 
-			0 => __('--- Hide ---'), 
-			'PRE' => __('Before page render'), 
-			'POST' => __('After page render')
+			-1		=> __('--- Remove from page ---'), 
+			0		=> __('--- Hide ---'), 
+			'PRE'	=> __('Before page render'), 
+			'POST'	=> __('After page render')
 		);
 	}
 
@@ -487,12 +471,12 @@ class Widget_Manager {
 	 */
 	public static function get_related( array $types, $ds_id = NULL )
 	{
-		$db_widgets = Widget_Manager::get_widgets( $types );
+		$db_widgets = Widget_Manager::get_widgets($types);
 
 		$widgets = array();
 		foreach ($db_widgets as $id => $widget)
 		{
-			if($ds_id !== NULL AND $ds_id != $widget->ds_id)
+			if ($ds_id !== NULL AND $ds_id != $widget->ds_id)
 			{
 				continue;
 			}
@@ -501,5 +485,33 @@ class Widget_Manager {
 		}
 
 		return $widgets;
+	}
+	
+	public static function get_params($type)
+	{
+		$class = 'Model_Widget_' . ucfirst($type);
+		
+		$reflector = new ReflectionClass($class);
+		$comments = $reflector->getMethod('fetch_data')->getDocComment();
+		
+		$params = array();
+
+		if(!empty($comments))
+		{
+			$comments = str_replace(array('/', '*', "\t", "\n", "\r", ' '), '', $comments);
+			preg_match_all("/\[(?s)(?m)(.*)\]/i", $comments, $found);
+
+			if( !empty($found[1]))
+			{
+				$params = explode(',', $found[1][0]);
+			}
+		}
+
+		$params[] = '$params';
+		$params[] = '$ctx';		
+		$params[] = '$widget_id';
+		$params[] = '$header';
+
+		return $params;
 	}
 }

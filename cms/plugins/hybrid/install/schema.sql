@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__dshfields` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `ds_id` int(11) unsigned NOT NULL DEFAULT '0',
   `name` varchar(32) NOT NULL DEFAULT '',
   `family` varchar(32) NOT NULL,
@@ -11,6 +11,15 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__dshfields` (
   PRIMARY KEY (`id`),
   KEY `ds_id` (`ds_id`),
   KEY `family` (`family`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__dshfield_enums` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `field_id` int(11) unsigned NOT NULL,
+  `value` varchar(255) NOT NULL,
+  `position` int(4) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `field_id` (`field_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__hybrid_tags` (
@@ -31,6 +40,14 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__dshybrid` (
   `meta_description` text NOT NULL,
   `created_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `updated_on` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_by_id` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `ds_id` (`ds_id`,`published`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__dshybrid_relations` (
+  `document_id` int(11) unsigned NOT NULL,
+  `field_id` int(11) unsigned NOT NULL,
+  `related_id` int(11) unsigned NOT NULL,
+  KEY `relation` (`document_id`,`related_id`,`field_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8;

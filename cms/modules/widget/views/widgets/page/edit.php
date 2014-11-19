@@ -1,12 +1,11 @@
 <?php if( ACL::check( 'widgets.index')): ?>
-<div class="widget-header spoiler-toggle" data-spoiler=".spoiler-widgets" data-hash="widgets" hotkeys="shift+w">
-	<h4><?php echo __('Widgets'); ?></h4>
+<div class="panel-heading panel-toggler" data-hotkeys="shift+w">
+	<span class="panel-title" data-icon="cubes"><?php echo __('Widgets'); ?></h4>
 </div>
-
-<div class="widget-content  spoiler spoiler-widgets">
+<div class="panel-body panel-spoiler">
 	<?php if(empty($page->id)): ?>
 	<h4><?php echo __('Copy widgets from'); ?></h4>
-	<select name="widgets[from_page_id]" class="span12">
+	<select name="widgets[from_page_id]" class="col-md-12">
 		<option value=""><?php echo __('--- Do not copy ---'); ?></option>
 		<?php foreach ($pages as $p): ?>
 		<option value="<?php echo($p['id']); ?>" <?php echo($p['id'] == $page->parent_id ? ' selected="selected"': ''); ?> ><?php echo str_repeat('- ', $p['level'] * 2).$p['title']; ?></option>
@@ -14,25 +13,14 @@
 	</select>
 	<?php else: ?>
 	
-	<?php if (ACL::check( 'widgets.location')): ?>
+	<?php if( ACL::check( 'widgets.location')): ?>
+	<a class="btn btn-success fancybox.ajax popup" href="/api-widget.list/<?php echo $page->id; ?>" id="addWidgetToPage"><i class="fa fa-plus"></i> <?php echo __( 'Add widget to page' ); ?></a>
 	
-	<?php echo HTML::anchor(
-		Route::get('api')->uri(array(
-				'controller' => 'widget',
-				'action' => 'list',
-				'id'=> $page->id)),
-		'<i class="icon-plus"></i>'.__( 'Add widget to page' ),
-		array(
-			'id' => 'addWidgetToPage',
-			'class' => 'btn btn-success fancybox.ajax popup'
-		)
-	); ?>
-		
-	<?php if (ACL::check( 'layout.rebuild')): ?>
+	<?php if( ACL::check( 'layout.rebuild')): ?>
 	<?php echo UI::button(__('Rebuild blocks'), array(
 		'icon' => UI::icon( 'refresh' ),
-		'class' => 'btn btn-inverse btn-mini btn-api',
-		'data-url' => 'layout.rebuild',
+		'class' => 'btn-inverse btn-xs',
+		'data-api-url' => 'layout.rebuild',
 		'data-method' => Request::POST
 	)); ?>
 	<?php endif; ?>

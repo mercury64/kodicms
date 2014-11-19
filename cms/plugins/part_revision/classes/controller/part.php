@@ -1,5 +1,13 @@
 <?php defined( 'SYSPATH' ) or die( 'No direct access allowed.' );
 
+/**
+ * @package		KodiCMS/Part_Revision
+ * @category	Controller
+ * @author		butschster <butschster@gmail.com>
+ * @link		http://kodicms.ru
+ * @copyright	(c) 2012-2014 butschster
+ * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
+ */
 class Controller_Part extends Controller_System_Backend
 {
 	public function before()
@@ -16,7 +24,7 @@ class Controller_Part extends Controller_System_Backend
 		Assets::js('part_revision', ADMIN_RESOURCES . 'js/controller/part_revision.js', 'global');
 		
 		$part_id = (int) $this->request->param('id');
-		$part = Record::findByIdFrom('Model_Page_Part', $part_id);
+		$part = ORM::factory('page_part', $part_id);
 		
 		$parts = DB::select()
 			->from('part_revision')
@@ -32,14 +40,15 @@ class Controller_Part extends Controller_System_Backend
 					'controller' => 'page',
 					'action' => 'edit',
 					'id' => $page->id
-				)))
-				->add(__('Revision for part :name', array(':name' => $part->name)));
+				)));
+			
+			$this->set_title(__('Revision for part :name', array(':name' => $part->name)));
 			
 			$parts->where('part_id', '=', $part_id);
 		}
 		else
 		{
-			$this->breadcrumbs->add(__('Parts revision'));
+			$this->set_title(__('Parts revision'));
 		}
 
 		
@@ -61,11 +70,12 @@ class Controller_Part extends Controller_System_Backend
 			->execute()
 			->current();
 
-		$part = Record::findByIdFrom('Model_Page_Part', $revision->part_id);
-		$part->setFromData(array('content' => $revision->content))->save();
+		$part = ORM::factory('page_part', $revision->part_id);
+		$part
+			->values(array('content' => $revision->content))
+			->save();
 		
 		DB::delete('part_revision')->where('id', '=', $revision_id)->execute();
-		Cache::instance()->delete_tag('page_parts');
 
 		$this->go_back();
 	}

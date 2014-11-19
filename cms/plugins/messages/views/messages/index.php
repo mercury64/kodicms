@@ -1,52 +1,26 @@
-<div class="map widget">
+<div class="page-mail">
+	<div class="mail-container-header  no-margin-vr">
+		<?php echo __('Messages'); ?>
+	</div>
 	
-	<div class="widget-header">
-		<div class="row-fluid">
+	<div class="mail-controls clearfix">
+		<div class="btn-toolbar" role="toolbar">
 			<?php echo UI::button(__('Send message'), array(
-				'href' => Route::get('backend')->uri(array('controller' => 'messages', 'action' => 'add')), 'icon' => UI::icon('envelope'),
-				'class' => 'btn'
+				'href' => Route::get('backend')->uri(array('controller' => 'messages', 'action' => 'add')), 'icon' => UI::icon('envelope-o'),
+				'class' => 'btn-primary'
 			)); ?>
+			
+			<button type="button" class="btn btn-default btn-check-new"><i class="fa fa-repeat"></i></button>
+			
+			<?php if(count($messages) > 0): ?>
+				<button type="button" class="btn btn-remove btn-danger"><i class="fa fa-trash-o"></i></button>
+			<?php endif; ?>
 		</div>
 	</div>
 	
-	<?php if(count($messages) > 0): ?>
-	<div class="widget-content widget-nopad">
-		<table class=" table table-striped table-hover" id="MessagesList">
-			<colgroup>
-				<col />
-				<col width="150px" />
-				<col width="180px" />
-				<col width="100px" />
-			</colgroup>
-			<thead>
-				<tr>
-					<th><?php echo __('Message title'); ?></th>
-					<th><?php echo __('Message author'); ?></th>
-					<th><?php echo __('Date created'); ?></th>
-					<th><?php echo __('Actions'); ?></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php foreach($messages as $message): ?>
-				<tr data-id="<?php echo $message->id; ?>" <?php if( $message->is_read == Model_API_Message::STATUS_NEW): ?>class="info"<?php endif; ?>>
-					<td><?php echo HTML::anchor(Route::get('backend')->uri(array('controller' => 'messages', 'action' => 'view', 'id' => (int) $message->id)), $message->title); ?></td>
-					<td><?php echo $message->author; ?></td>
-					<td><?php echo Date::format($message->created_on); ?></td>
-					<td class="actions">
-						<?php echo UI::button(NULL, array(
-							'icon' => UI::icon( 'remove' ),
-							'class' => 'btn btn-mini btn-confirm btn-remove'
-						)); ?>
-					</td>
-				</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
+	<div id="messages-container">
+		<?php echo View::factory('messages/messages', array(
+			'messages' => $messages
+		)); ?>
 	</div>
-	<?php else: ?>
-	<div class="widget-content">
-		<h1><?php echo __('You dont have messages'); ?></h1>
-	</div>
-	<?php endif; ?>
-	
 </div>
