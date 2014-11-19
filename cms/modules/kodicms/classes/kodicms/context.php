@@ -24,7 +24,6 @@ class KodiCMS_Context {
 	public static function & instance(array $params = array())
 	{
 		if (self::$_instance === NULL)
->>>>>>> upstream/dev
 		{
 			self::$_instance = new Context($params);
 			return self::$_instance;
@@ -32,11 +31,7 @@ class KodiCMS_Context {
 
 		return self::$_instance;
 	}
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> upstream/dev
 	/**
 	 *
 	 * @var Model_Page_Front 
@@ -120,19 +115,11 @@ class KodiCMS_Context {
 	 */
 	public function meta(Meta $meta = NULL)
 	{
-<<<<<<< HEAD
-		if($meta !== NULL)
-		{
-			$this->_meta = $meta;
-		}
-		
-=======
 		if ($meta !== NULL)
 		{
 			$this->_meta = $meta;
 		}
 
->>>>>>> upstream/dev
 		return $this->_meta;
 	}
 
@@ -141,23 +128,6 @@ class KodiCMS_Context {
 	 * @param string $param
 	 * @return mixed
 	 */
-<<<<<<< HEAD
-	public function &get($param) 
-	{
-		$result = NULL;
-		
-		if (strpos($param, '::') !== FALSE)
-		{
-			list($class, $method) = explode('::', $param, 2);
-			$method = new ReflectionMethod($class, $method);
-			$result = $method->invoke();
-		}
-		else if(strpos($param, '$page->') !== FALSE)
-		{
-			list($class, $method) = explode('->', $param, 2);
-			
-			if(strpos($method, '()') !== FALSE)
-=======
 	public function get($param)
 	{
 		$result = NULL;
@@ -178,7 +148,6 @@ class KodiCMS_Context {
 			list($class, $method) = explode('->', $param, 2);
 
 			if (strpos($method, '()') !== FALSE)
->>>>>>> upstream/dev
 			{
 				$method = substr($method, 0, strpos($method, '()'));
 				$result = $this->get_page()->{$method}();
@@ -188,21 +157,12 @@ class KodiCMS_Context {
 				$result = $this->get_page()->{$method};
 			}
 		}
-<<<<<<< HEAD
-		elseif (strpos($param, '$user->') !== FALSE)
-		{
-			$user = Auth::instance()->get_user();
-			list($class, $method) = explode('->', $param, 2);
-			
-			if ( ! ($user instanceof ORM))
-=======
 		else if (strpos($param, '$user->') !== FALSE)
 		{
 			$user = Auth::instance()->get_user();
 			list($class, $method) = explode('->', $param, 2);
 
 			if (!($user instanceof ORM))
->>>>>>> upstream/dev
 			{
 				return $result;
 			}
@@ -217,35 +177,6 @@ class KodiCMS_Context {
 				$result = $user->{$method};
 			}
 		}
-<<<<<<< HEAD
-		elseif (isset($this->_params[$param]))
-		{
-			$result = $this->_params[$param];
-		}
-		elseif ( $this->request()->query($param) !== NULL) 
-		{
-			$result = $this->request()->query($param);
-		}
-		elseif ($this->request()->post( $param ) !== NULL)
-		{
-			$result = $this->request()->post( $param );
-		}
-		elseif (
-			$this->behavior_router() instanceof Behavior_Route 
-		AND 
-			$this->behavior_router()->param($param) !== NULL)
-		{
-			$result = $this->behavior_router()->param($param);
-		}
-		elseif ($this->request()->param( $param ) !== NULL)
-		{
-			$result = $this->request()->param( $param );
-		}
-		
-		return $result;
-	}
-	
-=======
 		else if (isset($this->_params[$param]))
 		{
 			$result = $this->_params[$param];
@@ -273,7 +204,6 @@ class KodiCMS_Context {
 		return $result;
 	}
 
->>>>>>> upstream/dev
 	/**
 	 * 
 	 * @param string $param
@@ -293,12 +223,7 @@ class KodiCMS_Context {
 				{
 					foreach($fields as $field => $param_name)
 					{
-<<<<<<< HEAD
-						$this->inject($this->_widgets[$id], 
-								$field, $this->get($param_name));
-=======
 						$this->inject($this->_widgets[$id], $field, $this->get($param_name));
->>>>>>> upstream/dev
 					}
 				}
 			}
@@ -346,11 +271,6 @@ class KodiCMS_Context {
 	 * @param Model_Page_Front $page
 	 * @return \Context
 	 */
-<<<<<<< HEAD
-	public function set_page( Model_Page_Front & $page )
-	{
-		$this->_page = & $page;
-=======
 	public function set_page( Model_Page_Front $page )
 	{
 		$this->_page = & $page;
@@ -365,7 +285,6 @@ class KodiCMS_Context {
 	 */
 	public function set_crumbs( Model_Page_Front $page )
 	{
->>>>>>> upstream/dev
 		$this->_crumbs = $page->breadcrumbs();
 
 		return $this;
@@ -399,11 +318,7 @@ class KodiCMS_Context {
 	 * 
 	 * @return \Context
 	 */
-<<<<<<< HEAD
-	public function throw_404( $message = NULL)
-=======
 	public function throw_404($message = NULL)
->>>>>>> upstream/dev
 	{
 		$this->set('throw_message', $message);
 
@@ -411,11 +326,7 @@ class KodiCMS_Context {
 		return $this;
 	}
 
-<<<<<<< HEAD
-		/**
-=======
 	/**
->>>>>>> upstream/dev
 	 * 
 	 * @return Breadcrumbs
 	 */
@@ -429,43 +340,6 @@ class KodiCMS_Context {
 	 * @param integer $id
 	 * @return Model_Widget_Decorator
 	 */
-<<<<<<< HEAD
-	public function & get_widget($id)
-	{
-		$result = NULL;
-		
-		if(isset($this->_widgets[$id]))
-		{
-			$result = & $this->_widgets[$id];
-		}
-
-		return $result;
-	}
-	
-	/**
-	 * 
-	 * @param string $block
-	 * @return Model_Widget_Decorator
-	 */
-	public function & get_widget_by_block( $block )
-	{
-		$result = NULL;
-		if( !empty($block) AND isset($this->_blocks[$block]))
-		{
-			if(count($this->_blocks[$block]) == 1)
-			{
-				$result = & $this->_blocks[$block][0];
-			}
-			else
-			{
-				$result = & $this->_blocks[$block];
-			}
-		}
-		
-		return $result;
-	}
-	
-=======
 	public function get_widget($id)
 	{
 		return Arr::get($this->_widgets, $id);
@@ -486,7 +360,6 @@ class KodiCMS_Context {
 		return array();
 	}
 
->>>>>>> upstream/dev
 	/**
 	 * 
 	 * @return array
@@ -495,8 +368,6 @@ class KodiCMS_Context {
 	{
 		return array_keys($this->_blocks);
 	}
-<<<<<<< HEAD
-=======
 	
 	/**
 	 * 
@@ -511,42 +382,18 @@ class KodiCMS_Context {
 
 		return $this;
 	}
->>>>>>> upstream/dev
 
 	/**
 	 * 
 	 * @param array $widgets
 	 * @return \Context
 	 */
-<<<<<<< HEAD
-	public function register_widgets( array $widgets )
-=======
 	public function register_widgets(array $widgets)
->>>>>>> upstream/dev
 	{
 		foreach ($widgets as $id => $widget)
 		{
 			$this->_widgets[$id] = $widget;
 		}
-<<<<<<< HEAD
-		
-		return $this;
-	}
-	
-	
-	public function init_widgets()
-	{
-		$this->_sort_widgets();
-		
-		foreach( $this->_widget_ids as $id ) 
-		{
-			$widget =& $this->_widgets[$id];
-			if( !empty($widget->block) ) 
-			{
-				$this->_blocks[$widget->block][] = & $widget;
-				
-				if($widget instanceof Model_Widget_Decorator)
-=======
 
 		return $this;
 	}
@@ -563,7 +410,6 @@ class KodiCMS_Context {
 				$this->_blocks[$widget->block][] = & $widget;
 
 				if ($widget instanceof Model_Widget_Decorator)
->>>>>>> upstream/dev
 				{
 					Observer::observe('on_page_load', array(& $widget, 'on_page_load'));
 					Observer::observe('after_page_load', array(& $widget, 'after_page_load'));
@@ -579,18 +425,6 @@ class KodiCMS_Context {
 	 * @param mixed $value
 	 * @return \Context
 	 */
-<<<<<<< HEAD
-	public function inject( & $widget, $field, $value) 
-	{
-		if($widget instanceof Model_Widget_Decorator 
-				OR $widget instanceof View)
-		{
-			if( ! empty($field) )
-			{
-				if(method_exists($widget, "set_{$field}"))
-				{
-					call_user_func(array( & $widget, "set_{$field}"), $value);
-=======
 	public function inject(& $widget, $field, $value)
 	{
 		if ($widget instanceof Model_Widget_Decorator OR $widget instanceof View)
@@ -600,22 +434,14 @@ class KodiCMS_Context {
 				if (method_exists($widget, "set_{$field}"))
 				{
 					call_user_func(array(& $widget, "set_{$field}"), $value);
->>>>>>> upstream/dev
 				}
 				else
 				{
 					$widget->{$field} = $value;
-<<<<<<< HEAD
-				}				
-			}
-		}
-		
-=======
 				}
 			}
 		}
 
->>>>>>> upstream/dev
 		return $this;
 	}
 
@@ -626,60 +452,25 @@ class KodiCMS_Context {
 	 * @param mixed $param_key
 	 * @return \Context
 	 */
-<<<<<<< HEAD
-	public function inject_param( & $widget, $field, $param_key) 
-	{
-		if($widget instanceof Model_Widget_Decorator 
-				OR $widget instanceof View)
-		{
-			if( strpos( $param_key, '/' ) !== FALSE)
-=======
 	public function inject_param(& $widget, $field, $param_key)
 	{
 		if ($widget instanceof Model_Widget_Decorator OR $widget instanceof View)
 		{
 			if (strpos($param_key, '/') !== FALSE)
->>>>>>> upstream/dev
 			{
 				list($name, $index) = explode('/', $param_key, 2);
 			}
 
 			$value = $this->get($param_key);
-<<<<<<< HEAD
-			if($value !== NULL)
-			{
-				$this->inject($widget, $field, $value);
-			}
-			else if(isset($name))
-=======
 			if ($value !== NULL)
 			{
 				$this->inject($widget, $field, $value);
 			}
 			else if (isset($name))
->>>>>>> upstream/dev
 			{
 				$this->_injections[$name][$widget->id][$field] = $param_key;
 			}
 		}
-<<<<<<< HEAD
-		
-		return $this;
-	}
-	
-	protected function _sort_widgets() 
-	{
-		if( $this->_widget_ids !== NULL ) return;
-
-		$ids = array_keys( $this->_widgets );
-
-		$widgets = array(); 
-		$types = array('PRE' => array(), '*named' => array(), 'POST' => array());
-	
-		foreach($ids as $id)
-		{
-			if(isset($types[$this->_widgets[$id]->block]))
-=======
 
 		return $this;
 	}
@@ -699,19 +490,10 @@ class KodiCMS_Context {
 		foreach ($ids as $id)
 		{
 			if (isset($types[$this->_widgets[$id]->block]))
->>>>>>> upstream/dev
 			{
 				$types[$this->_widgets[$id]->block][] = $id;
 			}
 			else
-<<<<<<< HEAD
-				$types['*named'][] = $id;
-		}
-	
-		foreach($types as $type => $ids)
-		{
-			foreach($ids as $id )
-=======
 			{
 				$types['*named'][] = $id;
 			}
@@ -720,17 +502,12 @@ class KodiCMS_Context {
 		foreach ($types as $type => $ids)
 		{
 			foreach ($ids as $id)
->>>>>>> upstream/dev
 			{
 				$widgets[$id] = & $this->_widgets[$id];
 			}
 		}
 
-<<<<<<< HEAD
-		$this->_widget_ids = array_keys( $widgets );
-=======
 		$this->_widget_ids = array_keys($widgets);
->>>>>>> upstream/dev
 		$this->_widgets = & $widgets;
 	}
 
@@ -740,50 +517,29 @@ class KodiCMS_Context {
 	 */
 	public function build_crumbs()
 	{
-<<<<<<< HEAD
-		foreach($this->_widget_ids as $id)
-		{
-			if($this->_widgets[$id] instanceof Model_Widget_Decorator 
-=======
 		foreach ($this->_widget_ids as $id)
 		{
 			if ($this->_widgets[$id] instanceof Model_Widget_Decorator
->>>>>>> upstream/dev
 					AND $this->_widgets[$id]->crumbs)
 			{
 				$this->_widgets[$id]->change_crumbs($this->_crumbs);
 			}
 		}
-<<<<<<< HEAD
-		
-		return $this;
-	}
-	
-=======
 
 		return $this;
 	}
 
->>>>>>> upstream/dev
 	/**
 	 * Используется для вывода ошибки 404
 	 * Если не сбрасывать объект, то все блоки на странице дублируются
 	 */
 	public function __destruct()
 	{
-<<<<<<< HEAD
-		$this->_widgets = array();
-		$this->_widget_ids = array();
-		$this->_blocks = array();
-		$this->_params = array();
-		$this->_injections = array();
-=======
 		$this->reset_widgets();
 		$this->_params = array();
 		$this->_meta = NULL;
 		$this->_page = NULL;
 		$this->_behavior_router = array();
 		$this->_crumbs = NULL;
->>>>>>> upstream/dev
 	}
 }

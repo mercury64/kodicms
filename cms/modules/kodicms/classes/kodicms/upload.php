@@ -126,56 +126,23 @@ class KodiCMS_Upload extends Kohana_Upload {
 		{
 			$directory = TMPPATH;
 		}
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> upstream/dev
 		if ($filename === NULL)
 		{
 			$filename = uniqid();
 		}
 		else if ($filename === TRUE)
 		{
-<<<<<<< HEAD
-			$filename = pathinfo( $filename, PATHINFO_BASENAME );
-		}
-		
-		$filename_ext = pathinfo( $filename, PATHINFO_EXTENSION );
-		
-=======
 			$filename = pathinfo($filename, PATHINFO_BASENAME);
 		}
 
 		$filename_ext = pathinfo($filename, PATHINFO_EXTENSION);
 
->>>>>>> upstream/dev
 		if (empty($filename_ext))
 		{
 			$filename .= '.' . $ext;
 		}
 
-<<<<<<< HEAD
-		$validation = Validation::factory( array('url' => $url, 'ext' => $ext ) )
-			->rules( 'url', array(
-				array('url'),
-				array('not_empty'),
-			) );
-		
-		if ( ! empty($types))
-		{
-			$validation->rule('ext', 'in_array', array(':value', $types));
-		}
-			
-		if ( ! $validation->check())
-		{
-			throw new Validation_Exception($validation);
-		}
-		
-		if ( ! is_dir($directory))
-		{
-			mkdir($directory, 0777);
-=======
 		$validation = Validation::factory(array('url' => $url, 'ext' => $ext))
 				->rules('url', array(
 			array('url'),
@@ -195,19 +162,13 @@ class KodiCMS_Upload extends Kohana_Upload {
 		if (!is_dir($directory))
 		{
 			mkdir($directory, 0777, TRUE);
->>>>>>> upstream/dev
 			chmod($directory, 0777);
 		}
 
 		// Make the filename into a complete path
 		$path = $directory . $filename;
-<<<<<<< HEAD
-		
-		if($use_curl === TRUE)
-=======
 
 		if ($use_curl === TRUE)
->>>>>>> upstream/dev
 		{
 			$file = Request::factory($url, array(
 				'options' => array(
@@ -221,17 +182,6 @@ class KodiCMS_Upload extends Kohana_Upload {
 		{
 			$file = fopen($url, 'rb');
 		}
-<<<<<<< HEAD
-		
-		if ( empty($file))
-		{
-			return FALSE;
-		}
-		
-		$new_file = fopen($path, 'wb');
-		
-		if ( ! $new_file)
-=======
 
 		if (empty($file))
 		{
@@ -241,21 +191,10 @@ class KodiCMS_Upload extends Kohana_Upload {
 		$new_file = fopen($path, 'wb');
 
 		if (!$new_file)
->>>>>>> upstream/dev
 		{
 			return FALSE;
 		}
 
-<<<<<<< HEAD
-		if($use_curl === TRUE)
-		{
-			 fwrite($new_file, $file);
-			
-		}
-		else
-		{
-			while ( ! feof($file))
-=======
 		if ($use_curl === TRUE)
 		{
 			fwrite($new_file, $file);
@@ -263,21 +202,14 @@ class KodiCMS_Upload extends Kohana_Upload {
 		else
 		{
 			while (!feof($file))
->>>>>>> upstream/dev
 			{
 				// Write the url file to the directory.
 				fwrite($new_file, fread($file, 1024 * 8), 1024 * 8);
 			}
 		}
-<<<<<<< HEAD
-		
-		fclose($new_file);
-		
-=======
 
 		fclose($new_file);
 
->>>>>>> upstream/dev
 		// Set permissions on filename
 		chmod($path, 0777);
 

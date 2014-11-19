@@ -7,27 +7,6 @@
 		<title><?php echo $title; ?> &ndash; <?php echo Config::get('site', 'title' ); ?></title>
 		<link href="<?php echo ADMIN_RESOURCES; ?>favicon.ico" rel="favourites icon" />
 		
-<<<<<<< HEAD
-		<script type="text/javascript">
-		<?php echo View::factory('system/blocks/jsvars'); ?>
-		<?php echo $messages; ?>
-		</script>
-
-		<?php Observer::notify( 'layout_frontend_head_before' ); ?>
-		<?php echo Assets::css(); ?>
-		<?php echo Assets::js(); ?>
-		<?php echo Assets::group('global'); ?>
-		<?php Observer::notify( 'layout_frontend_head_after' ); ?>
-	</head>
-	<body id="body_frontend">
-		<div id="content-wrapper">
-			<div class="container" id="content">
-				<section id="content">
-					<?php echo $content; ?>
-				</section>
-			</div>
-		</div>
-=======
 		<?php echo Assets::group('global', 'js_params'); ?>
 		<?php Observer::notify( 'layout_frontend_head_before' ); ?>
 		<?php echo Assets::css(); ?>
@@ -38,7 +17,6 @@
 	<body id="body_frontend" class="theme-default">
 		<?php echo $content; ?>
 		
->>>>>>> upstream/dev
 		<?php if ( Config::get('site', 'profiling' ) == Config::YES ): ?>
 		<hr />
 		<?php echo View::factory( 'profiler/stats' ) ?>

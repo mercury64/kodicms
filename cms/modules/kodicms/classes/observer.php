@@ -3,14 +3,10 @@
 /**
  * @package		KodiCMS
  * @category	Helper
-<<<<<<< HEAD
- * @author		ButscHSter
-=======
  * @author		butschster <butschster@gmail.com>
  * @link		http://kodicms.ru
  * @copyright	(c) 2012-2014 butschster
  * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
->>>>>>> upstream/dev
  */
 final class Observer {
 
@@ -65,11 +61,7 @@ final class Observer {
 		{
 			list($class, $class_args) = $callback;
 
-<<<<<<< HEAD
-			if (Kohana::$profiling === TRUE)
-=======
 			if(Kohana::$profiling === TRUE)
->>>>>>> upstream/dev
 			{
 				$benchmark = Profiler::start('Observer notify', $event_name);
 			}
@@ -89,8 +81,5 @@ final class Observer {
 			}
 		}
 	}
-<<<<<<< HEAD
-=======
 
->>>>>>> upstream/dev
 }

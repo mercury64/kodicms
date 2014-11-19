@@ -22,14 +22,6 @@ CREATE TABLE IF NOT EXISTS `__TABLE_PREFIX__job_logs` (
   `updated_on` datetime NOT NULL,
   `status` varchar(2) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-<<<<<<< HEAD
-  KEY `job_id` (`job_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-
-
-ALTER TABLE `__TABLE_PREFIX__job_logs`
-  ADD CONSTRAINT `__TABLE_PREFIX__job_logs_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `__TABLE_PREFIX__jobs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-=======
   KEY `job_id` (`job_id`),
   CONSTRAINT `__TABLE_PREFIX__job_logs_ibfk_1` FOREIGN KEY (`job_id`) REFERENCES `__TABLE_PREFIX__jobs` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
@@ -47,4 +39,3 @@ CREATE TABLE `__TABLE_PREFIX__calendar` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
->>>>>>> upstream/dev

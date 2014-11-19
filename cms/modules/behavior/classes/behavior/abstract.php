@@ -122,13 +122,10 @@ abstract class Behavior_Abstract {
 		return $this->_settings;
 	}
 
-<<<<<<< HEAD
-=======
 	public function stub()
 	{
 		
 	}
->>>>>>> upstream/dev
 	
 	abstract public function execute();
 }

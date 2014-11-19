@@ -37,8 +37,4 @@
 			<?php if(!ACL::check('filemanager.edit')): ?>,allowShortcuts : false<?php endif; ?>
 		}).elfinder('instance');
 	};
-<<<<<<< HEAD
 </script>
-=======
-</script>
->>>>>>> upstream/dev
