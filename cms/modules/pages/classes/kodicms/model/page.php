@@ -675,11 +675,7 @@ class KodiCMS_Model_Page extends ORM
 	public function get_layouts_list()
 	{
 		$options = array();
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> 9a0358025ccb341f6e696fc4c7e2ca472bac2199
 		if ($this->id != 1)
 		{
 			$layout = NULL;
@@ -687,11 +683,7 @@ class KodiCMS_Model_Page extends ORM
 			{
 				$layout = $this->parent->layout();
 			}
-<<<<<<< HEAD
-			
-=======
 
->>>>>>> 9a0358025ccb341f6e696fc4c7e2ca472bac2199
 			if (empty($layout))
 			{
 				$layout = __('--- Not set ---');
