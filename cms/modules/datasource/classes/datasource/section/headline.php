@@ -78,13 +78,15 @@ abstract class Datasource_Section_Headline {
 				'name' => 'ID',
 				'width' => 50,
 				'class' => 'text-right text-muted',
-				'visible' => TRUE
+				'visible' => TRUE,
+				'db_name' => 'd.id'
 			),
 			'header' => array(
 				'name' => 'Header',
 				'width' => NULL,
 				'type' => 'link',
-				'visible' => TRUE
+				'visible' => TRUE,
+				'db_name' => 'd.header'
 			)
 		);
 	}
@@ -212,8 +214,8 @@ abstract class Datasource_Section_Headline {
 	 * @param array $ids
 	 * @return array array( 'total' => ..., 'documents' => array([id] => array([Field name] => $value, ....)))
 	 */
-	abstract public function get( array $ids = NULL );
-	
+	abstract public function get(array $ids = NULL);
+
 	/**
 	 * Подсчет кол-ва документов в разделе
 	 * 
@@ -221,8 +223,8 @@ abstract class Datasource_Section_Headline {
 	 * @param string $search_word
 	 * @return integer
 	 */
-	abstract public function count_total( array $ids = NULL );
-	
+	abstract public function count_total(array $ids = NULL);
+
 	/**
 	 * Метод используется для поиска по документам по ключевому слову.
 	 * 
@@ -231,28 +233,38 @@ abstract class Datasource_Section_Headline {
 	 * @param Database_Query $query
 	 * @return Database_Query
 	 */
-	public function search_by_keyword( Database_Query $query )
+	public function search_by_keyword(Database_Query $query)
 	{
 		$keyword = Request::initial()->query('keyword');
 		
-		if(empty($keyword))
+		if (empty($keyword))
 		{
 			return $query;
 		}
 
-		if($this->_section->is_indexable())
+		if ($this->_section->is_indexable())
 		{
-			$query = Search::instance()->get_module_query($query, $keyword, 'ds_' . $this->_section->id());
+			$ids = Search::instance()->find_by_keyword($keyword, FALSE, 'ds_' . $this->_section->id(), NULL);
+			$ids = Arr::get($ids,   'ds_' . $this->_section->id());
+
+			if(!empty($ids))
+			{
+				$query->where('d.id', 'in', array_keys($ids));
+			}
+			else
+			{
+				$query->where('d.id', '=', 0);
+			}
 		}
 		else
 		{
 			$query
 				->where_open()
-				->where('d.id', 'like', '%'.$keyword.'%')
-				->or_where('d.header', 'like', '%'.$keyword.'%')
+				->where('d.id', 'like', '%' . $keyword . '%')
+				->or_where('d.header', 'like', '%' . $keyword . '%')
 				->where_close();
 		}
-		
+
 		return $query;
 	}
 	

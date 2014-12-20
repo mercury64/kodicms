@@ -10,10 +10,13 @@
  */
 class DataSource_Hybrid_Field_Source_Document extends DataSource_Hybrid_Field_Source_OneToOne {
 
+	protected $_is_searchable = FALSE;
+	
 	protected $_props = array(
 		'isreq' => TRUE,
 		'ds_type' => NULL,
-		'one_to_one' => FALSE
+		'one_to_one' => FALSE,
+		'default' => 0
 	);
 	
 	public function booleans()

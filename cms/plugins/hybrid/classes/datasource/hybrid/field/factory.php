@@ -230,24 +230,24 @@ class DataSource_Hybrid_Field_Factory {
 		static $cached_fields;
 
 		$ds_id = (int) $ds_id;
-		
-		if(isset( $cached_fields[$ds_id]) )
+
+		if (isset($cached_fields[$ds_id]))
 		{
 			return $cached_fields[$ds_id];
 		}
-		
+
 		$fields = array();
 
 		$query = DB::select()
-			->from('dshfields')
-			->where('ds_id', '=', $ds_id)
-			->order_by('position');
-		
-		if( ! empty($type) )
+				->from('dshfields')
+				->where('ds_id', '=', $ds_id)
+				->order_by('position');
+
+		if (!empty($type))
 		{
 			$query->where('type', 'in', $type);
 		}
-		
+
 		$query = $query
 			->execute()
 			->as_array('id');
@@ -259,10 +259,10 @@ class DataSource_Hybrid_Field_Factory {
 			{
 				continue;
 			}
-
+			
 			$fields[$id] = $field;
 		}
-		
+
 		$cached_fields[$ds_id] = $fields;
 
 		return $fields;
