@@ -59,8 +59,8 @@ class Kohana_Database_PDO extends Database {
 			throw new Database_Exception(':error',
 				array(':error' => $e->getMessage()),
 				$e->getCode());
-		}		
-			
+		}
+
 		if ( ! empty($this->_config['charset']))
 		{
 			// Set the character set
@@ -339,7 +339,7 @@ class Kohana_Database_PDO extends Database {
 
 		return $this->_connection->quote($value);
 	}
-	
+
 	public function datatype($type)
 	{
 		static $types = array

@@ -26,30 +26,30 @@ class DataSource_Hybrid_Agent {
 	public static function instance($ds_id)
 	{
 		$ds_id = (int) $ds_id;
-		if(isset(self::$_instance[$ds_id]))
+		if (isset(self::$_instance[$ds_id]))
 		{
 			return self::$_instance[$ds_id];
 		}
-		
-		$result = DB::select('id', 'name')
+
+		$query = DB::select('id', 'name')
 			->from('datasources')
 			->where('type', '=', 'hybrid')
 			->where('id', '=', $ds_id)
 			->execute();
-		
-		if($result->count() > 0)
+
+		if ($query->count() > 0)
 		{
-			$current = $result->current();
+			$current = $query->current();
 			$ds_id = $current['id'];
 			$ds_name = $current['name'];
-			
+
 			self::$_instance[$ds_id] = new DataSource_Hybrid_Agent($ds_id, $ds_name);
 		}
 		else
 		{
 			self::$_instance[$ds_id] = NULL;
 		}
-		
+
 		return self::$_instance[$ds_id];
 	}
 
@@ -64,6 +64,9 @@ class DataSource_Hybrid_Agent {
 
 	const VALUE_CTX = 10;
 	const VALUE_PLAIN = 20;
+	const VALUE_BEHAVIOR = 30;
+	const VALUE_GET = 40;
+	const VALUE_POST = 50;
 	
 	/**
 	 * Идентификатор раздела
@@ -123,28 +126,29 @@ class DataSource_Hybrid_Agent {
 
 		$hybrid_fields = $this->get_fields();
 
-		if(empty($id_field))
-		{
-			$id_field = 'ds.id';
-		}
-		else if(Valid::numeric($id_field) AND isset($hybrid_fields[$id_field]))
+		if (Valid::numeric($id_field) AND isset($hybrid_fields[$id_field]))
 		{
 			$id_field = $hybrid_fields[$id_field]->name;
 		}
-		
-		$result = $query->where($id_field, '=', $id)
+
+		if ($id_field == 'id' OR empty($id_field))
+		{
+			$id_field = 'd.id';
+		}
+
+		$query = $query->where($id_field, '=', $id)
 			->where('d.published', '=', 1)
 			->group_by('d.id')
 			->limit(1)
 			->execute()
 			->current();
-		
-		if (empty($result))
+
+		if (empty($query))
 		{
 			return NULL;
 		}
-		
-		return $result;
+
+		return $query;
 	}
 
 	/**
@@ -168,13 +172,13 @@ class DataSource_Hybrid_Agent {
 
 		return $this->_ds_fields;
 	}
-	
+
 	/**
 	 * Получение списка массива ключей полей
 	 * 
 	 * @return array array([id] => [key])
 	 */
-	public function get_field_names() 
+	public function get_field_names()
 	{
 		if ($this->_ds_fields === NULL)
 		{
@@ -183,7 +187,7 @@ class DataSource_Hybrid_Agent {
 
 		return $this->_ds_field_names;
 	}
-	
+
 	/**
 	 * Получение списка системных полей
 	 * 
@@ -253,7 +257,7 @@ class DataSource_Hybrid_Agent {
 	 */
 	public function get_query_props(array $fields = NULL, array $order = NULL, array $filter = NULL)
 	{
-		$result = DB::select('d.id', 'd.ds_id', 'd.header', 'd.published', 'd.created_on', 'd.meta_title', 'd.meta_keywords', 'd.meta_description')
+		$query = DB::select('d.id', 'd.ds_id', 'd.header', 'd.published', 'd.created_on', 'd.meta_title', 'd.meta_keywords', 'd.meta_description')
 			->from(array('dshybrid_' . $this->ds_id,  'ds'))
 			->join(array('dshybrid', 'd'))
 				->on('d.id', '=', 'ds.id');
@@ -264,8 +268,8 @@ class DataSource_Hybrid_Agent {
 
 		$select_fields = array();
 
-		if($fields !== NULL)
-		{
+		if (!empty($fields))
+        {
 			foreach ($fields as $i => $fid)
 			{
 				if (!isset($ds_fields[$fid]))
@@ -290,26 +294,26 @@ class DataSource_Hybrid_Agent {
 
 			if (!isset($t[$field->ds_id]))
 			{
-				$result->join(array('dshybrid_' . $field[$field->ds_id], 'd' . $i))
-					->on('d' . $i, '=', ds . id);
+				$query->join(array('dshybrid_' . $field[$field->ds_id], 'd' . $i))
+						->on('d' . $i, '=', ds . id);
 
 				$t[$field[$field->ds_id]] = TRUE;
 			}
 
-			$field->get_query_props($result, $this);
+			$field->get_query_props($query, $this);
 		}
 
 		if (!empty($order))
 		{
-			$this->_fetch_orders($order, $t, $result);
+			$this->_fetch_orders($order, $t, $query);
 		}
 
 		if (!empty($filter))
 		{
-			$this->_fetch_filters($filter, $t, $result);
+			$this->_fetch_filters($filter, $t, $query);
 		}
 
-		return $result;
+		return $query;
 	}
 	
 	/**
@@ -317,10 +321,10 @@ class DataSource_Hybrid_Agent {
 	 * 
 	 * @param array $orders
 	 * @param array $t
-	 * @param Database_Query_Builder $result
+	 * @param Database_Query_Builder $query
 	 * @return Database_Query_Builder
 	 */
-	protected function _fetch_orders(array $orders, &$t, $result)
+	protected function _fetch_orders(array $orders, &$t, $query)
 	{
 		$j = 0;
 		$ds_fields = $this->get_fields();
@@ -348,20 +352,20 @@ class DataSource_Hybrid_Agent {
 
 			if (!isset($t[$field->ds_id]))
 			{
-				$result->join(array('dshybrid_' . $field->ds_id, 'dorder' . $j))
+				$query->join(array('dshybrid_' . $field->ds_id, 'dorder' . $j))
 					->on('dorder' . $j . '.id', '=', 'ds.id');
 
 				$t[$field->ds_id] = TRUE;
 			}
 
-			$field->sorting_condition($result, $dir);
+			$field->sorting_condition($query, $dir);
 
 			unset($field);
 
 			$j++;
 		}
 
-		return $result;
+		return $query;
 	}
 	
 	/**
@@ -369,14 +373,14 @@ class DataSource_Hybrid_Agent {
 	 * 
 	 * @param array $filters
 	 * @param array $t
-	 * @param Database_Query_Builder $result
+	 * @param Database_Query_Builder $query
 	 * @return Database_Query_Builder
 	 */
-	protected function _fetch_filters(array $filters, & $t, & $result)
+	protected function _fetch_filters(array $filters, & $t, & $query)
 	{
 		if (empty($filters))
 		{
-			return $result;
+			return $query;
 		}
 
 		$field_names = array_flip($this->get_field_names());
@@ -389,11 +393,11 @@ class DataSource_Hybrid_Agent {
 
 			$field = $data['field'];
 	
-			if(!empty($data['params']))
+			if (!empty($data['params']))
 			{
 				parse_str($data['params'], $params);
 			}
-			
+
 			$condition = $data['condition'];
 			$type = $data['type'];
 			$invert = !empty($data['invert']);
@@ -402,9 +406,29 @@ class DataSource_Hybrid_Agent {
 
 			if ($value !== NULL AND $type != self::VALUE_PLAIN)
 			{
-				$value = Context::instance()->get($value);
+				$ctx = Context::instance();
+				$request = Request::initial();
+
+				switch ($type)
+				{
+					case self::VALUE_BEHAVIOR:
+						if ($ctx->behavior_router() instanceof Behavior_Route)
+						{
+							$value = $ctx->behavior_router()->param($value);
+							break;
+						}
+					case self::VALUE_GET:
+						$value = $request->query($value);
+						break;
+					case self::VALUE_POST:
+						$value = $request->post($value);
+						break;
+					default:
+						$value = $ctx->get($value);
+						break;
+				}
 			}
-			
+
 			if ($value === NULL)
 			{
 				continue;
@@ -438,7 +462,7 @@ class DataSource_Hybrid_Agent {
 
 			if (!isset($t[$field->ds_id]))
 			{
-				$result->join('dshybrid_' . $field->ds_id, 'dfilter' . $pos)
+				$query->join('dshybrid_' . $field->ds_id, 'dfilter' . $pos)
 					->on('dfilter' . $pos . '.id', '=', 'ds.id');
 
 				$t[$field->ds_id] = TRUE;
@@ -471,6 +495,7 @@ class DataSource_Hybrid_Agent {
 				default:
 					$value = $value;
 			}
+
 			$in = $in === TRUE 
 				? 'IN' 
 				: '=';
@@ -479,16 +504,21 @@ class DataSource_Hybrid_Agent {
 			{
 				foreach ($value as $i => $v)
 				{
-					if (preg_match('/now()|curdate()|curtime()|interval/i', $v))
+					if ($this->is_db_function($value))
 					{
 						$value[$i] = DB::expr($v);
 					}
 				}
 			}
-			else
-			if (preg_match('/now()|curdate()|curtime()|interval/i', $value))
+			else if ($this->is_db_function($value))
 			{
 				$value = DB::expr($value);
+			}
+			
+			
+			if (isset($params['db_function']) AND ! $this->is_db_function($params['db_function']))
+			{
+				unset($params['db_function']);
 			}
 
 			$conditions = array($in, 'BETWEEN', '>', '<', '>=', '<=', 'IN', 'LIKE');
@@ -532,11 +562,85 @@ class DataSource_Hybrid_Agent {
 				}
 			}
 
-			$field->filter_condition($result, $condition, $value, $params);
+			$field->filter_condition($query, $condition, $value, $params);
 		}
 		
 		unset($field_names, $ds_fields, $sys_fields, $filters);
 
-		return $result;
+		return $query;
+	}
+	
+	public function is_db_function($string)
+	{
+		if (!is_string($string))
+		{
+			return FALSE;
+		}
+
+		$functions = array(
+			'ADDDATE',
+			'ADDTIME',
+			'CONVERT_TZ',
+			'CURDATE',
+			'CURRENT_DATE',
+			'CURRENT_TIME',
+			'CURRENT_TIMESTAMP',
+			'CURTIME',
+			'DATE_ADD',
+			'DATE_FORMAT',
+			'DATE_SUB',
+			'DATE',
+			'DATEDIFF',
+			'DAY',
+			'DAYNAME',
+			'DAYOFMONTH',
+			'DAYOFWEEK',
+			'DAYOFYEAR',
+			'EXTRACT',
+			'FROM_DAYS',
+			'FROM_UNIXTIME',
+			'GET_FORMAT',
+			'HOUR',
+			'LAST_DAY',
+			'LOCALTIME',
+			'LOCALTIMESTAMP',
+			'LOCALTIMESTAMP',
+			'MAKEDATE',
+			'MAKETIME',
+			'MICROSECOND',
+			'MINUTE',
+			'MONTH',
+			'MONTHNAME',
+			'NOW',
+			'PERIOD_ADD',
+			'PERIOD_DIFF',
+			'QUARTER',
+			'SEC_TO_TIME',
+			'SECOND',
+			'STR_TO_DATE',
+			'SUBDATE',
+			'SUBTIME',
+			'SYSDATE',
+			'TIME_FORMAT',
+			'TIME_TO_SEC',
+			'TIME',
+			'TIMEDIFF',
+			'TIMESTAMP',
+			'TIMESTAMPADD',
+			'TIMESTAMPDIFF',
+			'TO_DAYS',
+			'TO_SECONDS',
+			'UNIX_TIMESTAMP',
+			'UTC_DATE',
+			'UTC_TIME',
+			'UTC_TIMESTAMP',
+			'WEEK',
+			'WEEKDAY',
+			'WEEKOFYEAR',
+			'YEAR',
+			'YEARWEEK',
+		);
+
+		return preg_match('/' . implode('|', $functions) . '/', $string);
 	}
 }

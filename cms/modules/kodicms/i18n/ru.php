@@ -58,6 +58,8 @@ return array(
 	'Admin Theme :name' => 'Тема :name',
 	'The requested view :file could not be found' 
 		=> 'Запрашиваемый файл шаблона :file не найден',
+	'Layout is not writeable' => 'Файл в статусе только для чтения',
+	'Layouts folder :folder is not writeable' => 'Директория :folder в статусе только для чтения',
 	
 	/*********************** Dashboard *********************************/
 	'Dashboard' => 'Рабочий стол',
@@ -146,6 +148,8 @@ return array(
 	'Check URL suffix' => 'Проверять налицие URL суффикса',
 	'(Sec.)' => '(Сек.)',
 	'KodiCMS API key' => 'Ключ KodiCMS API',
+	'Ace settings' => 'Ace',
+	'Select theme' => 'Выберите тему',
 	
 	/*********************** Autorization *******************/
 	'Username' => 'Логин',

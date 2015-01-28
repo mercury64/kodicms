@@ -9,7 +9,7 @@ Assets_Package::add('jquery')
 	->js(NULL, ADMIN_RESOURCES . 'libs/jquery.min.js');
 
 Assets_Package::add('bootstrap')
-	->js(NULL, ADMIN_RESOURCES . 'libs/bootstrap-3.2.0/dist/js/bootstrap.min.js', 'jquery');
+	->js(NULL, ADMIN_RESOURCES . 'libs/bootstrap-3.3.1/dist/js/bootstrap.min.js', 'jquery');
 
 Assets_Package::add('underscore')
 	->js(NULL, ADMIN_RESOURCES . 'libs/underscore-min.js', 'jquery');
@@ -57,8 +57,17 @@ Assets_Package::add('ace')
 
 Assets_Package::add('steps')
 	->js(NULL, ADMIN_RESOURCES . 'libs/steps/jquery.steps.min.js', 'jquery');
+	
+Assets_Package::add('chart')
+	->js(NULL, ADMIN_RESOURCES . 'libs/highcharts/highcharts.js', 'jquery');
+
+Assets_Package::add('ckeditor')
+	->js('ckeditor-library', ADMIN_RESOURCES . 'libs/ckeditor/ckeditor.js', 'jquery')
+//	->js('ckeditor-library', 'http://cdn.ckeditor.com/4.4.6/standard/ckeditor.js', 'jquery')
+	->js(NULL, ADMIN_RESOURCES . 'js/ckeditor.js', 'global');
 
 WYSIWYG::add('ace');
+WYSIWYG::add('ckeditor');
 
 // Подключение пакета после загрузки модулей, чтобы определить текущий язык
 Observer::observe('modules::after_load', function() {
@@ -69,4 +78,8 @@ Observer::observe('modules::after_load', function() {
 	Assets_Package::add('validate')
 		->js(NULL, ADMIN_RESOURCES . 'libs/validation/jquery.validate.min.js', 'jquery')
 		->js(NULL . I18n::lang_short(), ADMIN_RESOURCES . 'libs/validation/localization/messages_' . I18n::lang_short() . '.min.js', 'validate');
+});
+
+Observer::observe('view_setting_plugins', function() {
+	echo View::factory('ace/settings');
 });

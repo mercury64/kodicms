@@ -63,14 +63,14 @@ ini_set('unserialize_callback_func', 'spl_autoload_call');
  */
 mb_substitute_character('none');
 
+// -- Configuration and initialization -----------------------------------------
+
 /**
  * Set Kohana::$environment if a 'KOHANA_ENV' environment variable has been supplied.
  *
  * Note: If you supply an invalid environment name, a PHP warning will be thrown
  * saying "Couldn't find constant Kohana::<INVALID_ENV_NAME>"
  */
-
-// -- Configuration and initialization -----------------------------------------
 if (isset($_SERVER['KOHANA_ENV']))
 {
 	Kohana::$environment = constant('Kohana::' . strtoupper($_SERVER['KOHANA_ENV']));
@@ -94,6 +94,16 @@ if (isset($_SERVER['SERVER_PROTOCOL']))
 	HTTP::$protocol = $_SERVER['SERVER_PROTOCOL'];
 }
 
+if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) AND $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+{
+	Request::$type = 'https';
+}
+
+if (isset($_SERVER['HTTP_HOST']))
+{
+	Request::$host = str_replace('www.', '', $_SERVER['HTTP_HOST']);
+}
+
 /**
  * InitializeCore, setting the default options.
  *
@@ -106,17 +116,17 @@ if (isset($_SERVER['SERVER_PROTOCOL']))
  * - boolean  caching     enable or disable internal caching                 FALSE
  */
 Kohana::init( array(
-	'base_url'			=> '/kodicms',
-	'index_file'		=> FALSE,
-	'cache_dir'			=> CMSPATH.'cache',
-	'caching'			=> Kohana::$environment < Kohana::DEVELOPMENT,
-	'profile'			=> Kohana::$environment > Kohana::PRODUCTION,
-	'errors'			=> TRUE
-) );
+	'base_url'				=> '/kodicms',
+	'index_file'			=> FALSE,
+	'cache_dir'				=> CMSPATH.'cache',
+	'caching'				=> Kohana::$environment < Kohana::DEVELOPMENT,
+	'profile'				=> Kohana::$environment > Kohana::PRODUCTION,
+	'errors'				=> TRUE
+));
 
 define('CMS_NAME',			'KodiCMS');
 define('CMS_SITE',			'http://www.kodicms.ru');
-define('CMS_VERSION',		'12.33.70');
+define('CMS_VERSION',		'13.55.110');
 
 define('PUBLICPATH',		DOCROOT . 'public' . DIRECTORY_SEPARATOR);
 define('TMPPATH',			PUBLICPATH . 'temp' . DIRECTORY_SEPARATOR);
@@ -125,12 +135,15 @@ define('SNIPPETS_SYSPATH',	DOCROOT . 'snippets' . DIRECTORY_SEPARATOR);
 
 if (PHP_SAPI != 'cli')
 {
-	define('BASE_URL',		URL::base('http'));
-	define('SITE_HOST',		str_replace('www.', '', $_SERVER['HTTP_HOST']));
+	define('BASE_URL',		URL::base(Request::$type));
 }
 
-if ( ! defined('BASE_URL'))	define('BASE_URL', '/');
-if ( ! defined('SITE_HOST'))	define('SITE_HOST', 'test');
+define('SITE_HOST',	Request::$host);
+
+if ( ! defined('BASE_URL'))
+{
+	define('BASE_URL', '/kodicms');
+}
 
 define('ADMIN_RESOURCES',	BASE_URL . 'cms/media/');
 

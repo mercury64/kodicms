@@ -20,7 +20,7 @@ class KodiCMS_Callback
 	{
 		if (is_array($callback) OR ! is_string($callback))
 		{
-			if(empty($params))
+			if (empty($params))
 			{
 				return call_user_func($callback);
 			}
@@ -37,10 +37,8 @@ class KodiCMS_Callback
 		{
 			return self::invoke_static_class($callback, $params);
 		}
-		
-		return $default;
 	}
-	
+
 	/**
 	 * 
 	 * @param string $callback
@@ -84,5 +82,4 @@ class KodiCMS_Callback
 			return $class->invokeArgs($params);
 		}
 	}
-
 }

@@ -18,7 +18,7 @@ class KodiCMS_Date extends Kohana_Date
 	 */
 	protected static $_translate = array();
 
-	protected static function _translate()
+	protected static function _translate_words()
 	{
 		if (empty(self::$_translate))
 		{
@@ -71,17 +71,33 @@ class KodiCMS_Date extends Kohana_Date
 			$format = Config::get('site', 'date_format', 'Y-m-d H:I:s');
 		}
 
-		if (!Valid::numeric($date))
+		if (is_array($date))
+		{
+			$string = '';
+
+			if (!empty($date['year']) AND !empty($date['month']) AND !empty($date['day']))
+			{
+				$string = $date['year'] . '-' . $date['month'] . '-' . $date['day'];
+			}
+
+			if (($date['hour']) AND !empty($date['minute']) AND !empty($date['second']))
+			{
+				$string .= ' ' . $date['hour'] . ':' . $date['minute'] . ':' . $date['second'];
+			}
+
+			$date = strtotime($string);
+		}
+		else if (!Valid::numeric($date))
 		{
 			$date = strtotime($date);
 		}
 
-		if (!$date)
+		if (empty($date))
 		{
 			return __('Never');
 		}
 
-		return strtr(date($format, $date), self::_translate());
+		return strtr(date($format, $date), self::_translate_words());
 	}
 
 	/**
@@ -98,5 +114,4 @@ class KodiCMS_Date extends Kohana_Date
 
 		return $dates;
 	}
-
 }

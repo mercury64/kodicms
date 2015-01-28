@@ -36,11 +36,11 @@ abstract class DataSource_Hybrid_Field {
 	public static function get_empty_fields()
 	{
 		$filed_types = self::types();
-		
+
 		$fields = array();
 		foreach ($filed_types as $type => $title)
 		{
-			if(is_array($title))
+			if (is_array($title))
 			{
 				foreach ($title as $type => $title)
 				{
@@ -52,7 +52,7 @@ abstract class DataSource_Hybrid_Field {
 				$fields[$type] = DataSource_Hybrid_Field::factory($type);
 			}
 		}
-		
+
 		return $fields;
 	}
 
@@ -68,13 +68,13 @@ abstract class DataSource_Hybrid_Field {
 	public static function factory($type, array $data = NULL)
 	{
 		$class_name = 'DataSource_Hybrid_Field_' . $type;
-		
-		if(!class_exists( $class_name ))
+
+		if (!class_exists($class_name))
 		{
 			throw new Kohana_Exception('Class for field - :type not found', array(
 				':type' => $type));
 		}
-		
+
 		return new $class_name($data);
 	}
 	
@@ -737,9 +737,27 @@ abstract class DataSource_Hybrid_Field {
 	 */
 	public function filter_condition(Database_Query $query, $condition, $value, array $params = NULL)
 	{
-		$query->where($this->name, $condition, $value);
+		$field = $this->name;
+		if (isset($params['db_function']))
+		{
+			$field = $this->build_sql_field($params['db_function'], $field, $value);
+		}
+
+		$query->where($field, $condition, $value);
 	}
 	
+	/**
+	 * 
+	 * @param type $field
+	 * @return type
+	 */
+	public function build_sql_field($function, $field, $value)
+	{
+		return DB::expr($function)
+			->param(':field', DB::expr(Database::instance()->quote_column($this->name)))
+			->param(':value', $value);
+	}
+
 	/**
 	 * Метод используется в момент вывода данных документа в форме редактирования.
 	 * Применяется в том случае, если в момент вывода данных они должны быть приведены
@@ -950,12 +968,12 @@ abstract class DataSource_Hybrid_Field {
 	
 	public function include_media()
 	{
-		if(file_exists($this->media_path() . 'field/'. DIRECTORY_SEPARATOR . $this->media_filename() . '.css'))
+		if (file_exists($this->media_path() . 'field/' . DIRECTORY_SEPARATOR . $this->media_filename() . '.css'))
 		{
 			Assets::css('field::' . $this->media_filename(), $this->media_url() . 'field/' . $this->media_filename() . '.css');
 		}
-		
-		if(file_exists($this->media_path() . 'field/'. DIRECTORY_SEPARATOR . $this->media_filename() . '.js'))
+
+		if (file_exists($this->media_path() . 'field/' . DIRECTORY_SEPARATOR . $this->media_filename() . '.js'))
 		{
 			Assets::js('field::' . $this->media_filename(), $this->media_url() . 'field/' . $this->media_filename() . '.js', 'global');
 		}
@@ -987,9 +1005,7 @@ abstract class DataSource_Hybrid_Field {
 	 */
 	public function has_access_create($user_id = NULL, $check_own = TRUE)
 	{
-		return (
-			$this->has_access('create')
-		);
+		return $this->has_access('create');
 	}
 	
 	/**

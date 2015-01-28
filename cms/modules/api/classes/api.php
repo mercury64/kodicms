@@ -17,6 +17,18 @@ class API {
 	const ERROR_PERMISSIONS = 220;
 	const ERROR_PAGE_NOT_FOUND = 404;
 	
+	protected static function _get_key()
+	{
+		$key = Config::get('api', 'key');
+
+		if ($key === NULL)
+		{
+			throw HTTP_API_Exception::factory(API::ERROR_TOKEN, 'API key not generated. Generate a new key in the site settings.');
+		}
+
+		return $key;
+	}
+
 	/**
 	 * 
 	 * @param string $uri
@@ -29,7 +41,7 @@ class API {
 		$request = static::request($uri, $cache)
 			->method(Request::GET)
 			->query($params)
-			->query('api_key', Config::get('api', 'key'))
+			->query('api_key', self::_get_key())
 			->execute();
 		
 		return static::response($request);
@@ -47,7 +59,7 @@ class API {
 		$request = static::request($uri, $cache)
 			->method(Request::PUT)
 			->post($params)
-			->post('api_key', Config::get('api', 'key'))
+			->post('api_key', self::_get_key())
 			->execute();
 		
 		return static::response($request);
@@ -65,7 +77,7 @@ class API {
 		$request = static::request($uri, $cache)
 			->method(Request::POST)
 			->post($params)
-			->post('api_key', Config::get('api', 'key'))
+			->post('api_key', self::_get_key())
 			->execute();
 		
 		return static::response($request);
@@ -83,7 +95,7 @@ class API {
 		$request = static::request($uri, $cache)
 			->method(Request::DELETE)
 			->post($params)
-			->post('api_key', Config::get('api', 'key'))
+			->post('api_key', self::_get_key())
 			->execute();
 		
 		return static::response($request);
@@ -97,7 +109,7 @@ class API {
 	 */
 	public static function request($uri, $cache = FALSE)
 	{
-		if(strpos( $uri, '-' ) === FALSE)
+		if (strpos($uri, '-') === FALSE)
 		{
 			$uri = '-' . $uri;
 		}
@@ -105,8 +117,8 @@ class API {
 		{
 			$uri = '/' . $uri;
 		}
-		
-		if(IS_BACKEND)
+
+		if (IS_BACKEND)
 		{
 			$uri = ADMIN_DIR_NAME . '/api' . $uri;
 		}
@@ -114,9 +126,9 @@ class API {
 		{
 			$uri = 'api' . $uri;
 		}
-		
+
 		$params = array();
-		if($cache !== FALSE)
+		if ($cache !== FALSE)
 		{
 			$params['cache'] = HTTP_Cache::factory(Cache::instance());
 		}

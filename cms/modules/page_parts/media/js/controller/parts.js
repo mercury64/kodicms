@@ -3,7 +3,7 @@ $(function() {
 		urlRoot: Api.build_url('page-parts'),
 		defaults: {
 			name: 'part',
-			filter_id: '',
+			filter_id: DEFAULT_FILTER,
 			page_id: PAGE_ID,
 			content: '',
 			is_protected: 0,
@@ -79,7 +79,7 @@ $(function() {
 		events: {
 			'click .part-options-button': 'toggleOptions',
 			'click .part-minimize-button': 'toggleMinimize',
-			'dblclick .panel ': 'toggleMinimize',
+			'dblclick .panel-heading ': 'toggleMinimize',
 			'change .item-filter': 'changeFilter',
 			'change .is_protected': 'switchProtected',
 			'change .is_indexable': 'switchIndexable',

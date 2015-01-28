@@ -2,10 +2,11 @@
 
 <?php
 $layout_name = $page->layout();
+$layout_link = '';
 
-if( ACL::check( 'layout.edit') OR ACL::check( 'layout.view'))
+if ((ACL::check('layout.edit') OR ACL::check('layout.view')) AND ! empty($layout_name))
 {
-	$layout_name = HTML::anchor(Route::get('backend')->uri(array(
+	$layout_link = HTML::anchor(Route::get('backend')->uri(array(
 		'controller' => 'layout', 
 		'action' => 'edit', 
 		'id' => $layout_name
@@ -16,7 +17,7 @@ if( ACL::check( 'layout.edit') OR ACL::check( 'layout.view'))
 ?>
 
 <div class="panel-body">
-	<?php if( $page->id != 1 ): ?>
+	<?php if ($page->id != 1): ?>
 	<div class="form-group">
 		<?php echo $page->label('parent_id', array('class' => 'control-label col-md-3')); ?>
 		<div class="col-md-6">
@@ -35,10 +36,15 @@ if( ACL::check( 'layout.edit') OR ACL::check( 'layout.view'))
 				'prefix' => 'page'
 			)); ?>
 		</div>
-		
+
 		<div class="col-md-3">
-			<?php echo UI::label(__('Current layput: :name', array(':name' => $layout_name))); ?>
+			<?php if (!empty($layout_name)): ?>
+			<?php echo UI::label(__('Current layput: :name', array(':name' => $layout_link))); ?>
+			<?php else: ?>
+			<?php echo UI::label(__('Layout not set'), 'danger'); ?>
+			<?php endif; ?>
 		</div>
+		
 	</div>
 	
 	<hr class="panel-wide" />
@@ -55,7 +61,7 @@ if( ACL::check( 'layout.edit') OR ACL::check( 'layout.view'))
 	
 	<hr class="panel-wide" />
 
-	<?php if( $page->id != 1 ): ?>
+	<?php if ($page->id != 1): ?>
 	<div class="form-group page-statuses">
 		<?php echo $page->label('status_id', array('class' => 'control-label col-md-3')); ?>
 		<div class="col-md-6">
@@ -77,7 +83,7 @@ if( ACL::check( 'layout.edit') OR ACL::check( 'layout.view'))
 	<hr class="panel-wide" />
 	<?php endif; ?>
 
-	<?php if( $page->id != 1 ): ?>
+	<?php if ($page->id != 1): ?>
 	<div class="form-group">
 		<?php echo $page->label('published_on', array('class' => 'control-label col-md-3')); ?>
 		<div class="col-md-6">
@@ -90,7 +96,7 @@ if( ACL::check( 'layout.edit') OR ACL::check( 'layout.view'))
 	<hr class="panel-wide" />
 	<?php endif; ?>
 
-	<?php if ( ACL::check( 'page.permissions' ) ): ?>
+	<?php if (ACL::check('page.permissions')): ?>
 	<div class="form-group">
 		<?php echo $page->label('needs_login', array('class' => 'control-label col-md-3')); ?>
 		<div class="col-md-6">
@@ -102,7 +108,7 @@ if( ACL::check( 'layout.edit') OR ACL::check( 'layout.view'))
 	<?php endif; ?>
 </div>
 
-<?php if ( ACL::check( 'page.permissions' ) ): ?>
+<?php if (ACL::check('page.permissions')): ?>
 <div class="panel-heading">
 	<?php echo $page->label('page_permissions', array('class' => 'panel-title')); ?>
 </div>

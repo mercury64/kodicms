@@ -14,6 +14,15 @@ class Controller_API_Dashboard extends Controller_System_Api {
 	{
 		$widget_type = $this->param('widget_type', NULL, TRUE);
 		$widget = Dashboard::add_widget($widget_type);
+		
+		if (!empty($widget->media_packages))
+		{
+			$this->json['media'] = Assets_Package::get_scripts($widget->media_packages);
+		}
+		
+		$this->json['size'] = $widget->size();
+		$this->json['id'] = $widget->id;
+
 		$this->response((string) $widget->run());
 	}
 	
@@ -31,7 +40,7 @@ class Controller_API_Dashboard extends Controller_System_Api {
 
 		$widget = Dashboard::update_widget($widget_id, $settings);
 
-		if($widget !== NULL)
+		if ($widget !== NULL)
 		{
 			$this->json['update_settings'] = $widget->is_update_settings_page();
 			$this->response((string) $widget->run());
@@ -52,13 +61,13 @@ class Controller_API_Dashboard extends Controller_System_Api {
 		
 		foreach ($types as $key => $data)
 		{
-			if(Arr::get($attached_types, $key) === FALSE)
+			if (Arr::get($attached_types, $key) === FALSE)
 			{
 				unset($types[$key]);
 			}
 		}
 
-		$this->json = (string) View::factory( 'dashboard/widgets', array(
+		$this->json = (string) View::factory('dashboard/widgets', array(
 			'types' => $types
 		));
 	}
@@ -78,5 +87,19 @@ class Controller_API_Dashboard extends Controller_System_Api {
 			'widget' => $widget
 		)));
 	}
+	
+	public function rest_delete()
+	{
+		if (!ACL::check('dshboard.empty'))
+		{
+			throw HTTP_API_Exception::factory(API::ERROR_PERMISSIONS, 'You dont hanve permissions to empty dashboard');
+		}
 
+		Dashboard::remove_data();
+		Cache::register_shutdown_function();
+
+		Kohana::$log->add(Log::INFO, ':user empty dashboard')->write();
+
+		$this->message('Dashboard is empty!');
+	}
 }

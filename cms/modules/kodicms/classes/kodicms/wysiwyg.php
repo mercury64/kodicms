@@ -88,12 +88,14 @@ class KodiCMS_WYSIWYG {
 	{
 		if (isset(self::$filters[$filter_id]))
 		{
-			if (!class_exists($filter_id))
+			$class_name = 'Filter_' . ucfirst($filter_id);
+
+			if ( ! class_exists($class_name))
 			{
-				return FALSE;
+				return new Filter_Default;
 			}
 
-			return new $filter_id;
+			return new $class_name;
 		}
 		else
 		{
@@ -108,12 +110,13 @@ class KodiCMS_WYSIWYG {
 	public static function html_select()
 	{
 		$filters = array('' => __('none'));
-		
+
 		foreach (WYSIWYG::findAll() as $filter)
 		{
 			$filters[$filter] = Inflector::humanize($filter);
 		}
-		
+
 		return $filters;
 	}
+
 }
