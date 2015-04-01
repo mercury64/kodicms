@@ -154,6 +154,11 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 		return strtolower($path);
 	}
 	
+	public function close_popup()
+	{
+		Session::instance()->set('close_popup', TRUE);
+	}
+
 	/**
 	 * 
 	 * @param string $title
@@ -185,9 +190,9 @@ class KodiCMS_Controller_System_Template extends Controller_System_Security
 			'CONTROLLER' => strtolower(Request::current()->controller()),
 			'ACTION' => Request::current()->action(),
 			'USER_ID' => Auth::get_id(),
-			'FILTERS' => WYSIWYG::findAll(),
 			'DATE_FORMAT' => Config::get('site', 'date_format'),
-			'IS_BACKEND' => IS_BACKEND
+			'IS_BACKEND' => IS_BACKEND,
+			'CLOSE_POPUP' => Session::instance()->get_once('close_popup', FALSE)
 		);
 
 		foreach (Messages::get() as $type => $messages)

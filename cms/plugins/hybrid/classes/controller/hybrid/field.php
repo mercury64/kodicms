@@ -14,7 +14,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 	
 	public function before()
 	{
-		if ($this->request->action() == 'edit')
+		if ($this->request->action() == 'edit' OR $this->request->action() == 'location')
 		{
 			$id = (int) $this->request->param('id');
 			$this->field = DataSource_Hybrid_Field_Factory::get_field($id);
@@ -29,6 +29,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			if ($this->field->has_access_edit())
 			{
 				$this->allowed_actions[] = 'edit';
+				$this->allowed_actions[] = 'location';
 			}
 		}
 
@@ -51,8 +52,83 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		}
 	}
 	
+	public function action_location()
+	{
+		$ds = $this->section($this->field->ds_id);
+		$this->set_title(__('Field location'));
+		$this->breadcrumbs
+			->add($ds->name, Route::get('datasources')->uri(array(
+				'controller' => 'data',
+				'directory' => 'datasources',
+			)) . URL::query(array('ds_id' => $ds->id()), FALSE))
+			->add(__('Edit section :name', array(':name' => $ds->name)), Route::get('datasources')->uri(array(
+				'directory' => 'datasources',
+				'controller' => 'section',
+				'action' => 'edit',
+				'id' => $ds->id()
+			)));
+		
+		$widget_types = array(
+			'hybrid_document', 'hybrid_editor',
+			'hybrid_headline', 'hybrid_profile',
+			'hybrid_creator'
+		);
+		
+		$widgets = Widget_Manager::get_widgets($widget_types);
+		$field_status = array();
+		foreach ($widgets as $id => $widget)
+		{
+			if ($this->field->ds_id != $widget->ds_id)
+			{
+				unset($widgets[$id]);
+			}
+		}
+		
+		if ($this->request->method() === Request::POST)
+		{
+			return $this->_save_location($widgets, $this->field);
+		}
+		
+		$this->template->content = View::factory('datasource/hybrid/field/location', array(
+			'field' => $this->field,
+			'widgets' => $widgets
+		));
+	}
+	
+	private function _save_location(array $widgets, $field)
+	{
+		$post_data = $this->request->post();
+		foreach ($widgets as $id => $widget)
+		{
+			$fields = $widget->doc_fields;
+	
+			if (isset($post_data['widget'][$widget->id]))
+			{
+				$fields[] = $field->id;
+			}
+			else if (($key = array_search($field->id, $fields)) !== FALSE)
+			{
+				unset($fields[$key]);
+			}
+			else
+			{
+				continue;
+			}
+			
+			$widget->doc_fields = array_unique($fields);	
+			Widget_Manager::update($widget);
+		}
+		
+		Messages::success(__('Field location saved'));
+		
+		$this->close_popup();
+
+		$this->go_back();
+	}
+
 	public function action_template()
 	{
+		$this->set_title(__('Fielt template'));
 		$ds_id = (int) $this->request->param('id');
 		$ds = $this->section($ds_id);
 
@@ -93,7 +169,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		));
 	}
 	
-	private function _add($ds)
+	private function _add(DataSource_Section_Hybrid $ds)
 	{
 		$data = $this->request->post();
 		
@@ -103,7 +179,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			unset($data['type']);
 			
 			$field = DataSource_Hybrid_Field::factory($type, $data);
-			$field_id = DataSource_Hybrid_Field_Factory::create_field($ds->record(), $field);
+			$ds->add_field($field);
 		}
 		catch (Validation_Exception $e)
 		{
@@ -117,11 +193,13 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			$this->go_back();
 		}
 		
-		if (!$field_id)
+		if (!$field->loaded())
 		{
+			Messages::errors(__('Field not created'));
 			$this->go_back();
 		}
 
+		Messages::success(__('Field created'));
 		Session::instance()->delete('post_data');
 		
 		if ($this->request->post('save_and_create') !== NULL)
@@ -139,7 +217,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 				'directory' => 'hybrid',
 				'controller' => 'field',
 				'action' => 'edit',
-				'id' => $field_id
+				'id' => $field->id
 			)));
 		}
 	}
@@ -150,10 +228,13 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 
 		if ($this->request->method() === Request::POST)
 		{
-			return $this->_edit($this->field);
+			return $this->_edit($ds, $this->field);
 		}
 
-		$this->set_title(__('Edit field :field_name', array(':field_name' => $this->field->header)));
+		$this->set_title(__('Field :field_name (:field_type)', array(
+			':field_name' => $this->field->header,
+			':field_type' => $this->field->type()
+		)));
 
 		$this->breadcrumbs
 			->add($ds->name, Route::get('datasources')->uri(array(
@@ -170,18 +251,18 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 		$this->template->content = View::factory('datasource/hybrid/field/edit', array(
 			'ds' => $ds,
 			'field' => $this->field,
+			'column_exists' => DataSource_Hybrid_Field_Factory::is_column_exists($this->field),
 			'type' => $this->field->type,
 			'sections' => $this->_get_sections(),
 			'post_data' => Session::instance()->get_once('post_data', array())
 		));
 	}
 	
-	private function _edit($field)
+	private function _edit(DataSource_Section_Hybrid $ds, $field)
 	{
 		try
 		{
-			$field->set($this->request->post());
-			DataSource_Hybrid_Field_Factory::update_field(clone($field), $field);
+			$ds->update_field($field, $this->request->post());
 		}
 		catch (Validation_Exception $e)
 		{
@@ -195,6 +276,7 @@ class Controller_Hybrid_Field extends Controller_System_Datasource
 			$this->go_back();
 		}
 		
+		Messages::success(__('Field updated'));
 		Session::instance()->delete('post_data');
 		
 		// save and quit or save and continue editing?

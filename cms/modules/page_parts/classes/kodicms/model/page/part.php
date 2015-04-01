@@ -49,7 +49,7 @@ class KodiCMS_Model_Page_Part extends ORM
 	{
 		if ($this->filter_id === NULL)
 		{
-			$this->filter_id = Config::get('site', 'default_filter_id');
+			$this->filter_id = Config::get('site', 'default_html_editor');
 		}
 
 		if ($this->is_protected === NULL)
@@ -62,18 +62,11 @@ class KodiCMS_Model_Page_Part extends ORM
 			$this->name = 'part';
 		}
 
-		$filter = FALSE;
 		if ($this->filter_id !== NULL)
 		{
-			$filter = WYSIWYG::get($this->filter_id);
+			$filter = WYSIWYG::get_filter($this->filter_id);
+			$this->content_html = $filter->apply($this->content);
 		}
-		
-		if ($filter === FALSE OR ! ($filter instanceof Filter_Decorator))
-		{
-			$filter = new Filter_Default;
-		}
-
-		$this->content_html = $filter->apply($this->content);
 
 		Observer::notify('part_before_save', $this);
 		

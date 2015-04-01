@@ -38,7 +38,7 @@ setlocale( LC_ALL, 'en_US.utf-8' );
  * @link http://kohanaframework.org/guide/using.autoloading
  * @link http://www.php.net/manual/function.spl-autoload-register
  */
-//spl_autoload_register(array('Kohana', 'auto_load'));
+spl_autoload_register(array('Kohana', 'auto_load'));
 
 /**
  * Optionally, you can enable a compatibility auto-loader for use with
@@ -47,6 +47,14 @@ setlocale( LC_ALL, 'en_US.utf-8' );
  * It is recommended to not enable this unless absolutely necessary.
  */
 spl_autoload_register(array('Kohana', 'auto_load_lowercase'));
+
+/**
+ * Composer auto-loader
+ */
+if (file_exists(DOCROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload' . EXT))
+{
+	require DOCROOT . 'vendor' . DIRECTORY_SEPARATOR . 'autoload' . EXT;
+}
 
 /**
  * Enable the Kohana auto-loader for unserialization.
@@ -118,7 +126,7 @@ if (isset($_SERVER['HTTP_HOST']))
 Kohana::init( array(
 	'base_url'				=> '/kodicms',
 	'index_file'			=> FALSE,
-	'cache_dir'				=> CMSPATH.'cache',
+	'cache_dir'				=> CMSPATH . 'cache',
 	'caching'				=> Kohana::$environment < Kohana::DEVELOPMENT,
 	'profile'				=> Kohana::$environment > Kohana::PRODUCTION,
 	'errors'				=> TRUE
@@ -126,10 +134,10 @@ Kohana::init( array(
 
 define('CMS_NAME',			'KodiCMS');
 define('CMS_SITE',			'http://www.kodicms.ru');
-define('CMS_VERSION',		'13.55.110');
+define('CMS_VERSION',		'13.82.135');
 
 define('PUBLICPATH',		DOCROOT . 'public' . DIRECTORY_SEPARATOR);
-define('TMPPATH',			PUBLICPATH . 'temp' . DIRECTORY_SEPARATOR);
+define('TMPPATH',			CMSPATH . 'tmp' . DIRECTORY_SEPARATOR);
 define('LAYOUTS_SYSPATH',	DOCROOT . 'layouts' . DIRECTORY_SEPARATOR);
 define('SNIPPETS_SYSPATH',	DOCROOT . 'snippets' . DIRECTORY_SEPARATOR);
 

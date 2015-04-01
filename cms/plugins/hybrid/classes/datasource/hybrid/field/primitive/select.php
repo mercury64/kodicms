@@ -27,7 +27,7 @@ class DataSource_Hybrid_Field_Primitive_Select extends DataSource_Hybrid_Field_P
 	
 	public function set(array $data)
 	{
-		if ($this->id !== NULL)
+		if ($this->loaded())
 		{
 			$current_options = $this->load_from_db();
 			if (empty($data['options']) AND ! empty($current_options))
@@ -70,6 +70,11 @@ class DataSource_Hybrid_Field_Primitive_Select extends DataSource_Hybrid_Field_P
 	 */
 	public function add_option($value)
 	{
+		if ($this->id === NULL)
+		{
+			return NULL;
+		}
+			
 		$value = trim($value);
 
 		if (empty($value))
@@ -202,7 +207,7 @@ class DataSource_Hybrid_Field_Primitive_Select extends DataSource_Hybrid_Field_P
 	
 	public function get_query_props(Database_Query $query, DataSource_Hybrid_Agent $agent)
 	{
-		$query->select(array($this->table_column_key(), $this->id . '_original'));
+		$query->select(array($this->table_column_key(), $this->id . '::original'));
 		$query->select(array($this->get_subquery(), $this->id));
 	}
 	

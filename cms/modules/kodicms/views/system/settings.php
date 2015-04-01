@@ -88,15 +88,21 @@
 			<label class="control-label col-md-3"><?php echo __('Default page status'); ?> </label>
 			<div class="col-md-9">
 				<?php echo Form::select('setting[site][default_status_id]', $default_status_id, Config::get('site', 'default_status_id')); ?>
-				<p class="help-block"><?php echo __('This status will be autoselected when page creating.'); ?></p>
+				<p class="help-block"><?php echo __('This status will be auto selected when page creating.'); ?></p>
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label class="control-label col-md-3"><?php echo __('Default filter'); ?></label>
+			<label class="control-label col-md-3"><?php echo __('Default HTML editor'); ?></label>
 			<div class="col-md-9">
-				<?php echo Form::select('setting[site][default_filter_id]', $filters, Config::get('site', 'default_filter_id')); ?>
-				<p class="help-block"><?php echo __('Only for filter in pages, <i>not</i> in snippets.'); ?></p>
+				<?php echo Form::select('setting[site][default_html_editor]', $html_editors, Config::get('site', 'default_html_editor')); ?>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label class="control-label col-md-3"><?php echo __('Default Code editor'); ?></label>
+			<div class="col-md-9">
+				<?php echo Form::select('setting[site][default_code_editor]', $code_editors, Config::get('site', 'default_code_editor')); ?>
 			</div>
 		</div>
 

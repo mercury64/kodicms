@@ -418,7 +418,7 @@ class KodiCMS_Model_Page extends ORM
 	 */
 	public function get_status()
 	{
-		$status = __('None');
+		$status = __('none');
 		$label = 'default';
 
 		switch ($this->status_id)
@@ -629,6 +629,20 @@ class KodiCMS_Model_Page extends ORM
 		$object['layout'] = $this->layout();
 
 		return $object;
+	}
+	
+	/**
+	 * 
+	 * @return array
+	 */
+	public function behavior()
+	{
+		if (!Valid::not_empty($this->behavior_id))
+		{
+			return NULL;
+		}
+
+		return Behavior::factory($this->behavior_id);
 	}
 
 	/**

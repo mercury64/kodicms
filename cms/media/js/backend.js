@@ -25,7 +25,7 @@ var cms = {
 				}
 
 				if($type == 'error'){
-					cms.error_field(text, $messages[text]);
+					cms.error_field(text, decodeURIComponent($messages[text]));
 				}
 
 				this.show($messages[text], $type);
@@ -37,7 +37,7 @@ var cms = {
 			var title = type.charAt(0).toUpperCase() + type.slice(1);
 			window.top.$.pnotify({
 				title: __(title),
-				text: msg,
+				text: decodeURIComponent(msg),
 				sticker: false,
 				nonblock: true,
 				delay: 4000,
@@ -278,7 +278,21 @@ var cms = {
 				autoSize: false,
 				width: 1000,
 				afterLoad: function() {
-					this.content[0].contentWindow.elfinderInit(object, type);
+					this.content[0].contentWindow.elfinderInit({
+						getFileCallback: function(file) {
+							if(_.isObject(file)) {
+								file = file.url;
+							}
+							if(_.isObject(object)) {
+								object.val(file);
+								window.top.$.fancybox.close();
+							}
+							else {
+								if(window.top.cms.filters.exec(object, 'insert', file))
+									window.top.$.fancybox.close();
+							}
+						}
+					});
 				}
 			});
 		}
@@ -577,6 +591,13 @@ cms.ui.add('flags', function() {
 	});
 
 }).add('dropzone', function() {
+	// Disable auto discover for all elements:
+	Dropzone.autoDiscover = false;
+
+	if (!$('.dropzone').length) {
+		return;
+	};
+	
 	cms.uploader = new Dropzone('.dropzone', {
 		success: function(file, r) {
 			var response = $.parseJSON(r);
@@ -664,6 +685,11 @@ cms.ui.add('flags', function() {
 		window.top.$.fancybox.close();
 		e.preventDefault();
 	});
+	
+	if(CLOSE_POPUP)
+		setTimeout(function() {
+			window.top.$.fancybox.close();
+		}, 1000);
 }).add('select2', function() {
 	if(!TAG_SEPARATOR) var TAG_SEPARATOR = ',';
 
@@ -842,8 +868,9 @@ cms.ui.add('flags', function() {
 		else
 			$callback = function(response) {};
 		
-		var $method = $self.data('method');
-		var $reload = $self.data('reload');
+		var $method = $self.data('method'),
+			$reload = $self.data('reload'),
+			$params = $self.data('params');
 		
 		if($reload) {
 			if($reload === true)
@@ -852,8 +879,10 @@ cms.ui.add('flags', function() {
 				$callback = function() { window.location = $reload}
 		}
 		
-		if( ! $method) $method = 'GET';
-		Api.request($method, $url, null, $callback);
+		if (!$method)
+			$method = 'GET';
+
+		Api.request($method, $url, $params, $callback);
 	})
 }).add('select_all_checkbox', function() {
 	$(document).on('change', 'input[name="check_all"]', function(e) {

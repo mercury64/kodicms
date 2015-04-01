@@ -38,7 +38,7 @@ class Controller_Snippet extends Controller_System_Backend {
 			return $this->_add();
 		}
 
-		Assets::package('ace');
+		WYSIWYG::load_all();
 		
 		$this->template->title = __('Add snippet');
 		$this->breadcrumbs
@@ -51,11 +51,14 @@ class Controller_Snippet extends Controller_System_Backend {
 		{
 			$snippet = new Model_File_Snippet;
 		}
+		
+		$this->template_js_params['SNIPPET_EDITOR'] = $snippet->editor;
 
 		$this->template->content = View::factory('snippet/edit', array(
 			'action' => 'add',
-			'filters' => WYSIWYG::findAll(),
-			'snippet' => $snippet
+			'snippet' => $snippet,
+			'roles' => ORM::factory('role')->find_all()->as_array('name', 'name'),
+			'snippet_roles' => $snippet->get_roles()
 		));
 	}
 
@@ -65,6 +68,8 @@ class Controller_Snippet extends Controller_System_Backend {
 
 		$snippet = new Model_File_Snippet($data['name']);
 		$snippet->content = $data['content'];
+		$snippet->editor = $data['editor'];
+		$snippet->roles = $data['roles'];
 
 		Flash::set('post_data', $snippet);
 
@@ -127,12 +132,15 @@ class Controller_Snippet extends Controller_System_Backend {
 			return $this->_edit($snippet_name);
 		}
 
-		Assets::package('ace');
+		WYSIWYG::load_all();
+		
+		$this->template_js_params['SNIPPET_EDITOR'] = $snippet->editor;
 
 		$this->template->content = View::factory('snippet/edit', array(
 			'action' => 'edit',
-			'filters' => WYSIWYG::findAll(),
-			'snippet' => $snippet
+			'snippet' => $snippet,
+			'roles' => ORM::factory('role')->find_all()->as_array('name', 'name'),
+			'snippet_roles' => $snippet->get_roles()
 		));
 	}
 
@@ -144,6 +152,8 @@ class Controller_Snippet extends Controller_System_Backend {
 
 		$snippet->name = $data['name'];
 		$snippet->content = $data['content'];
+		$snippet->editor = $data['editor'];
+		$snippet->roles = $data['roles'];
 
 		try
 		{

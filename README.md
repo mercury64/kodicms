@@ -66,8 +66,10 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 	Также необходимо установить права на запись и чтение для следующих папок:
 	* `cms/logs`
 	* `cms/cache`
+	* `cms/tmp`
 	* `layouts`
 	* `snippets`
+	* `public`
 
 	Через консоль можно сделать с помощью команды `chmod -R a+rwx ...`, например `chmod -R a+rwx cms/cache`
 
@@ -150,11 +152,20 @@ KodiCMS основана на базе [Kohana framework](http://kohanaframework
 			include fastcgi_params;
 		}
 	
-		# Блокируем доступ для всех скрытых файлов,
-		# таких как .htaccess, .git, .svn и т.д.
-		location ~ /\.ht {
-			deny all;
-		}
+		# Блокируем доступ извне, к файлам и папкам:
+			# таким как .htaccess
+			location ~ /\.ht {
+				deny all;
+				return 404;
+			}
+
+			# а также каталогов .git, .svn
+			location ~.(git|svn) {
+	        	deny  all;
+	            return 404;
+	        }
+
+
 	}
 
 

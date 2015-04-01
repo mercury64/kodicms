@@ -8,17 +8,32 @@
  * @copyright	(c) 2012-2014 butschster
  * @license		http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
  */
-class DataSource_Hybrid_Field_Primitive_Integer extends DataSource_Hybrid_Field_Primitive {
+class DataSource_Hybrid_Field_Primitive_Integer extends DataSource_Hybrid_Field_Primitive_Primary {
 	
 	protected $_use_as_document_id = TRUE;
+	
+	protected $_is_required = TRUE;
 	
 	protected $_props = array(
 		'default' => 0,
 		'min' => 0, 
 		'max' => 500,
-		'length' => 10
+		'length' => 10,
+		'auto_increment' => FALSE,
+		'unique' => FALSE,
+		'increment_step' => 1
 	);
 	
+	public function booleans()
+	{
+		return array('auto_increment');
+	}
+	
+	public function db_default_value()
+	{
+		return $this->set_value($this->default);
+	}
+
 	public function set_value($value)
 	{
 		$value = (int) $value;
@@ -35,9 +50,15 @@ class DataSource_Hybrid_Field_Primitive_Integer extends DataSource_Hybrid_Field_
 		return $value;
 	}
 	
-	public function set_default($value)
+	public function set_increment_step($value)
 	{
-		$this->default = $this->set_value($value);
+		$value = (int) $value;
+		if($value === 0)
+		{
+			$value = 1;
+		}
+		
+		$this->increment_step = $value;
 	}
 	
 	public function set_min($value)
@@ -50,16 +71,11 @@ class DataSource_Hybrid_Field_Primitive_Integer extends DataSource_Hybrid_Field_
 		$this->max = (int) $value;
 	}
 	
-	public function onUpdateDocument(DataSource_Hybrid_Document $old = NULL, DataSource_Hybrid_Document $new) 
-	{
-		$new->set($this->name, (int) $new->get($this->name));
-	}
+	public function onCreate() {}
 	
-	public function onValidateDocument(Validation $validation, DataSource_Hybrid_Document $doc)
+	public function onCreateDocument(DataSource_Hybrid_Document $doc)
 	{
-		$validation->rule($this->name, 'numeric');
-
-		return parent::onValidateDocument($validation, $doc);
+		$this->onUpdateDocument($doc, $doc);
 	}
 
 	public function onReadDocumentValue(array $data, DataSource_Hybrid_Document $document)
@@ -80,10 +96,4 @@ class DataSource_Hybrid_Field_Primitive_Integer extends DataSource_Hybrid_Field_
 
 		return 'INT(' . $this->length . ') UNSIGNED NOT NULL';
 	}
-
-	public static function fetch_widget_field($widget, $field, $row, $fid, $recurse)
-	{
-		return (int) $row[$fid];
-	}
-
 }

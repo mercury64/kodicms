@@ -25,18 +25,32 @@
 			</div>
 		</div>
 	</div>
-	
+	<?php if(!$column_exists): ?>
+	<div class="alert alert-danger alert-dark">
+		<?php echo __('Missing field column ":column" in table ":table"', array(
+			':column' => $field->name, ':table' => $field->ds_table
+		)); ?>
+		&nbsp;&nbsp;&nbsp;
+		<?php echo UI::button(__('Repair field'), array(
+			'icon' => UI::icon('wrench'), 'class' => 'btn-sm btn-success', 
+			'data-api-url' => '/datasource/hybrid-field.repair', 
+			'data-method' => 'POST',
+			'data-params' => json_encode(array('id' => $field->id))
+		)); ?>
+	</div>
+	<?php endif; ?>
 	<div class="panel-heading">
-		<span class="panel-title"><?php echo __( 'Field settings' ); ?></span>
+		<span class="panel-title"><?php echo __('Field settings'); ?></span>
 	</div>
 	<div class="panel-body ">
 		<?php
 		try
 		{
-			if( ! empty($post_data))
+			if (!empty($post_data))
 			{
 				$field->set($post_data);
 			}
+	
 			echo View::factory('datasource/hybrid/field/edit/' . $type, array(
 				'field' => $field, 'sections' => $sections
 			));
@@ -60,6 +74,20 @@
 			'field' => $field, 'post_data' => $post_data
 		)); ?>
 	</div>
+	<?php if ($field->has_access_edit()): ?>
+	<hr class="no-margin-vr" />
+	<div class="panel-body">
+		<?php echo HTML::anchor(Route::get('datasources')->uri(array(
+			'directory' => 'hybrid',
+			'controller' => 'field',
+			'action' => 'location',
+			'id' => $field->id
+		)), __('Field location'), array(
+			'class' => 'btn btn-primary popup fancybox.iframe',
+			'data-icon' => 'sitemap'
+		)); ?>
+	</div>
+	<?php endif; ?>
 	<div class="panel-footer form-actions">
 		<?php echo UI::actions(NULL, Route::get('datasources')->uri(array(
 			'controller' => 'section',

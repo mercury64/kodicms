@@ -64,7 +64,8 @@ class KodiCMS_Controller_System_Backend extends Controller_System_Template
 		parent::init_media();
 		
 		$this->template_js_params['ACE_THEME'] = Config::get('ace', 'theme', 'textmate');
-		$this->template_js_params['DEFAULT_FILTER'] = Config::get('site', 'default_filter_id', '');
+		$this->template_js_params['DEFAULT_HTML_EDITOR'] = Config::get('site', 'default_html_editor', '');
+		$this->template_js_params['DEFAULT_CODE_EDITOR'] = Config::get('site', 'default_code_editor', '');
 		
 		Assets::package(array(
 			'jquery', 'bootstrap', 'notify', 'select2', 'dropzone', 'fancybox', 'datepicker', 'underscore', 'core'
@@ -72,9 +73,11 @@ class KodiCMS_Controller_System_Backend extends Controller_System_Template
 
 		foreach (array('.js', '-message.js') as $file_name)
 		{
-			if (file_exists(CMSPATH . FileSystem::normalize_path('media/js/i18n/' . I18n::lang() . $file_name)))
+			$filename = Kohana::$cache_dir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, array('i18n', NULL)) . I18n::lang() . $file_name;
+			
+			if (file_exists($filename))
 			{
-				Assets::js('i18n', ADMIN_RESOURCES . 'js/i18n/' . I18n::lang() . $file_name, 'global', FALSE, 0);
+				Assets::js('i18n', BASE_URL . 'cms/cache/i18n/' . I18n::lang() . $file_name, 'global', FALSE, 0);
 			}
 		}
 

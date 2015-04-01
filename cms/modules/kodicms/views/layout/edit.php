@@ -31,7 +31,7 @@
 		<?php if ($layout->is_writable() OR ! $layout->is_exists()): ?>
 		<div class="panel-heading-controls">
 		<?php echo UI::button(__('File manager'), array(
-			'class' => 'btn-default btn-filemanager',
+			'class' => 'btn-filemanager btn-flat btn-info btn-sm', 
 			'data-el' => 'textarea_content',
 			'icon' => UI::icon( 'folder-open'),
 			'data-hotkeys' => 'ctrl+m'
@@ -40,14 +40,15 @@
 		<?php endif; ?>
 	</div>
 	<?php echo Form::textarea('content', $layout->content, array(
-		'tabindex'			=> 2,
-		'id'				=> 'textarea_content',
-		'data-readonly'		=> (!$layout->is_exists() OR ( $layout->is_exists() AND $layout->is_writable())) ? 'off' : 'on'
+		'class' => 'form-control',
+		'id' => 'textarea_content',
+		'data-height' => 600,
+		'data-readonly' => (!$layout->is_exists() OR ( $layout->is_exists() AND $layout->is_writable())) ? 'off' : 'on'
 	)); ?>
 
 	<?php if($layout->is_exists() AND !$layout->is_writable()): ?>
 	<div class="panel-default alert alert-danger alert-dark no-margin-b">
-		<?php echo __('Layout is not writeable'); ?>
+		<?php echo __('File is not writable'); ?>
 	</div>
 	<?php elseif (ACL::check('layout.edit')): ?>
 	<div class="form-actions panel-footer">

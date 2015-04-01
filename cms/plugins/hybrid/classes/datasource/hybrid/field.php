@@ -264,6 +264,52 @@ abstract class DataSource_Hybrid_Field {
 			)
 		);
 	}
+	
+	/**
+	 * return string
+	 */
+	public function default_value()
+	{
+		return $this->default;
+	}
+	
+	/**
+	 * return string
+	 */
+	public function db_default_value()
+	{
+		return $this->default_value();
+	}
+
+	/**
+	 * 
+	 * @return booelan
+	 */
+	public function loaded()
+	{
+		return $this->id !== NULL;
+	}
+	
+	/**
+	 * Получение названия типа поля
+	 * 
+	 * @return string
+	 */
+	public function type()
+	{
+		$name = Inflector::humanize($this->type);
+
+		foreach (self::types() as $category => $fields)
+		{
+			if(isset($fields[$this->type]))
+			{
+				$name = $fields[$this->type];
+				break;
+			}
+		}
+		
+		return $name;
+	}
 
 	/**
 	 * Валидация создаваемого поля.
@@ -929,6 +975,17 @@ abstract class DataSource_Hybrid_Field {
 	{
 		$this->include_media();
 	}
+	
+	
+	/**
+	 * Событие вызываемое после создания поля
+	 */
+	public function onCreate() {}
+	
+	/**
+	 * Событие вызываемое после обновления поля
+	 */
+	public function onUpdate() {}
 
 	/**
 	 * Тип поля в БД
@@ -1048,5 +1105,14 @@ abstract class DataSource_Hybrid_Field {
 			AND 
 			$this->has_access('remove')
 		);
+	}
+	
+	/**
+	 * 
+	 * @return string ID
+	 */
+	public function __toString()
+	{
+		return (string) $this->id;
 	}
 }

@@ -2,6 +2,7 @@
 
 return array(
 	'Primitive' => array(
+		'primitive_primary' => 'Primary',
 		'primitive_boolean' => 'Boolean',
 	
 		// Text
@@ -26,12 +27,14 @@ return array(
 		'primitive_color' => 'Color',
 	),
 	'Source' => array(
+		'source_ajax' => 'AJAX',
 		'source_document' => 'Document',
 		'source_array' => 'Array of documents',
 		'source_tags' => 'Tags',
 		'source_user' => 'User',
 		'source_free' => 'Free',
 		'source_images' => 'Images',
+		'source_html' => 'Source HTML',
 	),
 	
 	'File' => array(
